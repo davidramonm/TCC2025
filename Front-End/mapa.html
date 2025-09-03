@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Mapa Acessível</title>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body class="map-page">
+        <div class="header">
+            <button id="sidebar-toggle" class="menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="header-title">
+                <div class="logo-small">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <h2>Mapa Acessível</h2>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar" id="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span id="user-name"></span>
+                <button class="logout-btn" id="logout-btn" title="Sair">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="app-container">
+            <div id="sidebar" class="sidebar">
+                <div class="sidebar-content">
+                    <div class="form-section">
+                        <div class="section-header">
+                            <i class="fas fa-plus-circle"></i>
+                            <h3>Adicionar Local</h3>
+                        </div>
+                        <form id="location-form" class="location-form">
+                            <div class="form-group">
+                                <div class="input-wrapper">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <input type="text" id="location-name" placeholder="Nome do local" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-wrapper">
+                                    <i class="fas fa-map"></i>
+                                    <input type="text" id="location-address" placeholder="Endereço" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="select-wrapper">
+                                    <i class="fas fa-universal-access"></i>
+                                    <select id="location-type" required>
+                                        <option value="">Tipo de Acessibilidade</option>
+                                        <option value="rampa">🛤️ Rampa de acesso</option>
+                                        <option value="banheiro">🚻 Banheiro adaptado</option>
+                                        <option value="elevador">🛗 Elevador acessível</option>
+                                        <option value="piso">👣 Piso tátil</option>
+                                        <option value="sinalizacao">🔍 Sinalização tátil</option>
+                                        <option value="corrimao">🤚 Corrimão</option>
+                                        <option value="vagas">🅿️ Vagas especiais</option>
+                                        <option value="audio">🔊 Sinalização sonora</option>
+                                        <option value="braille">⠃ Sinalização em Braille</option>
+                                        <option value="circulacao">↔️ Espaço para circulação</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="textarea-wrapper">
+                                    <i class="fas fa-comment"></i>
+                                    <textarea id="location-description" rows="3" placeholder="Descrição (opcional)"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="rating-label">
+                                    <i class="fas fa-star"></i>
+                                    Avaliação
+                                </label>
+                                <div class="rating">
+                                    <span class="star" data-value="1">☆</span>
+                                    <span class="star" data-value="2">☆</span>
+                                    <span class="star" data-value="3">☆</span>
+                                    <span class="star" data-value="4">☆</span>
+                                    <span class="star" data-value="5">☆</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="file-input-wrapper">
+                                    <input type="file" id="location-photo" accept="image/*">
+                                    <label for="location-photo" class="file-input-label">
+                                        <i class="fas fa-camera"></i>
+                                        <span>Adicionar foto</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary">
+                                <span>Salvar Local</span>
+                                <i class="fas fa-save"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="locations-list">
+                        <div class="section-header">
+                            <i class="fas fa-list"></i>
+                            <h3>Locais Cadastrados</h3>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="location-filter" placeholder="Filtrar locais...">
+                            </div>
+                        </div>
+                        <div id="locations-container" class="locations-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="map-container">
+                <div id="map"></div>
+                <div class="map-instructions" id="map-instructions">
+                    <div class="instruction-content">
+                        <i class="fas fa-hand-pointer"></i>
+                        <p>Clique no mapa para selecionar a localização</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="search-container">
+                <div class="global-search-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="global-search" placeholder="Pesquisar locais...">
+                    <button id="search-btn" class="search-btn">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast notifications -->
+        <div id="toast-container" class="toast-container"></div>
+
+        <!-- Loading overlay -->
+        <div id="loading-overlay" class="loading-overlay" style="display: none;">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Carregando...</p>
+            </div>
+        </div>
+
+        <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+        <script src="script.js"></script>
+    </body>
+</html>

@@ -23,36 +23,17 @@ import {
   Loader2,
   CheckCircle,
   AlertCircle,
-  Armchair as Wheelchair,
-  EarOff,
-  Brain,
-  Baby,
-  Clock,
-  Scale,
-  Church as Crutches,
-  Users,
-  Navigation,
-  Volume2,
 } from "lucide-react"
+import { necessidades, getPasswordStrength } from "@/lib/constants"
 
 interface RegisterPageProps {
   onNavigate: (view: "login" | "map") => void
 }
 
-const necessidades = [
-  { value: "cadeirante", label: "Cadeirante", icon: Wheelchair },
-  { value: "baixa-visao", label: "Baixa visão", icon: Eye },
-  { value: "cegueira", label: "Cegueira", icon: EyeOff },
-  { value: "surdez", label: "Surdez", icon: EarOff },
-  { value: "deficiencia-auditiva", label: "Deficiência auditiva", icon: Volume2 },
-  { value: "deficiencia-motora", label: "Deficiência motora", icon: Crutches },
-  { value: "deficiencia-intelectual", label: "Deficiência intelectual", icon: Brain },
-  { value: "autismo", label: "Autismo", icon: Users },
-  { value: "mobilidade-reduzida", label: "Mobilidade reduzida", icon: Navigation },
-  { value: "obesidade", label: "Obesidade", icon: Scale },
-  { value: "gestante", label: "Gestante", icon: Baby },
-  { value: "idoso", label: "Idoso", icon: Clock },
-]
+const isValidEmail = (email: string) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(email)
+}
 
 export default function RegisterPage({ onNavigate }: RegisterPageProps) {
   const { toast } = useToast()
@@ -69,20 +50,6 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps) {
     password: "",
     confirmPassword: "",
   })
-
-  const isValidEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-  }
-
-  const getPasswordStrength = (password: string) => {
-    let strength = 0
-    if (password.length >= 8) strength += 25
-    if (/[A-Z]/.test(password)) strength += 25
-    if (/[0-9]/.test(password)) strength += 25
-    if (/[^A-Za-z0-9]/.test(password)) strength += 25
-    return strength
-  }
 
   const canProceedToStep2 = () => {
     return (
@@ -203,8 +170,8 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps) {
                           registerData.firstName && registerData.firstName.length >= 2
                             ? "border-gray-600 focus:border-gray-600"
                             : registerData.firstName && registerData.firstName.length > 0
-                              ? "border-red-500 focus:border-red-500"
-                              : ""
+                            ? "border-red-500 focus:border-red-500"
+                            : ""
                         }`}
                         value={registerData.firstName}
                         onChange={(e) => setRegisterData((prev) => ({ ...prev, firstName: e.target.value }))}
@@ -235,8 +202,8 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps) {
                           registerData.lastName && registerData.lastName.length >= 2
                             ? "border-gray-600 focus:border-gray-600"
                             : registerData.lastName && registerData.lastName.length > 0
-                              ? "border-red-500 focus:border-red-500"
-                              : ""
+                            ? "border-red-500 focus:border-red-500"
+                            : ""
                         }`}
                         value={registerData.lastName}
                         onChange={(e) => setRegisterData((prev) => ({ ...prev, lastName: e.target.value }))}
@@ -261,8 +228,8 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps) {
                         registerData.email && isValidEmail(registerData.email)
                           ? "border-gray-600 focus:border-gray-600"
                           : registerData.email && registerData.email.length > 0
-                            ? "border-red-500 focus:border-red-500"
-                            : ""
+                          ? "border-red-500 focus:border-red-500"
+                          : ""
                       }`}
                       value={registerData.email}
                       onChange={(e) => setRegisterData((prev) => ({ ...prev, email: e.target.value }))}
@@ -292,8 +259,8 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps) {
                         registerData.password && getPasswordStrength(registerData.password) >= 80
                           ? "border-gray-600 focus:border-gray-600"
                           : registerData.password && registerData.password.length > 0
-                            ? "border-yellow-500 focus:border-yellow-500"
-                            : ""
+                          ? "border-yellow-500 focus:border-yellow-500"
+                          : ""
                       }`}
                       value={registerData.password}
                       onChange={(e) => setRegisterData((prev) => ({ ...prev, password: e.target.value }))}
@@ -315,10 +282,10 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps) {
                             getPasswordStrength(registerData.password) >= 80
                               ? "bg-gray-600"
                               : getPasswordStrength(registerData.password) >= 60
-                                ? "bg-yellow-500"
-                                : getPasswordStrength(registerData.password) >= 40
-                                  ? "bg-orange-500"
-                                  : "bg-red-500"
+                              ? "bg-yellow-500"
+                              : getPasswordStrength(registerData.password) >= 40
+                              ? "bg-orange-500"
+                              : "bg-red-500"
                           }`}
                           style={{ width: `${getPasswordStrength(registerData.password)}%` }}
                         ></div>
@@ -381,8 +348,8 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps) {
                         registerData.confirmPassword && registerData.password === registerData.confirmPassword
                           ? "border-gray-600 focus:border-gray-600"
                           : registerData.confirmPassword && registerData.confirmPassword.length > 0
-                            ? "border-red-500 focus:border-red-500"
-                            : ""
+                          ? "border-red-500 focus:border-red-500"
+                          : ""
                       }`}
                       value={registerData.confirmPassword}
                       onChange={(e) => setRegisterData((prev) => ({ ...prev, confirmPassword: e.target.value }))}
@@ -572,7 +539,7 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps) {
                   </Card>
 
                   <div className="flex items-start space-x-3 p-4 border border-gray-300 rounded-lg bg-gray-50">
-                    <Checkbox id="terms" checked={acceptTerms} onCheckedChange={setAcceptTerms} className="mt-1" />
+                    <Checkbox id="terms" checked={acceptTerms} onCheckedChange={(checked) => setAcceptTerms(checked === true)} className="mt-1" />
                     <div className="flex-1">
                       <Label htmlFor="terms" className="text-sm font-medium cursor-pointer">
                         Aceito os termos de uso e política de privacidade

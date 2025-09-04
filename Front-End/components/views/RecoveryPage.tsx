@@ -20,6 +20,7 @@ import {
   AlertCircle,
   RotateCcw,
 } from "lucide-react"
+import { getPasswordStrength } from "@/lib/constants"
 
 interface RecoveryPageProps {
   onNavigate: (view: "login") => void
@@ -40,15 +41,6 @@ export default function RecoveryPage({ onNavigate }: RecoveryPageProps) {
     newPassword: "",
     confirmPassword: "",
   })
-
-  const getPasswordStrength = (password: string) => {
-    let strength = 0
-    if (password.length >= 8) strength += 25
-    if (/[A-Z]/.test(password)) strength += 25
-    if (/[0-9]/.test(password)) strength += 25
-    if (/[^A-Za-z0-9]/.test(password)) strength += 25
-    return strength
-  }
 
   const sendVerificationCode = async () => {
     setIsLoading(true)
@@ -360,10 +352,10 @@ export default function RecoveryPage({ onNavigate }: RecoveryPageProps) {
                           getPasswordStrength(recoveryData.newPassword) >= 80
                             ? "bg-gray-600"
                             : getPasswordStrength(recoveryData.newPassword) >= 60
-                              ? "bg-yellow-500"
-                              : getPasswordStrength(recoveryData.newPassword) >= 40
-                                ? "bg-orange-500"
-                                : "bg-red-500"
+                            ? "bg-yellow-500"
+                            : getPasswordStrength(recoveryData.newPassword) >= 40
+                            ? "bg-orange-500"
+                            : "bg-red-500"
                         }`}
                         style={{ width: `${getPasswordStrength(recoveryData.newPassword)}%` }}
                       ></div>

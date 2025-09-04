@@ -22,7 +22,6 @@ export default function LoginPage({ onNavigate }: LoginPageProps) {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simular login
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
     toast({

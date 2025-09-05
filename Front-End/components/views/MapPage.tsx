@@ -41,8 +41,8 @@ const tiposAcessibilidade = [
 ];
 
 const getLocationIcon = (type: string) => {
-  const item = tiposAcessibilidade.find((t) => t.value === type);
-  return item ? item.icon : "📍";
+  const item = tiposAcessibilidade.find((t) => t.value === type);
+  return item ? item.icon : ""; // Retorna uma string vazia se não houver ícone correspondente
 };
 
 const getLocationTypeName = (type: string) => {
@@ -72,7 +72,7 @@ interface MapProps {
 const MapContainerComponent = dynamic(
   async () => {
     const React = await import("react");
-    const { MapContainer, TileLayer, Marker, Popup, useMapEvents } = await import("react-leaflet");
+    const { MapContainer, TileLayer, useMapEvents } = await import("react-leaflet");
     const L = await import("leaflet");
     import("leaflet/dist/leaflet.css");
 
@@ -120,11 +120,12 @@ const MapContainerComponent = dynamic(
         if (clickedPosition) {
           const icon = L.divIcon({
             className: "click-marker",
-            html: '<div style="background: #ef4444; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3); font-size: 16px;">📍</div>',
+            html: '<div style="background: #ef4444; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3); font-size: 16px;">👆</div>',
             iconSize: [30, 30],
             iconAnchor: [15, 30],
           });
           clickMarkerRef.current = L.marker(clickedPosition, { icon }).addTo(map);
+          clickMarkerRef.current.bindPopup("Local selecionado para adicionar ponto de acessibilidade.").openPopup();
         }
       }, [map, locations, clickedPosition, onMarkerClick]);
 
@@ -591,12 +592,6 @@ export default function MapPage({ onNavigate }: { onNavigate: (view: "login") =>
         </div>
 
         <div className="flex-1 relative">
-          {clickedPosition && (
-            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white px-4 py-2 rounded-lg z-[1000] flex items-center gap-2 shadow-lg">
-              <CheckCircle className="w-4 h-4" />
-              <span>Localização selecionada! Preencha o formulário.</span>
-            </div>
-          )}
           <MapContainerComponent
             locations={locations}
             clickedPosition={clickedPosition}

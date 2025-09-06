@@ -11,16 +11,15 @@ import {
   ArrowRight,
   ArrowLeft,
   Key,
-  Eye,
-  EyeOff,
   Mail,
-  Lock,
   Loader2,
   CheckCircle,
   AlertCircle,
   RotateCcw,
 } from "lucide-react"
 import { getPasswordStrength } from "@/lib/constants"
+import AuthLayout from "../layouts/AuthLayout"
+import { PasswordInput } from "../ui/password-input"
 
 interface RecoveryPageProps {
   onNavigate: (view: "login") => void
@@ -29,8 +28,6 @@ interface RecoveryPageProps {
 export default function RecoveryPage({ onNavigate }: RecoveryPageProps) {
   const { toast } = useToast()
   const [recoveryStep, setRecoveryStep] = useState(1)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isResendingCode, setIsResendingCode] = useState(false)
   const [sentCode, setSentCode] = useState("")
@@ -161,13 +158,7 @@ export default function RecoveryPage({ onNavigate }: RecoveryPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-10 left-10 w-20 h-20 bg-gray-600 rounded-full animate-pulse"></div>
-        <div className="absolute top-32 right-20 w-16 h-16 bg-gray-500 rounded-full animate-pulse delay-1000"></div>
-        <div className="absolute bottom-20 left-32 w-12 h-12 bg-gray-400 rounded-full animate-pulse delay-2000"></div>
-      </div>
-
+    <AuthLayout>
       <Card className="w-full max-w-md backdrop-blur-sm bg-white/95 shadow-2xl border-0">
         <CardContent className="p-8">
           <div className="text-center mb-8">
@@ -325,25 +316,13 @@ export default function RecoveryPage({ onNavigate }: RecoveryPageProps) {
             <form onSubmit={resetPassword} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="new-password">Nova Senha</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                  <Input
-                    id="new-password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Digite sua nova senha"
-                    className="pl-10 pr-10 h-12"
-                    value={recoveryData.newPassword}
-                    onChange={(e) => setRecoveryData((prev) => ({ ...prev, newPassword: e.target.value }))}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
+                <PasswordInput
+                  id="new-password"
+                  placeholder="Digite sua nova senha"
+                  value={recoveryData.newPassword}
+                  onChange={(e) => setRecoveryData((prev) => ({ ...prev, newPassword: e.target.value }))}
+                  required
+                />
                 {recoveryData.newPassword && (
                   <div className="space-y-2">
                     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -408,25 +387,13 @@ export default function RecoveryPage({ onNavigate }: RecoveryPageProps) {
 
               <div className="space-y-2">
                 <Label htmlFor="confirm-new-password">Confirmar Nova Senha</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                  <Input
-                    id="confirm-new-password"
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Digite a senha novamente"
-                    className="pl-10 pr-10 h-12"
-                    value={recoveryData.confirmPassword}
-                    onChange={(e) => setRecoveryData((prev) => ({ ...prev, confirmPassword: e.target.value }))}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                  >
-                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
+                <PasswordInput
+                  id="confirm-new-password"
+                  placeholder="Digite a senha novamente"
+                  value={recoveryData.confirmPassword}
+                  onChange={(e) => setRecoveryData((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+                  required
+                />
                 {recoveryData.confirmPassword && recoveryData.newPassword !== recoveryData.confirmPassword && (
                   <p className="text-xs text-red-500 flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
@@ -468,6 +435,6 @@ export default function RecoveryPage({ onNavigate }: RecoveryPageProps) {
           )}
         </CardContent>
       </Card>
-    </div>
+    </AuthLayout>
   )
 }

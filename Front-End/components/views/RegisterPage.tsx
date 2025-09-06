@@ -13,10 +13,7 @@ import {
   ArrowRight,
   ArrowLeft,
   UserPlus,
-  Eye,
-  EyeOff,
   Mail,
-  Lock,
   User,
   Heart,
   Check,
@@ -25,6 +22,8 @@ import {
   AlertCircle,
 } from "lucide-react"
 import { necessidades, getPasswordStrength } from "@/lib/constants"
+import AuthLayout from "../layouts/AuthLayout"
+import { PasswordInput } from "../ui/password-input"
 
 interface RegisterPageProps {
   onNavigate: (view: "login" | "map") => void
@@ -38,8 +37,6 @@ const isValidEmail = (email: string) => {
 export default function RegisterPage({ onNavigate }: RegisterPageProps) {
   const { toast } = useToast()
   const [registerStep, setRegisterStep] = useState(1)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [selectedNeeds, setSelectedNeeds] = useState<string[]>([])
   const [acceptTerms, setAcceptTerms] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -92,13 +89,7 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-10 left-10 w-20 h-20 bg-gray-600 rounded-full animate-pulse"></div>
-        <div className="absolute top-32 right-20 w-16 h-16 bg-gray-500 rounded-full animate-pulse delay-1000"></div>
-        <div className="absolute bottom-20 left-32 w-12 h-12 bg-gray-400 rounded-full animate-pulse delay-2000"></div>
-      </div>
-
+    <AuthLayout>
       <Card className="w-full max-w-3xl backdrop-blur-sm bg-white/95 shadow-2xl border-0 max-h-[95vh] overflow-y-auto">
         <CardContent className="p-8">
           <div className="text-center mb-8">
@@ -249,31 +240,20 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps) {
 
                 <div className="space-y-2">
                   <Label htmlFor="register-password">Senha *</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                    <Input
-                      id="register-password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Crie uma senha segura"
-                      className={`pl-10 pr-10 h-12 transition-all ${
-                        registerData.password && getPasswordStrength(registerData.password) >= 80
-                          ? "border-gray-600 focus:border-gray-600"
-                          : registerData.password && registerData.password.length > 0
-                          ? "border-yellow-500 focus:border-yellow-500"
-                          : ""
-                      }`}
-                      value={registerData.password}
-                      onChange={(e) => setRegisterData((prev) => ({ ...prev, password: e.target.value }))}
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
+                  <PasswordInput
+                    id="register-password"
+                    placeholder="Crie uma senha segura"
+                    className={`${
+                      registerData.password && getPasswordStrength(registerData.password) >= 80
+                        ? "border-green-500 focus-visible:ring-green-500"
+                        : registerData.password && registerData.password.length > 0
+                        ? "border-yellow-500 focus-visible:ring-yellow-500"
+                        : ""
+                    }`}
+                    value={registerData.password}
+                    onChange={(e) => setRegisterData((prev) => ({ ...prev, password: e.target.value }))}
+                    required
+                  />
                   {registerData.password && (
                     <div className="space-y-2">
                       <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -338,31 +318,20 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps) {
 
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword">Confirmar Senha *</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                    <Input
-                      id="confirmPassword"
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Digite a senha novamente"
-                      className={`pl-10 pr-10 h-12 transition-all ${
-                        registerData.confirmPassword && registerData.password === registerData.confirmPassword
-                          ? "border-gray-600 focus:border-gray-600"
-                          : registerData.confirmPassword && registerData.confirmPassword.length > 0
-                          ? "border-red-500 focus:border-red-500"
-                          : ""
-                      }`}
-                      value={registerData.confirmPassword}
-                      onChange={(e) => setRegisterData((prev) => ({ ...prev, confirmPassword: e.target.value }))}
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
+                  <PasswordInput
+                    id="confirmPassword"
+                    placeholder="Digite a senha novamente"
+                    className={`${
+                      registerData.confirmPassword && registerData.password === registerData.confirmPassword
+                        ? "border-green-500 focus-visible:ring-green-500"
+                        : registerData.confirmPassword && registerData.confirmPassword.length > 0
+                        ? "border-red-500 focus-visible:ring-red-500"
+                        : ""
+                    }`}
+                    value={registerData.confirmPassword}
+                    onChange={(e) => setRegisterData((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+                    required
+                  />
                   {registerData.confirmPassword && registerData.password !== registerData.confirmPassword && (
                     <p className="text-xs text-red-500 flex items-center gap-1">
                       <AlertCircle className="w-3 h-3" />
@@ -594,6 +563,6 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps) {
           </form>
         </CardContent>
       </Card>
-    </div>
+    </AuthLayout>
   )
 }

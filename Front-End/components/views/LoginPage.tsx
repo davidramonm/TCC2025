@@ -7,7 +7,9 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { ArrowRight, UserPlus, Key, Eye, EyeOff, Mail, Lock, Loader2, Armchair as Wheelchair } from "lucide-react"
+import { ArrowRight, UserPlus, Key, Mail, Loader2, Armchair as Wheelchair } from "lucide-react"
+import AuthLayout from "../layouts/AuthLayout" // Importa o novo layout
+import { PasswordInput } from "../ui/password-input" // Importa o novo input de senha
 
 interface LoginPageProps {
   onNavigate: (view: "register" | "recovery" | "map") => void
@@ -15,7 +17,6 @@ interface LoginPageProps {
 
 export default function LoginPage({ onNavigate }: LoginPageProps) {
   const { toast } = useToast()
-  const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -36,13 +37,8 @@ export default function LoginPage({ onNavigate }: LoginPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-10 left-10 w-20 h-20 bg-gray-600 rounded-full animate-pulse"></div>
-        <div className="absolute top-32 right-20 w-16 h-16 bg-gray-500 rounded-full animate-pulse delay-1000"></div>
-        <div className="absolute bottom-20 left-32 w-12 h-12 bg-gray-400 rounded-full animate-pulse delay-2000"></div>
-      </div>
-
+    // Utiliza o AuthLayout para encapsular o conteúdo da página.
+    <AuthLayout>
       <Card className="w-full max-w-md backdrop-blur-sm bg-white/95 shadow-2xl border-0">
         <CardContent className="p-8">
           <div className="text-center mb-8">
@@ -66,23 +62,12 @@ export default function LoginPage({ onNavigate }: LoginPageProps) {
 
             <div className="space-y-2">
               <Label htmlFor="password">Senha</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Digite sua senha"
-                  className="pl-10 pr-10 h-12"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
+              {/* Substitui o antigo Input por PasswordInput, simplificando o código. */}
+              <PasswordInput
+                id="password"
+                placeholder="Digite sua senha"
+                required
+              />
             </div>
 
             <Button
@@ -120,6 +105,6 @@ export default function LoginPage({ onNavigate }: LoginPageProps) {
           </form>
         </CardContent>
       </Card>
-    </div>
+    </AuthLayout>
   )
 }

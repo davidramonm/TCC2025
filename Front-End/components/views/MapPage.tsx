@@ -25,7 +25,9 @@ import {
   X,
   Accessibility,
   Save,
+  User,
 } from "lucide-react";
+import UserProfilePage from "./UserProfilePage";
 
 const tiposAcessibilidade = [
   { value: "rampa", label: "Rampa de acesso", icon: "🛤️", color: "#4b5563" },
@@ -79,7 +81,7 @@ const MapContainerComponent = dynamic(
     const MapContent = (props: MapProps) => {
       const { locations, clickedPosition, searchLocation, onMarkerClick, onMapClick } = props;
       const markersRef = React.useRef<L.Marker[]>([]);
-      const clickMarkerRef = React.useRef<L.Marker | null>(null);
+      const clickPopupRef = React.useRef<L.Popup | null>(null); // Alterado para referenciar um popup
       const map = useMapEvents({
         click: (e: L.LeafletMouseEvent) => onMapClick(e.latlng),
       });
@@ -113,19 +115,18 @@ const MapContainerComponent = dynamic(
           markersRef.current.push(marker);
         });
 
-        if (clickMarkerRef.current) {
-          map.removeLayer(clickMarkerRef.current);
-          clickMarkerRef.current = null;
+        // Remove o popup anterior se existir
+        if (clickPopupRef.current) {
+          map.removeLayer(clickPopupRef.current);
+          clickPopupRef.current = null;
         }
+
+        // Se houver uma posição clicada, abre apenas o popup
         if (clickedPosition) {
-          const icon = L.divIcon({
-            className: "click-marker",
-            html: '<div style="background: #ef4444; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3); font-size: 16px;">👆</div>',
-            iconSize: [30, 30],
-            iconAnchor: [15, 30],
-          });
-          clickMarkerRef.current = L.marker(clickedPosition, { icon }).addTo(map);
-          clickMarkerRef.current.bindPopup("Local selecionado para adicionar ponto de acessibilidade.").openPopup();
+          clickPopupRef.current = L.popup()
+            .setLatLng(clickedPosition)
+            .setContent("Local selecionado para adicionar ponto de acessibilidade.")
+            .openOn(map);
         }
       }, [map, locations, clickedPosition, onMarkerClick]);
 
@@ -160,7 +161,7 @@ const MapContainerComponent = dynamic(
   { ssr: false }
 );
 
-export default function MapPage({ onNavigate }: { onNavigate: (view: "login") => void }) {
+export default function MapPage({ onNavigate, userName }: { onNavigate: (view: "login" | "profile") => void, userName: string }) {
   const { toast } = useToast();
   const [selectedRating, setSelectedRating] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -355,10 +356,14 @@ export default function MapPage({ onNavigate }: { onNavigate: (view: "login") =>
         </div>
 
         <div className="flex items-center gap-3">
-          <Avatar>
-            <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">U</AvatarFallback>
-          </Avatar>
-          <span className="hidden md:inline font-medium">Usuário</span>
+          <Button variant="ghost" className="flex items-center gap-2" onClick={() => onNavigate("profile")}>
+            <Avatar>
+              <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">
+                {userName.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <span className="hidden md:inline font-medium">{userName}</span>
+          </Button>
           <Button
             variant="outline"
             size="sm"

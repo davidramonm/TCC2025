@@ -26,7 +26,8 @@ import AuthLayout from "../layouts/AuthLayout"
 import { PasswordInput } from "../ui/password-input"
 
 interface RegisterPageProps {
-  onNavigate: (view: "login" | "map") => void
+  onNavigate: (view: "login" | "map") => void;
+  onRegister: (name: string, needs: string[]) => void;
 }
 
 const isValidEmail = (email: string) => {
@@ -34,7 +35,7 @@ const isValidEmail = (email: string) => {
   return emailRegex.test(email)
 }
 
-export default function RegisterPage({ onNavigate }: RegisterPageProps) {
+export default function RegisterPage({ onNavigate, onRegister }: RegisterPageProps) {
   const { toast } = useToast()
   const [registerStep, setRegisterStep] = useState(1)
   const [selectedNeeds, setSelectedNeeds] = useState<string[]>([])
@@ -77,13 +78,16 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps) {
     setIsLoading(true)
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
+    const fullName = `${registerData.firstName} ${registerData.lastName}`;
+
+
     toast({
       title: "🎉 Conta criada com sucesso!",
       description: `Bem-vindo(a), ${registerData.firstName}! Sua conta foi criada.`,
     })
 
     setTimeout(() => {
-      onNavigate("map")
+      onRegister(fullName, selectedNeeds);
       setIsLoading(false)
     }, 1000)
   }

@@ -8,16 +8,18 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { ArrowRight, UserPlus, Key, Mail, Loader2, Armchair as Wheelchair } from "lucide-react"
-import AuthLayout from "../layouts/AuthLayout" // Importa o novo layout
-import { PasswordInput } from "../ui/password-input" // Importa o novo input de senha
+import AuthLayout from "../layouts/AuthLayout"
+import { PasswordInput } from "../ui/password-input"
 
 interface LoginPageProps {
-  onNavigate: (view: "register" | "recovery" | "map") => void
+  onNavigate: (view: "register" | "recovery" | "map") => void;
+  onLogin: (name: string) => void;
 }
 
-export default function LoginPage({ onNavigate }: LoginPageProps) {
+export default function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
+  const [email, setEmail] = useState("")
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,19 +27,22 @@ export default function LoginPage({ onNavigate }: LoginPageProps) {
 
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
+    // Obtém o nome do usuário a partir do e-mail
+    const userFirstName = email.split('@')[0] || "Usuário";
+    const capitalizedFirstName = userFirstName.charAt(0).toUpperCase() + userFirstName.slice(1);
+
     toast({
       title: "Login realizado com sucesso!",
-      description: "Bem-vindo ao Mapa Acessível!",
+      description: `Bem-vindo(a) de volta, ${capitalizedFirstName}!`,
     })
 
     setTimeout(() => {
-      onNavigate("map")
+      onLogin(capitalizedFirstName) // Passa o nome capitalizado para o app principal
       setIsLoading(false)
     }, 1000)
   }
 
   return (
-    // Utiliza o AuthLayout para encapsular o conteúdo da página.
     <AuthLayout>
       <Card className="w-full max-w-md backdrop-blur-sm bg-white/95 shadow-2xl border-0">
         <CardContent className="p-8">
@@ -56,13 +61,20 @@ export default function LoginPage({ onNavigate }: LoginPageProps) {
               <Label htmlFor="email">E-mail</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                <Input id="email" type="email" placeholder="Digite seu e-mail" className="pl-10 h-12" required />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Digite seu e-mail"
+                  className="pl-10 h-12"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
               </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="password">Senha</Label>
-              {/* Substitui o antigo Input por PasswordInput, simplificando o código. */}
               <PasswordInput
                 id="password"
                 placeholder="Digite sua senha"

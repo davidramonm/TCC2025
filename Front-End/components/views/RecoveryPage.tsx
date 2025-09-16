@@ -20,6 +20,8 @@ import {
 import { getPasswordStrength } from "@/lib/constants"
 import AuthLayout from "../layouts/AuthLayout"
 import { PasswordInput } from "../ui/password-input"
+import { PasswordStrength } from "../ui/password-strength"
+import AuthHeader from "../layouts/AuthHeader" // Importação do novo componente
 
 interface RecoveryPageProps {
   onNavigate: (view: "login") => void
@@ -161,20 +163,16 @@ export default function RecoveryPage({ onNavigate }: RecoveryPageProps) {
     <AuthLayout>
       <Card className="w-full max-w-md backdrop-blur-sm bg-white/95 shadow-2xl border-0">
         <CardContent className="p-8">
-          <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-gradient-to-br from-gray-600 to-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Key className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
-              Recuperar Senha
-            </h1>
-            <p className="text-gray-600 mt-2">
-              {recoveryStep === 1 && "Digite seu e-mail para receber o código"}
-              {recoveryStep === 2 && "Digite o código enviado para seu e-mail"}
-              {recoveryStep === 3 && "Defina sua nova senha"}
-            </p>
-
-            <div className="flex items-center justify-center mt-6 space-x-2">
+          <AuthHeader
+            icon={<Key className="w-8 h-8 text-white" />}
+            title="Recuperar Senha"
+            subtitle={
+              recoveryStep === 1 ? "Digite seu e-mail para receber o código" :
+              recoveryStep === 2 ? "Digite o código enviado para seu e-mail" :
+              "Defina sua nova senha"
+            }
+          >
+            <div className="flex items-center justify-center space-x-2">
               <div className="flex items-center">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
@@ -212,7 +210,7 @@ export default function RecoveryPage({ onNavigate }: RecoveryPageProps) {
                 <span className="ml-2 text-sm font-medium text-gray-600">Nova Senha</span>
               </div>
             </div>
-          </div>
+          </AuthHeader>
 
           {recoveryStep === 1 && (
             <form
@@ -323,66 +321,7 @@ export default function RecoveryPage({ onNavigate }: RecoveryPageProps) {
                   onChange={(e) => setRecoveryData((prev) => ({ ...prev, newPassword: e.target.value }))}
                   required
                 />
-                {recoveryData.newPassword && (
-                  <div className="space-y-2">
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full transition-all duration-300 ${
-                          getPasswordStrength(recoveryData.newPassword) >= 80
-                            ? "bg-gray-600"
-                            : getPasswordStrength(recoveryData.newPassword) >= 60
-                            ? "bg-yellow-500"
-                            : getPasswordStrength(recoveryData.newPassword) >= 40
-                            ? "bg-orange-500"
-                            : "bg-red-500"
-                        }`}
-                        style={{ width: `${getPasswordStrength(recoveryData.newPassword)}%` }}
-                      ></div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div
-                        className={`flex items-center gap-1 ${recoveryData.newPassword.length >= 8 ? "text-gray-600" : "text-gray-400"}`}
-                      >
-                        {recoveryData.newPassword.length >= 8 ? (
-                          <CheckCircle className="w-3 h-3" />
-                        ) : (
-                          <AlertCircle className="w-3 h-3" />
-                        )}
-                        8+ caracteres
-                      </div>
-                      <div
-                        className={`flex items-center gap-1 ${/[A-Z]/.test(recoveryData.newPassword) ? "text-gray-600" : "text-gray-400"}`}
-                      >
-                        {/[A-Z]/.test(recoveryData.newPassword) ? (
-                          <CheckCircle className="w-3 h-3" />
-                        ) : (
-                          <AlertCircle className="w-3 h-3" />
-                        )}
-                        Letra maiúscula
-                      </div>
-                      <div
-                        className={`flex items-center gap-1 ${/[0-9]/.test(recoveryData.newPassword) ? "text-gray-600" : "text-gray-400"}`}
-                      >
-                        {/[0-9]/.test(recoveryData.newPassword) ? (
-                          <CheckCircle className="w-3 h-3" />
-                        ) : (
-                          <AlertCircle className="w-3 h-3" />
-                        )}
-                        Número
-                      </div>
-                      <div
-                        className={`flex items-center gap-1 ${/[^A-Za-z0-9]/.test(recoveryData.newPassword) ? "text-gray-600" : "text-gray-400"}`}
-                      >
-                        {/[^A-Za-z0-9]/.test(recoveryData.newPassword) ? (
-                          <CheckCircle className="w-3 h-3" />
-                        ) : (
-                          <AlertCircle className="w-3 h-3" />
-                        )}
-                        Símbolo especial
-                      </div>
-                    </div>
-                  </div>
-                )}
+                <PasswordStrength password={recoveryData.newPassword} />
               </div>
 
               <div className="space-y-2">

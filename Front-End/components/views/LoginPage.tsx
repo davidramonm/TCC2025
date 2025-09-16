@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast"
 import { ArrowRight, UserPlus, Key, Mail, Loader2, Armchair as Wheelchair } from "lucide-react"
 import AuthLayout from "../layouts/AuthLayout"
 import { PasswordInput } from "../ui/password-input"
+import AuthHeader from "../layouts/AuthHeader" // Importação do novo componente
 
 interface LoginPageProps {
   onNavigate: (view: "register" | "recovery" | "map") => void;
@@ -27,7 +28,6 @@ export default function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
 
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
-    // Obtém o nome do usuário a partir do e-mail
     const userFirstName = email.split('@')[0] || "Usuário";
     const capitalizedFirstName = userFirstName.charAt(0).toUpperCase() + userFirstName.slice(1);
 
@@ -37,7 +37,7 @@ export default function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
     })
 
     setTimeout(() => {
-      onLogin(capitalizedFirstName) // Passa o nome capitalizado para o app principal
+      onLogin(capitalizedFirstName)
       setIsLoading(false)
     }, 1000)
   }
@@ -46,15 +46,11 @@ export default function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
     <AuthLayout>
       <Card className="w-full max-w-md backdrop-blur-sm bg-white/95 shadow-2xl border-0">
         <CardContent className="p-8">
-          <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-gradient-to-br from-gray-600 to-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Wheelchair className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
-              Mapa Acessível
-            </h1>
-            <p className="text-gray-600 mt-2">Conectando pessoas a lugares acessíveis</p>
-          </div>
+          <AuthHeader
+            icon={<Wheelchair className="w-8 h-8 text-white" />}
+            title="Mapa Acessível"
+            subtitle="Conectando pessoas a lugares acessíveis"
+          />
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">

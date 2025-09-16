@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
+import { renderToStaticMarkup } from "react-dom/server";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,26 +27,35 @@ import {
   Accessibility,
   Save,
   User,
+  Bath,
+  ChevronsUp,
+  Footprints,
+  Eye,
+  Grip,
+  ParkingSquare,
+  Volume2,
+  BookOpenText,
+  MoveHorizontal,
 } from "lucide-react";
-import UserProfilePage from "./UserProfilePage";
 
 const tiposAcessibilidade = [
-  { value: "rampa", label: "Rampa de acesso", icon: "🛤️", color: "#4b5563" },
-  { value: "banheiro", label: "Banheiro adaptado", icon: "🚻", color: "#6b7280" },
-  { value: "elevador", label: "Elevador acessível", icon: "🛗", color: "#374151" },
-  { value: "piso", label: "Piso tátil", icon: "👣", color: "#9ca3af" },
-  { value: "sinalizacao", label: "Sinalização tátil", icon: "🔍", color: "#6b7280" },
-  { value: "corrimao", label: "Corrimão", icon: "🤚", color: "#4b5563" },
-  { value: "vagas", label: "Vagas especiais", icon: "🅿️", color: "#374151" },
-  { value: "audio", label: "Sinalização sonora", icon: "🔊", color: "#6b7280" },
-  { value: "braille", label: "Sinalização em Braille", icon: "⠃", color: "#4b5563" },
-  { value: "circulacao", label: "Espaço para circulação", icon: "↔️", color: "#9ca3af" },
+  { value: "rampa", label: "Rampa de acesso", icon: Accessibility, color: "#4b5563" },
+  { value: "banheiro", label: "Banheiro adaptado", icon: Bath, color: "#6b7280" },
+  { value: "elevador", label: "Elevador acessível", icon: ChevronsUp, color: "#374151" },
+  { value: "piso", label: "Piso tátil", icon: Footprints, color: "#9ca3af" },
+  { value: "sinalizacao", label: "Sinalização tátil", icon: Eye, color: "#6b7280" },
+  { value: "corrimao", label: "Corrimão", icon: Grip, color: "#4b5563" },
+  { value: "vagas", label: "Vagas especiais", icon: ParkingSquare, color: "#374151" },
+  { value: "audio", label: "Sinalização sonora", icon: Volume2, color: "#6b7280" },
+  { value: "braille", label: "Sinalização em Braille", icon: BookOpenText, color: "#4b5563" },
+  { value: "circulacao", label: "Espaço para circulação", icon: MoveHorizontal, color: "#9ca3af" },
 ];
 
 const getLocationIcon = (type: string) => {
-  const item = tiposAcessibilidade.find((t) => t.value === type);
-  return item ? item.icon : ""; // Retorna uma string vazia se não houver ícone correspondente
+  const item = tiposAcessibilidade.find((t) => t.value === type);
+  return item ? item.icon : null;
 };
+
 
 const getLocationTypeName = (type: string) => {
   const item = tiposAcessibilidade.find((t) => t.value === type);
@@ -81,7 +91,8 @@ const MapContainerComponent = dynamic(
     const MapContent = (props: MapProps) => {
       const { locations, clickedPosition, searchLocation, onMarkerClick, onMapClick } = props;
       const markersRef = React.useRef<L.Marker[]>([]);
-      const clickPopupRef = React.useRef<L.Popup | null>(null); // Alterado para referenciar um popup
+      const clickPopupRef = React.useRef<L.Popup | null>(null);
+
       const map = useMapEvents({
         click: (e: L.LeafletMouseEvent) => onMapClick(e.latlng),
       });
@@ -92,7 +103,12 @@ const MapContainerComponent = dynamic(
 
         locations.forEach((location) => {
           const tipo = tiposAcessibilidade.find((t) => t.value === location.typeValue);
-          const iconHtml = `<div style="background: ${tipo?.color}; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3); font-size: 20px;">${tipo?.icon || "📍"}</div>`;
+          const IconComponent = tipo?.icon || MapPin;
+
+          // Renderiza o ícone React para uma string HTML para ser usada no mapa
+          const iconString = renderToStaticMarkup(<IconComponent color="white" size={20} />);
+          const iconHtml = `<div style="background: ${tipo?.color}; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">${iconString}</div>`;
+          
           const icon = L.divIcon({
             className: "location-marker",
             html: iconHtml,
@@ -115,15 +131,12 @@ const MapContainerComponent = dynamic(
           markersRef.current.push(marker);
         });
 
-        // Remove o popup anterior se existir
         if (clickPopupRef.current) {
           map.removeLayer(clickPopupRef.current);
           clickPopupRef.current = null;
         }
-
-        // Se houver uma posição clicada, abre apenas o popup
         if (clickedPosition) {
-          clickPopupRef.current = L.popup()
+           clickPopupRef.current = L.popup()
             .setLatLng(clickedPosition)
             .setContent("Local selecionado para adicionar ponto de acessibilidade.")
             .openOn(map);
@@ -439,6 +452,7 @@ export default function MapPage({ onNavigate, userName }: { onNavigate: (view: "
                   <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto border rounded-lg p-3 bg-gray-50">
                     {tiposAcessibilidade.map((tipo) => {
                       const isSelected = selectedAccessibilityTypes.includes(tipo.value);
+                      const Icon = tipo.icon;
                       return (
                         <div
                           key={tipo.value}
@@ -457,10 +471,10 @@ export default function MapPage({ onNavigate, userName }: { onNavigate: (view: "
                             {isSelected && <CheckCircle className="w-3 h-3 text-white" />}
                           </div>
                           <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-xl"
+                            className="w-8 h-8 rounded-full flex items-center justify-center"
                             style={{ backgroundColor: `${tipo.color}20` }}
                           >
-                            {tipo.icon}
+                            {Icon && <Icon className="w-5 h-5" style={{ color: tipo.color }}/>}
                           </div>
                           <div className="flex-1">
                             <span className="text-sm font-medium text-gray-800">{tipo.label}</span>
@@ -477,15 +491,17 @@ export default function MapPage({ onNavigate, userName }: { onNavigate: (view: "
                       <div className="flex flex-wrap gap-2">
                         {selectedAccessibilityTypes.map((typeValue) => {
                           const tipo = tiposAcessibilidade.find((t) => t.value === typeValue);
+                          if (!tipo) return null;
+                          const Icon = tipo.icon;
                           return (
                             <Badge
                               key={typeValue}
                               variant="secondary"
                               className="flex items-center gap-1 bg-white border"
-                              style={{ borderColor: tipo?.color, color: tipo?.color }}
+                              style={{ borderColor: tipo.color, color: tipo.color }}
                             >
-                              <span className="text-lg leading-none">{tipo?.icon}</span>
-                              {tipo?.label}
+                              <Icon className="w-4 h-4"/>
+                              {tipo.label}
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -557,7 +573,9 @@ export default function MapPage({ onNavigate, userName }: { onNavigate: (view: "
               </div>
               <div className="space-y-3">
                 {filteredLocations.length > 0 ? (
-                  filteredLocations.map((location) => (
+                  filteredLocations.map((location) => {
+                    const Icon = getLocationIcon(location.typeValue);
+                    return (
                     <div
                       key={location.id}
                       className="p-4 border rounded-lg shadow-sm hover:bg-gray-100 cursor-pointer transition-colors"
@@ -565,13 +583,12 @@ export default function MapPage({ onNavigate, userName }: { onNavigate: (view: "
                     >
                       <div className="flex items-start gap-3">
                         <div
-                          className="w-8 h-8 rounded-full flex items-center justify-center text-xl"
+                          className="w-8 h-8 rounded-full flex items-center justify-center"
                           style={{
-                            backgroundColor: tiposAcessibilidade.find((t) => t.value === location.typeValue)?.color,
-                            color: "white",
+                            backgroundColor: tiposAcessibilidade.find((t) => t.value === location.typeValue)?.color + '20'
                           }}
                         >
-                          {getLocationIcon(location.typeValue)}
+                          {Icon && <Icon className="w-5 h-5" style={{ color: tiposAcessibilidade.find((t) => t.value === location.typeValue)?.color}}/>}
                         </div>
                         <div className="flex-1">
                           <h4 className="font-semibold text-base">{location.name}</h4>
@@ -585,7 +602,7 @@ export default function MapPage({ onNavigate, userName }: { onNavigate: (view: "
                         <div className="text-yellow-400">{renderStars(location.rating)}</div>
                       </div>
                     </div>
-                  ))
+                  )})
                 ) : (
                   <div className="text-center text-gray-500 py-8">
                     <p>Nenhum local encontrado.</p>

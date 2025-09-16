@@ -24,6 +24,8 @@ import {
 import { necessidades, getPasswordStrength } from "@/lib/constants"
 import AuthLayout from "../layouts/AuthLayout"
 import { PasswordInput } from "../ui/password-input"
+import { PasswordStrength } from "../ui/password-strength"
+import AuthHeader from "../layouts/AuthHeader" // Importação do novo componente
 
 interface RegisterPageProps {
   onNavigate: (view: "login" | "map") => void;
@@ -96,16 +98,12 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
     <AuthLayout>
       <Card className="w-full max-w-3xl backdrop-blur-sm bg-white/95 shadow-2xl border-0 max-h-[95vh] overflow-y-auto">
         <CardContent className="p-8">
-          <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-gradient-to-br from-gray-600 to-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse">
-              <UserPlus className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
-              Criar Conta
-            </h1>
-            <p className="text-gray-600 mt-2">Junte-se à nossa comunidade inclusiva</p>
-
-            <div className="flex items-center justify-center mt-6 space-x-2">
+          <AuthHeader
+            icon={<UserPlus className="w-8 h-8 text-white" />}
+            title="Criar Conta"
+            subtitle="Junte-se à nossa comunidade inclusiva"
+          >
+            <div className="flex items-center justify-center space-x-2">
               <div className="flex items-center">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
@@ -143,9 +141,10 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
                 <span className="ml-2 text-sm font-medium text-gray-600">Confirmação</span>
               </div>
             </div>
-          </div>
+          </AuthHeader>
 
           <form onSubmit={handleRegister} className="space-y-6">
+            {/* O restante do seu formulário continua aqui, sem alterações... */}
             {registerStep === 1 && (
               <div className="space-y-6 animate-in slide-in-from-right-5 duration-300">
                 <div className="text-center mb-6">
@@ -258,66 +257,7 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
                     onChange={(e) => setRegisterData((prev) => ({ ...prev, password: e.target.value }))}
                     required
                   />
-                  {registerData.password && (
-                    <div className="space-y-2">
-                      <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full transition-all duration-300 ${
-                            getPasswordStrength(registerData.password) >= 80
-                              ? "bg-gray-600"
-                              : getPasswordStrength(registerData.password) >= 60
-                              ? "bg-yellow-500"
-                              : getPasswordStrength(registerData.password) >= 40
-                              ? "bg-orange-500"
-                              : "bg-red-500"
-                          }`}
-                          style={{ width: `${getPasswordStrength(registerData.password)}%` }}
-                        ></div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div
-                          className={`flex items-center gap-1 ${registerData.password.length >= 8 ? "text-gray-600" : "text-gray-400"}`}
-                        >
-                          {registerData.password.length >= 8 ? (
-                            <CheckCircle className="w-3 h-3" />
-                          ) : (
-                            <AlertCircle className="w-3 h-3" />
-                          )}
-                          8+ caracteres
-                        </div>
-                        <div
-                          className={`flex items-center gap-1 ${/[A-Z]/.test(registerData.password) ? "text-gray-600" : "text-gray-400"}`}
-                        >
-                          {/[A-Z]/.test(registerData.password) ? (
-                            <CheckCircle className="w-3 h-3" />
-                          ) : (
-                            <AlertCircle className="w-3 h-3" />
-                          )}
-                          Letra maiúscula
-                        </div>
-                        <div
-                          className={`flex items-center gap-1 ${/[0-9]/.test(registerData.password) ? "text-gray-600" : "text-gray-400"}`}
-                        >
-                          {/[0-9]/.test(registerData.password) ? (
-                            <CheckCircle className="w-3 h-3" />
-                          ) : (
-                            <AlertCircle className="w-3 h-3" />
-                          )}
-                          Número
-                        </div>
-                        <div
-                          className={`flex items-center gap-1 ${/[^A-Za-z0-9]/.test(registerData.password) ? "text-gray-600" : "text-gray-400"}`}
-                        >
-                          {/[^A-Za-z0-9]/.test(registerData.password) ? (
-                            <CheckCircle className="w-3 h-3" />
-                          ) : (
-                            <AlertCircle className="w-3 h-3" />
-                          )}
-                          Símbolo especial
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  <PasswordStrength password={registerData.password} />
                 </div>
 
                 <div className="space-y-2">

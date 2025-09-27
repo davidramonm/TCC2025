@@ -6,8 +6,10 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { MapPin } from "lucide-react";
+import { MapPin, Navigation } from "lucide-react";
 import { tiposAcessibilidade, getLocationTypeName } from "@/lib/constants";
+import { useToast } from "@/hooks/use-toast";
+
 
 interface MapProps {
   locations: any[];
@@ -15,14 +17,57 @@ interface MapProps {
   searchLocation: any | null;
   onMapClick: (latlng: { lat: number; lng: number }) => void;
   onMarkerClick: (location: any) => void;
+  findMyLocation: boolean;
+  onMyLocationFound: () => void;
 }
 
-const MapContent = ({ locations, clickedPosition, searchLocation, onMarkerClick, onMapClick }: MapProps) => {
+const MapContent = ({ locations, searchLocation, onMarkerClick, onMapClick, findMyLocation, onMyLocationFound }: MapProps) => {
   const map = useMapEvents({
     click: (e) => onMapClick(e.latlng),
   });
   const markersRef = useRef<L.Marker[]>([]);
-  const clickPopupRef = useRef<L.Popup | null>(null);
+  const locationMarkerRef = useRef<L.Marker | null>(null);
+  const { toast } = useToast();
+
+  // Efeito para encontrar a localização do usuário
+  useEffect(() => {
+    if (findMyLocation) {
+      // AQUI ESTÁ A MUDANÇA: adicionamos enableHighAccuracy: true
+      map.locate({ setView: true, maxZoom: 16, enableHighAccuracy: true });
+      onMyLocationFound();
+    }
+  }, [findMyLocation, map, onMyLocationFound]);
+
+  // Efeito para lidar com os eventos do mapa
+  useEffect(() => {
+    const handleLocationFound = (e: L.LocationEvent) => {
+      const radius = e.accuracy;
+      if (locationMarkerRef.current) {
+        map.removeLayer(locationMarkerRef.current);
+      }
+      const iconString = renderToStaticMarkup(<Navigation color="white" size={16} />);
+      const iconHtml = `<div style="background: #2563eb; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">${iconString}</div>`;
+      const myLocationIcon = L.divIcon({
+        className: "my-location-marker",
+        html: iconHtml,
+        iconSize: [32, 32],
+      });
+      locationMarkerRef.current = L.marker(e.latlng, { icon: myLocationIcon }).addTo(map)
+        .bindPopup(`Você está aqui (margem de ${radius.toFixed(0)} metros de erro)`).openPopup();
+    };
+
+    const handleLocationError = (e: L.ErrorEvent) => {
+      toast({ title: "Erro de Localização", description: e.message, variant: "destructive" });
+    };
+
+    map.on('locationfound', handleLocationFound);
+    map.on('locationerror', handleLocationError);
+
+    return () => {
+      map.off('locationfound', handleLocationFound);
+      map.off('locationerror', handleLocationError);
+    };
+  }, [map, toast]);
 
   useEffect(() => {
     markersRef.current.forEach((marker) => marker.remove());
@@ -43,7 +88,6 @@ const MapContent = ({ locations, clickedPosition, searchLocation, onMarkerClick,
 
       const marker = L.marker([location.lat, location.lng], { icon }).addTo(map);
       
-      // Monta a lista de tipos de acessibilidade para o popup
       const typesList = location.typeValues.map((type: string) => `<li>${getLocationTypeName(type)}</li>`).join('');
       
       let popupContent = `
@@ -63,16 +107,7 @@ const MapContent = ({ locations, clickedPosition, searchLocation, onMarkerClick,
       markersRef.current.push(marker);
     });
 
-    if (clickPopupRef.current) {
-      map.removeLayer(clickPopupRef.current);
-    }
-    if (clickedPosition) {
-      clickPopupRef.current = L.popup()
-        .setLatLng(clickedPosition)
-        .setContent("Local selecionado para adicionar ponto de acessibilidade.")
-        .openOn(map);
-    }
-  }, [map, locations, clickedPosition, onMarkerClick]);
+  }, [map, locations, onMarkerClick]);
 
   useEffect(() => {
     if (searchLocation) {
@@ -87,7 +122,7 @@ export default function MapContainerComponent(props: MapProps) {
   return (
     <MapContainer
       center={[-23.52437655664778, -47.46314621710714]}
-      zoom={16}
+      zoom={13}
       scrollWheelZoom={true}
       style={{ height: "100%", width: "100%" }}
     >

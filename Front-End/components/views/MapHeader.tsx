@@ -4,7 +4,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { MapPin, Search, Menu, LogOut } from "lucide-react";
+import { MapPin, Search, LogOut } from "lucide-react";
 
 interface MapHeaderProps {
   userName: string;
@@ -12,7 +12,6 @@ interface MapHeaderProps {
   onSearchTermChange: (term: string) => void;
   onGlobalSearch: () => void;
   onNavigate: (view: "login" | "profile") => void;
-  onToggleSidebar: () => void;
 }
 
 export default function MapHeader({
@@ -21,14 +20,10 @@ export default function MapHeader({
   onSearchTermChange,
   onGlobalSearch,
   onNavigate,
-  onToggleSidebar,
 }: MapHeaderProps) {
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 shadow-sm">
+    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 shadow-sm z-20 relative">
       <div className="flex items-center gap-4">
-        <Button variant="outline" size="sm" onClick={onToggleSidebar} className="lg:hidden">
-          <Menu className="w-4 h-4" />
-        </Button>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-gray-600 to-gray-800 rounded-full flex items-center justify-center">
             <MapPin className="w-5 h-5 text-white" />

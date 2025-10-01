@@ -4,34 +4,36 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { MapPin, Search, LogOut } from "lucide-react";
+import { MapPin, Search, LogOut, LogIn } from "lucide-react";
 
 interface MapHeaderProps {
   userName: string;
+  isLoggedIn: boolean;
   searchTerm: string;
   onSearchTermChange: (term: string) => void;
   onGlobalSearch: () => void;
   onNavigate: (view: "login" | "profile") => void;
+  onLogout: () => void;
 }
 
 export default function MapHeader({
   userName,
+  isLoggedIn,
   searchTerm,
   onSearchTermChange,
   onGlobalSearch,
   onNavigate,
+  onLogout,
 }: MapHeaderProps) {
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 shadow-sm z-20 relative">
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-gray-600 to-gray-800 rounded-full flex items-center justify-center">
-            <MapPin className="w-5 h-5 text-white" />
-          </div>
-          <h1 className="text-xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
-            Mapa Acessível
-          </h1>
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 bg-gradient-to-br from-gray-600 to-gray-800 rounded-full flex items-center justify-center">
+          <MapPin className="w-5 h-5 text-white" />
         </div>
+        <h1 className="text-xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
+          Mapa Acessível
+        </h1>
       </div>
 
       <div className="flex-1 max-w-2xl mx-8 relative">
@@ -55,22 +57,31 @@ export default function MapHeader({
       </div>
 
       <div className="flex items-center gap-3">
-        <Button variant="ghost" className="flex items-center gap-2" onClick={() => onNavigate("profile")}>
-          <Avatar>
-            <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">
-              {userName.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <span className="hidden md:inline font-medium">{userName}</span>
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onNavigate("login")}
-          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-        >
-          <LogOut className="w-4 h-4" />
-        </Button>
+        {isLoggedIn ? (
+          <>
+            <Button variant="ghost" className="flex items-center gap-2" onClick={() => onNavigate("profile")}>
+              <Avatar>
+                <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">
+                  {userName.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <span className="hidden md:inline font-medium">{userName}</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onLogout}
+              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+            >
+              <LogOut className="w-4 h-4" />
+            </Button>
+          </>
+        ) : (
+          <Button onClick={() => onNavigate("login")}>
+            <LogIn className="mr-2 h-4 w-4" />
+            Entrar / Cadastrar
+          </Button>
+        )}
       </div>
     </header>
   );

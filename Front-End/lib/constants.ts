@@ -2,41 +2,21 @@
 import {
   Armchair as Wheelchair,
   Eye,
-  EyeOff,
-  EarOff,
-  Volume2,
-  Church as Crutches,
-  Brain,
-  Users,
-  Navigation,
-  Scale,
-  Baby,
-  Clock,
   Bath,
   ChevronsUp,
   Footprints,
-  Grip,
   ParkingSquare,
   BookOpenText,
   MoveHorizontal,
   Accessibility,
   MapPin,
+  ArrowDownUp,
+  HandHelping,
+  Dog,
+  TriangleRight,
+  AccessibilityIcon,
+  Toilet,
 } from "lucide-react";
-
-export const necessidades = [
-  { value: "cadeirante", label: "Cadeirante", icon: Wheelchair },
-  { value: "baixa-visao", label: "Baixa visão", icon: Eye },
-  { value: "cegueira", label: "Cegueira", icon: EyeOff },
-  { value: "surdez", label: "Surdez", icon: EarOff },
-  { value: "deficiencia-auditiva", label: "Deficiência auditiva", icon: Volume2 },
-  { value: "deficiencia-motora", label: "Deficiência motora", icon: Crutches },
-  { value: "deficiencia-intelectual", label: "Deficiência intelectual", icon: Brain },
-  { value: "autismo", label: "Autismo", icon: Users },
-  { value: "mobilidade-reduzida", label: "Mobilidade reduzida", icon: Navigation },
-  { value: "obesidade", label: "Obesidade", icon: Scale },
-  { value: "gestante", label: "Gestante", icon: Baby },
-  { value: "idoso", label: "Idoso", icon: Clock },
-];
 
 export const getPasswordStrength = (password: string) => {
   let strength = 0;
@@ -47,18 +27,18 @@ export const getPasswordStrength = (password: string) => {
   return strength;
 };
 
-// Dados de Acessibilidade centralizados
 export const tiposAcessibilidade = [
-  { value: "rampa", label: "Rampa de acesso", icon: Accessibility, color: "#4b5563" },
-  { value: "banheiro", label: "Banheiro adaptado", icon: Bath, color: "#6b7280" },
-  { value: "elevador", label: "Elevador acessível", icon: ChevronsUp, color: "#374151" },
+  { value: "rampa", label: "Rampa de acesso", icon: TriangleRight, color: "#9ca3af" },
+  { value: "acesso-cadeira-rodas", label: "Acesso para Cadeira de Rodas", icon: Accessibility, color: "#9ca3af" },
+  { value: "banheiro", label: "Banheiro adaptado", icon: Toilet, color: "#9ca3af" },
+  { value: "elevador", label: "Elevador acessível", icon: ChevronsUp, color: "#9ca3af" },
+  { value: "escada-rolante", label: "Escada rolante", icon: ArrowDownUp, color: "#9ca3af" },
   { value: "piso", label: "Piso tátil", icon: Footprints, color: "#9ca3af" },
-  { value: "sinalizacao", label: "Sinalização tátil", icon: Eye, color: "#6b7280" },
-  { value: "corrimao", label: "Corrimão", icon: Grip, color: "#4b5563" },
-  { value: "vagas", label: "Vagas especiais", icon: ParkingSquare, color: "#374151" },
-  { value: "audio", label: "Sinalização sonora", icon: Volume2, color: "#6b7280" },
-  { value: "braille", label: "Sinalização em Braille", icon: BookOpenText, color: "#4b5563" },
+  { value: "vagas", label: "Vagas especiais", icon: ParkingSquare, color: "#9ca3af" },
   { value: "circulacao", label: "Espaço para circulação", icon: MoveHorizontal, color: "#9ca3af" },
+  { value: "ajudantes", label: "Ajudantes no local", icon: HandHelping, color: "#9ca3af" },
+  { value: "info-braille", label: "Informações em Braile", icon: BookOpenText, color: "#9ca3af" },
+  { value: "animais-suporte", label: "Permite animais de suporte", icon: Dog, color: "#9ca3af" },
 ];
 
 export const getLocationIcon = (type: string) => {

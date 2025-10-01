@@ -1,3 +1,4 @@
+// Front-End/components/views/RegisterPage.tsx
 "use client"
 
 import type React from "react"
@@ -21,14 +22,13 @@ import {
   CheckCircle,
   AlertCircle,
 } from "lucide-react"
-import { necessidades, getPasswordStrength } from "@/lib/constants"
-import AuthLayout from "../layouts/AuthLayout"
+import { tiposAcessibilidade, getPasswordStrength } from "@/lib/constants"
 import { PasswordInput } from "../ui/password-input"
 import { PasswordStrength } from "../ui/password-strength"
-import AuthHeader from "../layouts/AuthHeader" // Importação do novo componente
+import AuthHeader from "../layouts/AuthHeader"
 
 interface RegisterPageProps {
-  onNavigate: (view: "login" | "map") => void;
+  onNavigate: (view: "login") => void; // Tipo corrigido
   onRegister: (name: string, needs: string[]) => void;
 }
 
@@ -82,431 +82,229 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
 
     const fullName = `${registerData.firstName} ${registerData.lastName}`;
 
-
     toast({
       title: "🎉 Conta criada com sucesso!",
       description: `Bem-vindo(a), ${registerData.firstName}! Sua conta foi criada.`,
     })
 
-    setTimeout(() => {
-      onRegister(fullName, selectedNeeds);
-      setIsLoading(false)
-    }, 1000)
+    onRegister(fullName, selectedNeeds);
+    setIsLoading(false)
   }
 
   return (
-    <AuthLayout>
-      <Card className="w-full max-w-3xl backdrop-blur-sm bg-white/95 shadow-2xl border-0 max-h-[95vh] overflow-y-auto">
-        <CardContent className="p-8">
-          <AuthHeader
-            icon={<UserPlus className="w-8 h-8 text-white" />}
-            title="Criar Conta"
-            subtitle="Junte-se à nossa comunidade inclusiva"
-          >
-            <div className="flex items-center justify-center space-x-2">
-              <div className="flex items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                    registerStep >= 1 ? "bg-gray-600 text-white" : "bg-gray-200 text-gray-500"
-                  }`}
-                >
-                  {registerStep > 1 ? <Check className="w-4 h-4" /> : "1"}
-                </div>
-                <span className="ml-2 text-sm font-medium text-gray-600">Dados Pessoais</span>
-              </div>
+    <Card className="w-full max-w-3xl backdrop-blur-sm bg-white/95 shadow-2xl border-0 max-h-[95vh] overflow-y-auto">
+      <CardContent className="p-8">
+        <AuthHeader
+          icon={<UserPlus className="w-8 h-8 text-white" />}
+          title="Criar Conta"
+          subtitle="Junte-se à nossa comunidade inclusiva"
+        >
+          <div className="flex items-center justify-center space-x-2">
+            <div className="flex items-center">
               <div
-                className={`w-8 h-1 rounded transition-all ${registerStep >= 2 ? "bg-gray-600" : "bg-gray-200"}`}
-              ></div>
-              <div className="flex items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                    registerStep >= 2 ? "bg-gray-600 text-white" : "bg-gray-200 text-gray-500"
-                  }`}
-                >
-                  {registerStep > 2 ? <Check className="w-4 h-4" /> : "2"}
-                </div>
-                <span className="ml-2 text-sm font-medium text-gray-600">Necessidades</span>
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  registerStep >= 1 ? "bg-gray-600 text-white" : "bg-gray-200 text-gray-500"
+                }`}
+              >
+                {registerStep > 1 ? <Check className="w-4 h-4" /> : "1"}
               </div>
-              <div
-                className={`w-8 h-1 rounded transition-all ${registerStep >= 3 ? "bg-gray-600" : "bg-gray-200"}`}
-              ></div>
-              <div className="flex items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                    registerStep >= 3 ? "bg-gray-600 text-white" : "bg-gray-200 text-gray-500"
-                  }`}
-                >
-                  {registerStep > 3 ? <Check className="w-4 h-4" /> : "3"}
-                </div>
-                <span className="ml-2 text-sm font-medium text-gray-600">Confirmação</span>
-              </div>
+              <span className="ml-2 text-sm font-medium text-gray-600">Dados Pessoais</span>
             </div>
-          </AuthHeader>
+            <div
+              className={`w-8 h-1 rounded transition-all ${registerStep >= 2 ? "bg-gray-600" : "bg-gray-200"}`}
+            ></div>
+            <div className="flex items-center">
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  registerStep >= 2 ? "bg-gray-600 text-white" : "bg-gray-200 text-gray-500"
+                }`}
+              >
+                {registerStep > 2 ? <Check className="w-4 h-4" /> : "2"}
+              </div>
+              <span className="ml-2 text-sm font-medium text-gray-600">Preferências</span>
+            </div>
+            <div
+              className={`w-8 h-1 rounded transition-all ${registerStep >= 3 ? "bg-gray-600" : "bg-gray-200"}`}
+            ></div>
+            <div className="flex items-center">
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  registerStep >= 3 ? "bg-gray-600 text-white" : "bg-gray-200 text-gray-500"
+                }`}
+              >
+                {registerStep > 3 ? <Check className="w-4 h-4" /> : "3"}
+              </div>
+              <span className="ml-2 text-sm font-medium text-gray-600">Confirmação</span>
+            </div>
+          </div>
+        </AuthHeader>
 
-          <form onSubmit={handleRegister} className="space-y-6">
-            {/* O restante do seu formulário continua aqui, sem alterações... */}
-            {registerStep === 1 && (
-              <div className="space-y-6 animate-in slide-in-from-right-5 duration-300">
-                <div className="text-center mb-6">
-                  <h2 className="text-xl font-semibold text-gray-800">Vamos começar com seus dados</h2>
-                  <p className="text-gray-600 text-sm mt-1">Precisamos de algumas informações básicas</p>
-                </div>
+        <form onSubmit={handleRegister} className="space-y-6">
+          {registerStep === 1 && (
+            <div className="space-y-6 animate-in slide-in-from-right-5 duration-300">
+              <div className="text-center mb-6">
+                <h2 className="text-xl font-semibold text-gray-800">Vamos começar com seus dados</h2>
+                <p className="text-gray-600 text-sm mt-1">Precisamos de algumas informações básicas</p>
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">Nome *</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                      <Input
-                        id="firstName"
-                        placeholder="Seu primeiro nome"
-                        className={`pl-10 h-12 transition-all ${
-                          registerData.firstName && registerData.firstName.length >= 2
-                            ? "border-gray-600 focus:border-gray-600"
-                            : registerData.firstName && registerData.firstName.length > 0
-                            ? "border-red-500 focus:border-red-500"
-                            : ""
-                        }`}
-                        value={registerData.firstName}
-                        onChange={(e) => setRegisterData((prev) => ({ ...prev, firstName: e.target.value }))}
-                        required
-                      />
-                      {registerData.firstName && registerData.firstName.length >= 2 && (
-                        <CheckCircle className="absolute right-3 top-3 w-4 h-4 text-gray-600" />
-                      )}
-                    </div>
-                    {registerData.firstName &&
-                      registerData.firstName.length > 0 &&
-                      registerData.firstName.length < 2 && (
-                        <p className="text-xs text-red-500 flex items-center gap-1">
-                          <AlertCircle className="w-3 h-3" />
-                          Nome deve ter pelo menos 2 caracteres
-                        </p>
-                      )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Sobrenome *</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                      <Input
-                        id="lastName"
-                        placeholder="Seu sobrenome"
-                        className={`pl-10 h-12 transition-all ${
-                          registerData.lastName && registerData.lastName.length >= 2
-                            ? "border-gray-600 focus:border-gray-600"
-                            : registerData.lastName && registerData.lastName.length > 0
-                            ? "border-red-500 focus:border-red-500"
-                            : ""
-                        }`}
-                        value={registerData.lastName}
-                        onChange={(e) => setRegisterData((prev) => ({ ...prev, lastName: e.target.value }))}
-                        required
-                      />
-                      {registerData.lastName && registerData.lastName.length >= 2 && (
-                        <CheckCircle className="absolute right-3 top-3 w-4 h-4 text-gray-600" />
-                      )}
-                    </div>
-                  </div>
-                </div>
-
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="register-email">E-mail *</Label>
+                  <Label htmlFor="firstName">Nome *</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                    <Input
-                      id="register-email"
-                      type="email"
-                      placeholder="seu.email@exemplo.com"
-                      className={`pl-10 h-12 transition-all ${
-                        registerData.email && isValidEmail(registerData.email)
-                          ? "border-gray-600 focus:border-gray-600"
-                          : registerData.email && registerData.email.length > 0
-                          ? "border-red-500 focus:border-red-500"
-                          : ""
-                      }`}
-                      value={registerData.email}
-                      onChange={(e) => setRegisterData((prev) => ({ ...prev, email: e.target.value }))}
-                      required
-                    />
-                    {registerData.email && isValidEmail(registerData.email) && (
-                      <CheckCircle className="absolute right-3 top-3 w-4 h-4 text-gray-600" />
-                    )}
+                    <User className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                    <Input id="firstName" placeholder="Seu primeiro nome" className={`pl-10 h-12 transition-all ${registerData.firstName && registerData.firstName.length >= 2 ? "border-gray-600 focus:border-gray-600" : registerData.firstName && registerData.firstName.length > 0 ? "border-red-500 focus:border-red-500" : ""}`} value={registerData.firstName} onChange={(e) => setRegisterData((prev) => ({ ...prev, firstName: e.target.value }))} required />
+                    {registerData.firstName && registerData.firstName.length >= 2 && (<CheckCircle className="absolute right-3 top-3 w-4 h-4 text-gray-600" />)}
                   </div>
-                  {registerData.email && registerData.email.length > 0 && !isValidEmail(registerData.email) && (
-                    <p className="text-xs text-red-500 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" />
-                      Digite um e-mail válido
-                    </p>
-                  )}
+                  {registerData.firstName && registerData.firstName.length > 0 && registerData.firstName.length < 2 && (<p className="text-xs text-red-500 flex items-center gap-1"><AlertCircle className="w-3 h-3" /> Nome deve ter pelo menos 2 caracteres</p>)}
                 </div>
-
                 <div className="space-y-2">
-                  <Label htmlFor="register-password">Senha *</Label>
-                  <PasswordInput
-                    id="register-password"
-                    placeholder="Crie uma senha segura"
-                    className={`${
-                      registerData.password && getPasswordStrength(registerData.password) >= 80
-                        ? "border-green-500 focus-visible:ring-green-500"
-                        : registerData.password && registerData.password.length > 0
-                        ? "border-yellow-500 focus-visible:ring-yellow-500"
-                        : ""
-                    }`}
-                    value={registerData.password}
-                    onChange={(e) => setRegisterData((prev) => ({ ...prev, password: e.target.value }))}
-                    required
-                  />
-                  <PasswordStrength password={registerData.password} />
+                  <Label htmlFor="lastName">Sobrenome *</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                    <Input id="lastName" placeholder="Seu sobrenome" className={`pl-10 h-12 transition-all ${registerData.lastName && registerData.lastName.length >= 2 ? "border-gray-600 focus:border-gray-600" : registerData.lastName && registerData.lastName.length > 0 ? "border-red-500 focus:border-red-500" : ""}`} value={registerData.lastName} onChange={(e) => setRegisterData((prev) => ({ ...prev, lastName: e.target.value }))} required />
+                    {registerData.lastName && registerData.lastName.length >= 2 && (<CheckCircle className="absolute right-3 top-3 w-4 h-4 text-gray-600" />)}
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="register-email">E-mail *</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                  <Input id="register-email" type="email" placeholder="seu.email@exemplo.com" className={`pl-10 h-12 transition-all ${registerData.email && isValidEmail(registerData.email) ? "border-gray-600 focus:border-gray-600" : registerData.email && registerData.email.length > 0 ? "border-red-500 focus:border-red-500" : ""}`} value={registerData.email} onChange={(e) => setRegisterData((prev) => ({ ...prev, email: e.target.value }))} required />
+                  {registerData.email && isValidEmail(registerData.email) && (<CheckCircle className="absolute right-3 top-3 w-4 h-4 text-gray-600" />)}
+                </div>
+                {registerData.email && registerData.email.length > 0 && !isValidEmail(registerData.email) && (<p className="text-xs text-red-500 flex items-center gap-1"><AlertCircle className="w-3 h-3" /> Digite um e-mail válido</p>)}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="register-password">Senha *</Label>
+                <PasswordInput id="register-password" placeholder="Crie uma senha segura" className={`${registerData.password && getPasswordStrength(registerData.password) >= 80 ? "border-green-500 focus-visible:ring-green-500" : registerData.password && registerData.password.length > 0 ? "border-yellow-500 focus-visible:ring-yellow-500" : ""}`} value={registerData.password} onChange={(e) => setRegisterData((prev) => ({ ...prev, password: e.target.value }))} required />
+                <PasswordStrength password={registerData.password} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirmar Senha *</Label>
+                <PasswordInput id="confirmPassword" placeholder="Digite a senha novamente" className={`${registerData.confirmPassword && registerData.password === registerData.confirmPassword ? "border-green-500 focus-visible:ring-green-500" : registerData.confirmPassword && registerData.confirmPassword.length > 0 ? "border-red-500 focus-visible:ring-red-500" : ""}`} value={registerData.confirmPassword} onChange={(e) => setRegisterData((prev) => ({ ...prev, confirmPassword: e.target.value }))} required />
+                {registerData.confirmPassword && registerData.password !== registerData.confirmPassword && (<p className="text-xs text-red-500 flex items-center gap-1"><AlertCircle className="w-3 h-3" /> As senhas não coincidem</p>)}
+                {registerData.confirmPassword && registerData.password === registerData.confirmPassword && (<p className="text-xs text-gray-600 flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Senhas coincidem</p>)}
+              </div>
+              <Button type="button" onClick={() => { if (canProceedToStep2()) { setRegisterStep(2) } else { toast({ title: "Campos obrigatórios", description: "Por favor, preencha todos os campos corretamente antes de continuar.", variant: "destructive", }) } }} className="w-full h-12 bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300" disabled={!canProceedToStep2()}>
+                <span className="flex items-center gap-2">Continuar <ArrowRight className="w-4 h-4" /></span>
+              </Button>
+            </div>
+          )}
+
+          {registerStep === 2 && (
+            <div className="space-y-6 animate-in slide-in-from-right-5 duration-300">
+              <div className="text-center mb-6">
+                <h2 className="text-xl font-semibold text-gray-800">Suas preferências de acessibilidade</h2>
+                <p className="text-gray-600 text-sm mt-1">Isso nos ajuda a personalizar sua experiência (opcional)</p>
+              </div>
+
+              <div className="space-y-4">
+                <Label className="flex items-center gap-2 text-base">
+                  <Heart className="w-5 h-5 text-gray-600" />
+                  Selecione os recursos que você mais procura
+                </Label>
+                <p className="text-sm text-gray-600 mb-4">
+                  Essas informações nos ajudam a destacar locais mais relevantes para você. Você pode pular esta etapa e configurar depois.
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {tiposAcessibilidade.map((tipo) => {
+                    const IconComponent = tipo.icon
+                    const isSelected = selectedNeeds.includes(tipo.value)
+                    return (
+                      <div key={tipo.value} className={`flex items-center space-x-3 p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${isSelected ? "border-gray-600 bg-gray-50 shadow-md transform scale-105" : "border-gray-200 hover:border-gray-400 hover:bg-gray-50"}`} onClick={() => toggleNeed(tipo.value)}>
+                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? "border-gray-600 bg-gray-600" : "border-gray-300"}`}>
+                          {isSelected && <Check className="w-4 h-4 text-white" />}
+                        </div>
+                        <IconComponent className={`w-5 h-5 transition-colors ${isSelected ? "text-gray-700" : "text-gray-500"}`} />
+                        <Label className="text-sm font-medium cursor-pointer flex-1">{tipo.label}</Label>
+                      </div>
+                    )
+                  })}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirmar Senha *</Label>
-                  <PasswordInput
-                    id="confirmPassword"
-                    placeholder="Digite a senha novamente"
-                    className={`${
-                      registerData.confirmPassword && registerData.password === registerData.confirmPassword
-                        ? "border-green-500 focus-visible:ring-green-500"
-                        : registerData.confirmPassword && registerData.confirmPassword.length > 0
-                        ? "border-red-500 focus-visible:ring-red-500"
-                        : ""
-                    }`}
-                    value={registerData.confirmPassword}
-                    onChange={(e) => setRegisterData((prev) => ({ ...prev, confirmPassword: e.target.value }))}
-                    required
-                  />
-                  {registerData.confirmPassword && registerData.password !== registerData.confirmPassword && (
-                    <p className="text-xs text-red-500 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" />
-                      As senhas não coincidem
+                {selectedNeeds.length > 0 && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-800 font-medium mb-2">
+                      Preferências selecionadas ({selectedNeeds.length}):
                     </p>
-                  )}
-                  {registerData.confirmPassword && registerData.password === registerData.confirmPassword && (
-                    <p className="text-xs text-gray-600 flex items-center gap-1">
-                      <CheckCircle className="w-3 h-3" />
-                      Senhas coincidem
-                    </p>
-                  )}
-                </div>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedNeeds.map((need) => {
+                        const tipo = tiposAcessibilidade.find((n) => n.value === need)
+                        return (<Badge key={need} variant="secondary" className="bg-gray-200 text-gray-800">{tipo?.label}</Badge>)
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
 
-                <Button
-                  type="button"
-                  onClick={() => {
-                    if (canProceedToStep2()) {
-                      setRegisterStep(2)
-                    } else {
-                      toast({
-                        title: "Campos obrigatórios",
-                        description: "Por favor, preencha todos os campos corretamente antes de continuar.",
-                        variant: "destructive",
-                      })
-                    }
-                  }}
-                  className="w-full h-12 bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-                  disabled={!canProceedToStep2()}
-                >
-                  <span className="flex items-center gap-2">
-                    Continuar <ArrowRight className="w-4 h-4" />
-                  </span>
+              <div className="flex gap-3">
+                <Button type="button" variant="outline" onClick={() => setRegisterStep(1)} className="flex-1 h-12">
+                  <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
+                </Button>
+                <Button type="button" onClick={() => setRegisterStep(3)} className="flex-1 h-12 bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900">
+                  <span className="flex items-center gap-2">Continuar <ArrowRight className="w-4 h-4" /></span>
                 </Button>
               </div>
-            )}
-
-            {registerStep === 2 && (
-              <div className="space-y-6 animate-in slide-in-from-right-5 duration-300">
-                <div className="text-center mb-6">
-                  <h2 className="text-xl font-semibold text-gray-800">Suas necessidades específicas</h2>
-                  <p className="text-gray-600 text-sm mt-1">Isso nos ajuda a personalizar sua experiência (opcional)</p>
-                </div>
-
-                <div className="space-y-4">
-                  <Label className="flex items-center gap-2 text-base">
-                    <Heart className="w-5 h-5 text-gray-600" />
-                    Selecione suas necessidades específicas
-                  </Label>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Essas informações nos ajudam a destacar locais mais relevantes para você. Você pode pular esta etapa
-                    e configurar depois.
-                  </p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {necessidades.map((necessidade) => {
-                      const IconComponent = necessidade.icon
-                      const isSelected = selectedNeeds.includes(necessidade.value)
-                      return (
-                        <div
-                          key={necessidade.value}
-                          className={`flex items-center space-x-3 p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
-                            isSelected
-                              ? "border-gray-600 bg-gray-50 shadow-md transform scale-105"
-                              : "border-gray-200 hover:border-gray-400 hover:bg-gray-50"
-                          }`}
-                          onClick={() => toggleNeed(necessidade.value)}
-                        >
-                          <div
-                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                              isSelected ? "border-gray-600 bg-gray-600" : "border-gray-300"
-                            }`}
-                          >
-                            {isSelected && <Check className="w-4 h-4 text-white" />}
-                          </div>
-                          <IconComponent
-                            className={`w-5 h-5 transition-colors ${isSelected ? "text-gray-700" : "text-gray-500"}`}
-                          />
-                          <Label className="text-sm font-medium cursor-pointer flex-1">{necessidade.label}</Label>
-                        </div>
-                      )
-                    })}
-                  </div>
-
-                  {selectedNeeds.length > 0 && (
-                    <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-800 font-medium mb-2">
-                        Necessidades selecionadas ({selectedNeeds.length}):
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedNeeds.map((need) => {
-                          const necessidade = necessidades.find((n) => n.value === need)
-                          return (
-                            <Badge key={need} variant="secondary" className="bg-gray-200 text-gray-800">
-                              {necessidade?.label}
-                            </Badge>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex gap-3">
-                  <Button type="button" variant="outline" onClick={() => setRegisterStep(1)} className="flex-1 h-12">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Voltar
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() => setRegisterStep(3)}
-                    className="flex-1 h-12 bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900"
-                  >
-                    <span className="flex items-center gap-2">
-                      Continuar <ArrowRight className="w-4 h-4" />
-                    </span>
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {registerStep === 3 && (
-              <div className="space-y-6 animate-in slide-in-from-right-5 duration-300">
-                <div className="text-center mb-6">
-                  <h2 className="text-xl font-semibold text-gray-800">Confirme seus dados</h2>
-                  <p className="text-gray-600 text-sm mt-1">Revise as informações antes de criar sua conta</p>
-                </div>
-
-                <div className="space-y-4">
-                  <Card className="p-4 bg-gray-50">
-                    <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                      <User className="w-4 h-4" />
-                      Dados Pessoais
-                    </h3>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Nome:</span>
-                        <span className="font-medium">
-                          {registerData.firstName} {registerData.lastName}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">E-mail:</span>
-                        <span className="font-medium">{registerData.email}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Senha:</span>
-                        <span className="font-medium">••••••••</span>
-                      </div>
-                    </div>
-                  </Card>
-
-                  <Card className="p-4 bg-gray-50">
-                    <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                      <Heart className="w-4 h-4 text-gray-600" />
-                      Necessidades Específicas
-                    </h3>
-                    {selectedNeeds.length > 0 ? (
-                      <div className="flex flex-wrap gap-2">
-                        {selectedNeeds.map((need) => {
-                          const necessidade = necessidades.find((n) => n.value === need)
-                          const IconComponent = necessidade?.icon || User
-                          return (
-                            <Badge key={need} variant="secondary" className="flex items-center gap-1">
-                              <IconComponent className="w-3 h-3" />
-                              {necessidade?.label}
-                            </Badge>
-                          )
-                        })}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-600">Nenhuma necessidade específica selecionada</p>
-                    )}
-                  </Card>
-
-                  <div className="flex items-start space-x-3 p-4 border border-gray-300 rounded-lg bg-gray-50">
-                    <Checkbox id="terms" checked={acceptTerms} onCheckedChange={(checked) => setAcceptTerms(checked === true)} className="mt-1" />
-                    <div className="flex-1">
-                      <Label htmlFor="terms" className="text-sm font-medium cursor-pointer">
-                        Aceito os termos de uso e política de privacidade
-                      </Label>
-                      <p className="text-xs text-gray-600 mt-1">
-                        Ao criar sua conta, você concorda com nossos{" "}
-                        <a href="#" className="text-gray-700 hover:underline">
-                          termos de uso
-                        </a>{" "}
-                        e{" "}
-                        <a href="#" className="text-gray-700 hover:underline">
-                          política de privacidade
-                        </a>
-                        .
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <Button type="button" variant="outline" onClick={() => setRegisterStep(2)} className="flex-1 h-12">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Voltar
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="flex-1 h-12 bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-                    disabled={isLoading || !acceptTerms}
-                  >
-                    {isLoading ? (
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        Criar Conta <Check className="w-4 h-4" />
-                      </span>
-                    )}
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            <div className="text-center pt-4 border-t">
-              <button
-                type="button"
-                onClick={() => onNavigate("login")}
-                className="text-gray-600 hover:text-gray-700 font-medium flex items-center gap-1 mx-auto transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Já tenho conta
-              </button>
             </div>
-          </form>
-        </CardContent>
-      </Card>
-    </AuthLayout>
+          )}
+
+          {registerStep === 3 && (
+            <div className="space-y-6 animate-in slide-in-from-right-5 duration-300">
+              <div className="text-center mb-6">
+                <h2 className="text-xl font-semibold text-gray-800">Confirme seus dados</h2>
+                <p className="text-gray-600 text-sm mt-1">Revise as informações antes de criar sua conta</p>
+              </div>
+
+              <div className="space-y-4">
+                <Card className="p-4 bg-gray-50">
+                  <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2"><User className="w-4 h-4" /> Dados Pessoais</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between"><span className="text-gray-600">Nome:</span><span className="font-medium">{registerData.firstName} {registerData.lastName}</span></div>
+                    <div className="flex justify-between"><span className="text-gray-600">E-mail:</span><span className="font-medium">{registerData.email}</span></div>
+                    <div className="flex justify-between"><span className="text-gray-600">Senha:</span><span className="font-medium">••••••••</span></div>
+                  </div>
+                </Card>
+
+                <Card className="p-4 bg-gray-50">
+                  <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2"><Heart className="w-4 h-4 text-gray-600" /> Preferências de Acessibilidade</h3>
+                  {selectedNeeds.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {selectedNeeds.map((need) => {
+                        const tipo = tiposAcessibilidade.find((n) => n.value === need)
+                        const IconComponent = tipo?.icon || User
+                        return (<Badge key={need} variant="secondary" className="flex items-center gap-1"><IconComponent className="w-3 h-3" />{tipo?.label}</Badge>)
+                      })}
+                    </div>
+                  ) : (<p className="text-sm text-gray-600">Nenhuma preferência selecionada</p>)}
+                </Card>
+
+                <div className="flex items-start space-x-3 p-4 border border-gray-300 rounded-lg bg-gray-50">
+                  <Checkbox id="terms" checked={acceptTerms} onCheckedChange={(checked) => setAcceptTerms(checked === true)} className="mt-1" />
+                  <div className="flex-1">
+                    <Label htmlFor="terms" className="text-sm font-medium cursor-pointer">Aceito os termos de uso e política de privacidade</Label>
+                    <p className="text-xs text-gray-600 mt-1">Ao criar sua conta, você concorda com nossos <a href="#" className="text-gray-700 hover:underline">termos de uso</a> e <a href="#" className="text-gray-700 hover:underline">política de privacidade</a>.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button type="button" variant="outline" onClick={() => setRegisterStep(2)} className="flex-1 h-12"><ArrowLeft className="w-4 h-4 mr-2" /> Voltar</Button>
+                <Button type="submit" className="flex-1 h-12 bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300" disabled={isLoading || !acceptTerms}>
+                  {isLoading ? (<Loader2 className="w-4 h-4 animate-spin mr-2" />) : (<span className="flex items-center gap-2">Criar Conta <Check className="w-4 h-4" /></span>)}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          <div className="text-center pt-4 border-t">
+            <button type="button" onClick={() => onNavigate("login")} className="text-gray-600 hover:text-gray-700 font-medium flex items-center gap-1 mx-auto transition-colors">
+              <ArrowLeft className="w-4 h-4" /> Já tenho conta
+            </button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   )
 }

@@ -18,7 +18,6 @@ import {
   RotateCcw,
 } from "lucide-react"
 import { getPasswordStrength } from "@/lib/constants"
-import AuthLayout from "../layouts/AuthLayout"
 import { PasswordInput } from "../ui/password-input"
 import { PasswordStrength } from "../ui/password-strength"
 import AuthHeader from "../layouts/AuthHeader" // Importação do novo componente
@@ -160,7 +159,6 @@ export default function RecoveryPage({ onNavigate }: RecoveryPageProps) {
   }
 
   return (
-    <AuthLayout>
       <Card className="w-full max-w-md backdrop-blur-sm bg-white/95 shadow-2xl border-0">
         <CardContent className="p-8">
           <AuthHeader
@@ -374,6 +372,5 @@ export default function RecoveryPage({ onNavigate }: RecoveryPageProps) {
           )}
         </CardContent>
       </Card>
-    </AuthLayout>
   )
 }

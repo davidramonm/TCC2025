@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { X, User, Settings } from "lucide-react";
-import { necessidades } from "@/lib/constants";
+import { tiposAcessibilidade } from "@/lib/constants"; // Alterado aqui
 import UserSettingsPage from "./UserSettingsPage";
 
 interface UserProfilePageProps {
@@ -28,10 +28,9 @@ export default function UserProfilePage({
 }: UserProfilePageProps) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  // Esta função agora fecha tanto as configurações quanto o perfil, voltando ao mapa.
   const handleCloseSettingsAndProfile = () => {
-    setIsSettingsOpen(false); // Fecha o painel de configurações
-    onClose(); // Executa a função para voltar ao mapa
+    setIsSettingsOpen(false);
+    onClose();
   };
 
   return (
@@ -67,13 +66,13 @@ export default function UserProfilePage({
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold mb-3">Minhas Necessidades</h3>
+              <h3 className="text-lg font-semibold mb-3">Minhas Preferências de Acessibilidade</h3>
               <div className="flex flex-wrap gap-2">
                 {userNeeds.length > 0 ? (
                   userNeeds.map((need) => {
-                    const necessidade = necessidades.find((n) => n.value === need);
-                    if (!necessidade) return null;
-                    const Icon = necessidade.icon;
+                    const tipo = tiposAcessibilidade.find((n) => n.value === need); // Alterado aqui
+                    if (!tipo) return null;
+                    const Icon = tipo.icon;
                     return (
                       <Badge
                         key={need}
@@ -81,13 +80,13 @@ export default function UserProfilePage({
                         className="flex items-center gap-2 text-base px-3 py-1"
                       >
                         <Icon className="w-4 h-4" />
-                        {necessidade.label}
+                        {tipo.label}
                       </Badge>
                     );
                   })
                 ) : (
                   <p className="text-gray-500">
-                    Nenhuma necessidade específica selecionada.
+                    Nenhuma preferência selecionada.
                   </p>
                 )}
               </div>
@@ -97,7 +96,7 @@ export default function UserProfilePage({
       </div>
       {isSettingsOpen && (
         <UserSettingsPage
-          onClose={handleCloseSettingsAndProfile} // Passa a nova função de fechamento
+          onClose={handleCloseSettingsAndProfile}
           userName={userName}
           userNeeds={userNeeds}
           onUpdateNeeds={onUpdateNeeds}

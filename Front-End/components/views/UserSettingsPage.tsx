@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { X, Shield, Save, Heart, User, Trash2, Camera } from "lucide-react";
-import { necessidades } from "@/lib/constants";
+import { tiposAcessibilidade } from "@/lib/constants"; // Alterado aqui
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertDialog,
@@ -41,7 +41,7 @@ export default function UserSettingsPage({
   const [selectedNeeds, setSelectedNeeds] = useState<string[]>(userNeeds);
   const [firstName, setFirstName] = useState(userName.split(' ')[0] || "");
   const [lastName, setLastName] = useState(userName.split(' ').slice(1).join(' ') || "");
-  const [email, setEmail] = useState("seu.email@exemplo.com"); // E-mail simulado
+  const [email, setEmail] = useState("seu.email@exemplo.com");
 
 
   const toggleNeed = (needValue: string) => {
@@ -113,21 +113,21 @@ export default function UserSettingsPage({
             <TabsContent value="accessibility" className="pt-6">
               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                 <Heart className="w-5 h-5 text-gray-600" />
-                Minhas Necessidades
+                Minhas Preferências
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-64 overflow-y-auto p-1">
-                {necessidades.map((necessidade) => {
-                  const IconComponent = necessidade.icon;
-                  const isSelected = selectedNeeds.includes(necessidade.value);
+                {tiposAcessibilidade.map((tipo) => {
+                  const IconComponent = tipo.icon;
+                  const isSelected = selectedNeeds.includes(tipo.value);
                   return (
                     <div
-                      key={necessidade.value}
+                      key={tipo.value}
                       className={`flex items-center space-x-3 p-3 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
                         isSelected
                           ? "border-gray-600 bg-gray-50 shadow-sm"
                           : "border-gray-200 hover:border-gray-400"
                       }`}
-                      onClick={() => toggleNeed(necessidade.value)}
+                      onClick={() => toggleNeed(tipo.value)}
                     >
                       <IconComponent
                         className={`w-5 h-5 transition-colors ${
@@ -135,7 +135,7 @@ export default function UserSettingsPage({
                         }`}
                       />
                       <Label className="text-sm font-medium cursor-pointer flex-1">
-                        {necessidade.label}
+                        {tipo.label}
                       </Label>
                     </div>
                   );

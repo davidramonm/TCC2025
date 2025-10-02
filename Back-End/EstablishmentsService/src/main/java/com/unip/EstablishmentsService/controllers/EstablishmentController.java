@@ -1,6 +1,7 @@
 package com.unip.EstablishmentsService.controllers;
 
 
+import com.unip.EstablishmentsService.dtos.EstablishmentCoordsResponseDTO;
 import com.unip.EstablishmentsService.models.Establishment;
 import com.unip.EstablishmentsService.services.EstablishmentService;
 import jakarta.validation.Valid;
@@ -21,13 +22,13 @@ public class EstablishmentController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Establishment>> getAllEstablishments (){
+    public ResponseEntity<List<EstablishmentCoordsResponseDTO>> getAllEstablishments (){
         return ResponseEntity.ok().body(service.getAllEstablishments());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Establishment> getEstablishmentInfo (@PathVariable @Valid UUID id){
-        return ResponseEntity.ok().body(service.getEstablishmentInfo(id));
+    public ResponseEntity<Establishment> getEstablishmentById (@PathVariable @Valid UUID id){
+        return ResponseEntity.ok().body(service.getEstablishmentById(id));
     }
 
     @PostMapping

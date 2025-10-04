@@ -51,7 +51,6 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
     }
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const fullName = `${data.firstName} ${data.lastName}`;
-    toast({ title: "🎉 Conta criada com sucesso!", description: `Bem-vindo(a), ${data.firstName}!` });
     onRegister(fullName, selectedNeeds);
   };
 

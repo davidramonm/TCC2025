@@ -27,6 +27,8 @@ export default function MapHeader({
 }: MapHeaderProps) {
   const { isLoggedIn, userName, logout } = useAuth();
 
+  const firstName = userName.split(' ')[0];
+
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 shadow-sm z-20 relative">
       <div className="flex items-center gap-3">
@@ -67,7 +69,8 @@ export default function MapHeader({
                   {userName.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <span className="hidden md:inline font-medium">{userName}</span>
+              {/* CORREÇÃO APLICADA AQUI */}
+              <span className="hidden md:inline font-medium">{firstName}</span>
             </Button>
             <Button
               variant="outline"

@@ -1,8 +1,11 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
-    "target": "ES6",
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
@@ -11,17 +14,30 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
     "incremental": true,
+    // --- ALTERAÇÕES PRINCIPAIS AQUI ---
+    "jsx": "preserve", // Mantemos "preserve" que é o padrão do Next.js
+    "baseUrl": ".", // Definimos a base do projeto
+    "paths": {
+      "@/*": [
+        "src/*"
+      ] // Apontamos o alias '@/' para dentro da pasta 'src'
+    },
+    // --- FIM DAS ALTERAÇÕES ---
     "plugins": [
       {
         "name": "next"
       }
     ],
-    "paths": {
-      "@/*": ["./*"]
-    }
+    "target": "ES2017"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

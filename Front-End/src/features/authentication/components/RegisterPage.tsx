@@ -16,7 +16,7 @@ import { tiposAcessibilidade } from "@/lib/constants";
 import { PasswordInput } from "@/components/ui/password-input";
 import { PasswordStrength } from "@/components/ui/password-strength";
 import AuthHeader from "@/components/layouts/AuthHeader";
-import { Card } from "@/components/ui/card"; // Import Card para o resumo
+import { Card } from "@/components/ui/card"; 
 
 interface RegisterPageProps {
   onNavigate: (view: "login") => void;
@@ -31,7 +31,7 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
 
   const { register, handleSubmit, watch, trigger, formState: { errors, isSubmitting } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
-    mode: "onTouched", // Valida ao sair do campo
+    mode: "onTouched", 
   });
   
   const passwordValue = watch("password");

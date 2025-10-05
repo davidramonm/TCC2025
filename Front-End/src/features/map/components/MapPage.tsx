@@ -4,15 +4,12 @@
 import { useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
 
-// --- Hooks e Contexto ---
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocations } from "../hooks/useLocations";
 
-// --- Camada de API ---
 import { getAddressFromCoordinates } from "@/lib/api";
 
-// --- Componentes ---
 import MapHeader from "@/components/layouts/MapHeader";
 import { AddLocationForm } from "./AddLocationForm";
 import FilterAndListComponent from "./FilterAndListComponent";
@@ -24,7 +21,6 @@ import UserProfilePage from "@/features/authentication/components/UserProfilePag
 import MapPageSkeleton from "./MapPageSkeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
-// --- Tipos e Constantes ---
 import { getLocationTypeName } from "@/lib/constants";
 import { Location } from "@/types";
 
@@ -35,16 +31,14 @@ const MapContainerComponent = dynamic(() => import("./MapContainerComponent"), {
 
 export default function MapPage() {
   const { toast } = useToast();
-  const { isLoggedIn, userName, userNeeds, login, register, logout, updateUser, updateNeeds } = useAuth();
+  const { isLoggedIn, login, register } = useAuth();
   
   const [activeModal, setActiveModal] = useState<"login" | "register" | "recovery" | "add" | "filter" | "profile" | null>(null);
   
-  // --- Gerenciamento de Estado Corrigido ---
   const [allLocations, setAllLocations] = useState<Location[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   
-  // A ordem agora está correta: 'allLocations' e 'activeFilters' são passados para o hook.
   const { filteredLocations } = useLocations(allLocations, activeFilters);
   
   const [clickedPosition, setClickedPosition] = useState<{ lat: number; lng: number } | null>(null);
@@ -170,8 +164,9 @@ export default function MapPage() {
         <DialogContent className="z-50 max-w-[700px]"><DialogHeader><DialogTitle>Filtrar & Listar Locais</DialogTitle><DialogDescription>Selecione filtros para refinar a busca.</DialogDescription></DialogHeader><div className="py-4 max-h-[70vh] overflow-y-auto px-1"><FilterAndListComponent onFilterChange={setActiveFilters} activeFilters={activeFilters} locations={filteredLocations} totalLocations={allLocations.length} onLocationClick={handleLocationClick} selectedLocationId={selectedLocationId} /></div></DialogContent>
       </Dialog>
       
+      {}
       {isLoggedIn && activeModal === 'profile' && (
-         <UserProfilePage onClose={() => setActiveModal(null)} userNeeds={userNeeds} onUpdateUser={updateUser} onUpdateNeeds={updateNeeds} userName={""} />
+         <UserProfilePage onClose={() => setActiveModal(null)} />
       )}
     </div>
   );

@@ -16,7 +16,6 @@ interface UserProfilePageProps {
 }
 
 export default function UserProfilePage({ onClose }: UserProfilePageProps) {
-  // 2. Consumir o contexto para obter as informações do usuário
   const { userName, userNeeds, updateUser, updateNeeds } = useAuth();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -37,7 +36,7 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  {/* 3. A variável userName agora vem diretamente do contexto */}
+                  {}
                   <h2 className="text-2xl font-bold">{userName}</h2>
                   <p className="text-gray-500">Membro desde 2024</p>
                 </div>

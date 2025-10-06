@@ -1,15 +1,12 @@
 // src/features/map/components/MapPage.tsx
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocations } from "../hooks/useLocations";
-
-import { getAddressFromCoordinates } from "@/lib/api";
-
+import { getAddressFromCoordinates, fetchLocations } from "@/lib/api";
 import MapHeader from "@/components/layouts/MapHeader";
 import { AddLocationForm } from "./AddLocationForm";
 import FilterAndListComponent from "./FilterAndListComponent";
@@ -20,7 +17,6 @@ import RecoveryPage from "@/features/authentication/components/RecoveryPage";
 import UserProfilePage from "@/features/authentication/components/UserProfilePage";
 import MapPageSkeleton from "./MapPageSkeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-
 import { getLocationTypeName } from "@/lib/constants";
 import { Location } from "@/types";
 
@@ -49,17 +45,23 @@ export default function MapPage() {
   const [findMyLocation, setFindMyLocation] = useState(false);
 
   useEffect(() => {
-    const fetchInitialData = async () => {
+    const loadData = async () => {
       setIsLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setAllLocations([
-        { id: 1, name: "Shopping Center Acessível", address: "Rua das Flores, 123, São Paulo", typeValues: ["rampa", "banheiro"], rating: 5, lat: -23.5505, lng: -46.6333, description: "Ótimo shopping." },
-        { id: 2, name: "Praça da Paz", address: "Avenida da Liberdade, 456, São Paulo", typeValues: ["circulacao", "piso"], rating: 4, lat: -23.54, lng: -46.65, description: "Praça ampla." },
-      ]);
-      setIsLoading(false);
+      try {
+        const locations = await fetchLocations();
+        setAllLocations(locations);
+      } catch (error) {
+        toast({
+          title: "Erro ao carregar locais",
+          description: "Não foi possível buscar os dados. Tente novamente mais tarde.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
     };
-    fetchInitialData();
-  }, []);
+    loadData();
+  }, [toast]);
 
   const handleMapClick = async (latlng: { lat: number; lng: number }) => {
     if (!isLoggedIn) {
@@ -72,7 +74,7 @@ export default function MapPage() {
     const address = await getAddressFromCoordinates(latlng.lat, latlng.lng);
     setAddressFromClick(address);
   };
-
+  
   const handleSaveLocation = (formData: any, clickedPosition: any, selectedTypes: any, rating: number) => {
     const newLocation: Location = {
       id: Date.now(),
@@ -139,6 +141,7 @@ export default function MapPage() {
         />
       </div>
 
+      {/* --- Modais --- */}
       <Dialog open={activeModal === 'login'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogTitle className="sr-only">Login</DialogTitle>
@@ -164,7 +167,6 @@ export default function MapPage() {
         <DialogContent className="z-50 max-w-[700px]"><DialogHeader><DialogTitle>Filtrar & Listar Locais</DialogTitle><DialogDescription>Selecione filtros para refinar a busca.</DialogDescription></DialogHeader><div className="py-4 max-h-[70vh] overflow-y-auto px-1"><FilterAndListComponent onFilterChange={setActiveFilters} activeFilters={activeFilters} locations={filteredLocations} totalLocations={allLocations.length} onLocationClick={handleLocationClick} selectedLocationId={selectedLocationId} /></div></DialogContent>
       </Dialog>
       
-      {}
       {isLoggedIn && activeModal === 'profile' && (
          <UserProfilePage onClose={() => setActiveModal(null)} />
       )}

@@ -3,7 +3,6 @@
 
 import { createContext, useState, useContext, ReactNode } from 'react';
 
-// Tipagem para os dados do usuário e as funções do contexto
 interface AuthContextType {
   isLoggedIn: boolean;
   userName: string;

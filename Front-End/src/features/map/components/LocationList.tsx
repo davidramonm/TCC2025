@@ -2,21 +2,9 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Star, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { tiposAcessibilidade, getLocationTypeName } from "@/lib/constants";
-
-const renderStars = (rating: number) => (
-  <div className="flex gap-1">
-    {[1, 2, 3, 4, 5].map((star) => (
-      <Star
-        key={star}
-        className={`w-4 h-4 ${
-          star <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
-        } transition-colors`}
-      />
-    ))}
-  </div>
-);
+import { StarRating } from "@/components/ui/star-rating";
 
 interface LocationListProps {
   locations: any[];
@@ -69,7 +57,13 @@ export function LocationList({
                 <div className="flex-1">
                   <h4 className="font-semibold text-base">{location.name}</h4>
                   <p className="text-sm text-gray-500">{location.address}</p>
-                  {location.rating > 0 && <div className="mt-2">{renderStars(location.rating)}</div>}
+                  {location.rating > 0 && 
+                    <StarRating 
+                      rating={location.rating} 
+                      size={4} 
+                      className="mt-2" 
+                    />
+                  }
                   <div className="mt-2 flex flex-wrap gap-1">
                     {location.typeValues.map((typeValue: string) => (
                        <Badge key={typeValue} variant="secondary" className="bg-gray-200 text-gray-700 font-normal">

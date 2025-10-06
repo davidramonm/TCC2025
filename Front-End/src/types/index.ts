@@ -8,7 +8,7 @@ export interface Location {
   name: string;
   address: string;
   typeValues: string[];
-  description?: string; // O '?' indica que a propriedade é opcional
+  description?: string;
   rating: number;
   lat: number;
   lng: number;

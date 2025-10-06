@@ -10,16 +10,6 @@ import { MapPin, Navigation } from "lucide-react";
 import { tiposAcessibilidade, getLocationTypeName } from "@/lib/constants";
 import { useToast } from "@/hooks/use-toast";
 
-/**
- * @description Props para o componente de mapa.
- * @param {any[]} locations - Lista de locais a serem exibidos no mapa.
- * @param {{ lat: number; lng: number } | null} clickedPosition - Coordenadas de um clique recente no mapa.
- * @param {any | null} searchLocation - Um local específico para centralizar o mapa (resultado de uma busca).
- * @param {(latlng: { lat: number; lng: number }) => void} onMapClick - Callback executada quando o usuário clica no mapa.
- * @param {(location: any) => void} onMarkerClick - Callback executada quando o usuário clica em um marcador.
- * @param {boolean} findMyLocation - Flag que dispara a busca pela geolocalização do usuário.
- * @param {() => void} onMyLocationFound - Callback para resetar a flag `findMyLocation` após a busca.
- */
 interface MapProps {
   locations: any[];
   clickedPosition: { lat: number; lng: number } | null;
@@ -30,10 +20,6 @@ interface MapProps {
   onMyLocationFound: () => void;
 }
 
-/**
- * @description Componente interno que lida com os eventos e a renderização dos marcadores no mapa.
- * É separado para poder usar o hook `useMapEvents`.
- */
 const MapContent = ({ locations, searchLocation, onMarkerClick, onMapClick, findMyLocation, onMyLocationFound }: MapProps) => {
   const map = useMapEvents({
     click: (e) => onMapClick(e.latlng),
@@ -128,10 +114,6 @@ const MapContent = ({ locations, searchLocation, onMarkerClick, onMapClick, find
   return null;
 };
 
-/**
- * @description Componente wrapper que renderiza o container do mapa Leaflet.
- * Ele é responsável por configurar o mapa e passar as props para o `MapContent`.
- */
 export default function MapContainerComponent(props: MapProps) {
   return (
     <MapContainer

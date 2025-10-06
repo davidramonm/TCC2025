@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MapPin, Star, Navigation, CheckCircle, AlertCircle, Save } from "lucide-react";
+import { MapPin, Navigation, CheckCircle, AlertCircle, Save } from "lucide-react";
 import { tiposAcessibilidade } from "@/lib/constants";
+import { StarRating } from "@/components/ui/star-rating";
 
 interface AddLocationFormProps {
   onSaveLocation: (formData: any, clickedPosition: any, selectedTypes: any, rating: number) => void;
@@ -38,13 +39,6 @@ export function AddLocationForm({ onSaveLocation, clickedPosition, initialAddres
     onSaveLocation(formData, clickedPosition, selectedAccessibilityTypes, selectedRating);
   };
 
-  const renderStars = (rating: number, interactive = false) => (
-    <div className="flex gap-1">{[1, 2, 3, 4, 5].map((star) => (
-      <button key={star} type="button" onClick={() => interactive && setSelectedRating(star)} disabled={!interactive}>
-        <Star className={`w-5 h-5 ${star <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`} />
-      </button>
-    ))}</div>
-  );
 
   return (
     <form onSubmit={handleSave} className="space-y-4">
@@ -87,7 +81,12 @@ export function AddLocationForm({ onSaveLocation, clickedPosition, initialAddres
       </div>
       <div className="space-y-2">
         <Label>Avaliação</Label>
-        <div className="flex gap-1">{renderStars(selectedRating, true)}</div>
+        <StarRating 
+          rating={selectedRating} 
+          interactive={true} 
+          onRatingChange={setSelectedRating} 
+          size={5}
+        />
       </div>
       <Button type="submit" className="w-full" disabled={!clickedPosition || selectedAccessibilityTypes.length === 0}>
         <Save className="w-4 h-4 mr-2" /> Salvar Local

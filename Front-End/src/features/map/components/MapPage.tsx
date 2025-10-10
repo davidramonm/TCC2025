@@ -19,6 +19,9 @@ import MapPageSkeleton from "./MapPageSkeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { getLocationTypeName } from "@/lib/constants";
 import { Location } from "@/types";
+import ReviewLocationModal from "./ReviewLocationModal";
+import FloatingHelpButton from "@/components/layouts/FloatingHelpButton";
+import WelcomeModal from "@/components/layouts/WelcomeModal";
 
 const MapContainerComponent = dynamic(() => import("./MapContainerComponent"), { 
   ssr: false,
@@ -43,6 +46,15 @@ export default function MapPage() {
   const [searchLocation, setSearchLocation] = useState<Location | null>(null);
   const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
   const [findMyLocation, setFindMyLocation] = useState(false);
+  
+  const [reviewModalState, setReviewModalState] = useState<{
+    isOpen: boolean;
+    locationId: number | null;
+    locationName: string | null;
+    initialTypes: string[];
+  }>({ isOpen: false, locationId: null, locationName: null, initialTypes: [] });
+
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false); // 3. Adicione o estado para o modal de ajuda
 
   useEffect(() => {
     const loadData = async () => {
@@ -92,9 +104,46 @@ export default function MapPage() {
   };
   
   const handleLocationClick = (location: Location) => {
-    setSearchLocation(location);
+    setSearchLocation({ ...location });
     setSelectedLocationId(location.id);
     setActiveModal(null);
+  };
+
+  const handleReviewClick = (locationId: number) => {
+    if (!isLoggedIn) {
+      setActiveModal("login");
+    } else {
+      const locationToReview = allLocations.find(loc => loc.id === locationId);
+      if (locationToReview) {
+        setReviewModalState({
+          isOpen: true,
+          locationId: locationToReview.id,
+          locationName: locationToReview.name,
+          initialTypes: locationToReview.typeValues,
+        });
+      }
+    }
+  };
+
+  const handleSaveReview = (reviewData: { rating: number; selectedTypes: string[]; description: string }) => {
+    if (reviewModalState.locationId) {
+      setAllLocations(prevLocations =>
+        prevLocations.map(loc =>
+          loc.id === reviewModalState.locationId ? {
+            ...loc,
+            rating: reviewData.rating,
+            typeValues: reviewData.selectedTypes,
+            description: reviewData.description || loc.description,
+          } : loc
+        )
+      );
+
+      toast({
+        title: "Avaliação Salva!",
+        description: `Obrigado por contribuir com informações sobre ${reviewModalState.locationName}.`,
+      });
+      setReviewModalState({ isOpen: false, locationId: null, locationName: null, initialTypes: [] });
+    }
   };
 
   const performGlobalSearch = () => {
@@ -129,9 +178,9 @@ export default function MapPage() {
             clickedPosition={clickedPosition}
             searchLocation={searchLocation}
             onMapClick={handleMapClick}
-            onMarkerClick={handleLocationClick}
             findMyLocation={findMyLocation}
             onMyLocationFound={() => setFindMyLocation(false)}
+            onRateClick={handleReviewClick}
           />
         </div>
         <FloatingMenu
@@ -139,6 +188,7 @@ export default function MapPage() {
           onFilterAndListClick={() => setActiveModal("filter")}
           onMyLocationClick={() => setFindMyLocation(true)}
         />
+        <FloatingHelpButton onClick={() => setIsHelpModalOpen(true)} />
       </div>
 
       {/* --- Modais --- */}
@@ -170,6 +220,16 @@ export default function MapPage() {
       {isLoggedIn && activeModal === 'profile' && (
          <UserProfilePage onClose={() => setActiveModal(null)} />
       )}
+
+      <ReviewLocationModal
+        isOpen={reviewModalState.isOpen}
+        onClose={() => setReviewModalState({ isOpen: false, locationId: null, locationName: null, initialTypes: [] })}
+        onSubmit={handleSaveReview}
+        locationName={reviewModalState.locationName}
+        initialTypes={reviewModalState.initialTypes}
+      />
+
+      <WelcomeModal isOpen={isHelpModalOpen} onClose={() => setIsHelpModalOpen(false)} />
     </div>
   );
 }

@@ -15,12 +15,12 @@ interface MapProps {
   clickedPosition: { lat: number; lng: number } | null;
   searchLocation: any | null;
   onMapClick: (latlng: { lat: number; lng: number }) => void;
-  onMarkerClick: (location: any) => void;
   findMyLocation: boolean;
   onMyLocationFound: () => void;
+  onRateClick: (locationId: number) => void;
 }
 
-const MapContent = ({ locations, searchLocation, onMarkerClick, onMapClick, findMyLocation, onMyLocationFound }: MapProps) => {
+const MapContent = ({ locations, searchLocation, onMapClick, findMyLocation, onMyLocationFound, onRateClick }: MapProps) => {
   const map = useMapEvents({
     click: (e) => onMapClick(e.latlng),
   });
@@ -96,14 +96,26 @@ const MapContent = ({ locations, searchLocation, onMarkerClick, onMapClick, find
           </div>
           ${location.rating ? `<p style="margin: 4px 0; font-size: 14px;">Avaliação: ${"★".repeat(location.rating)}${"☆".repeat(5 - location.rating)}</p>` : ""}
           ${location.description ? `<p style="margin: 4px 0; font-size: 14px;">Descrição: ${location.description}</p>` : ""}
+          <button class="rate-button" data-location-id="${location.id}" style="margin-top: 10px; padding: 6px 12px; background-color: #333; color: white; border: none; border-radius: 4px; cursor: pointer;">Avaliar</button>
         </div>
       `;
+
       marker.bindPopup(popupContent);
-      marker.on("click", () => onMarkerClick(location));
+
+      marker.on('popupopen', (e) => {
+        const popup = e.popup;
+        const rateButton = popup.getElement()?.querySelector('.rate-button');
+        if (rateButton) {
+          (rateButton as HTMLElement).onclick = () => {
+            onRateClick(location.id);
+          };
+        }
+      });
+      
       markersRef.current.push(marker);
     });
 
-  }, [map, locations, onMarkerClick]);
+  }, [map, locations, onRateClick]);
 
   useEffect(() => {
     if (searchLocation) {

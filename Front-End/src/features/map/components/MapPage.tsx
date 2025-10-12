@@ -14,7 +14,7 @@ import FloatingMenu from "./FloatingMenu";
 import LoginPage from "@/features/authentication/components/LoginPage";
 import RegisterPage from "@/features/authentication/components/RegisterPage";
 import RecoveryPage from "@/features/authentication/components/RecoveryPage";
-import UserProfilePage from "@/features/authentication/components/UserProfilePage";
+import UserSettingsPage from "@/features/authentication/components/UserSettingsPage";
 import MapPageSkeleton from "./MapPageSkeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { getLocationTypeName } from "@/lib/constants";
@@ -30,9 +30,9 @@ const MapContainerComponent = dynamic(() => import("./MapContainerComponent"), {
 
 export default function MapPage() {
   const { toast } = useToast();
-  const { isLoggedIn, login, register } = useAuth();
+  const { isLoggedIn, login, register, userName, userNeeds, updateUser, updateNeeds } = useAuth();
   
-  const [activeModal, setActiveModal] = useState<"login" | "register" | "recovery" | "add" | "filter" | "profile" | null>(null);
+  const [activeModal, setActiveModal] = useState<"login" | "register" | "recovery" | "add" | "filter" | null>(null);
   
   const [allLocations, setAllLocations] = useState<Location[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -51,10 +51,16 @@ export default function MapPage() {
     isOpen: boolean;
     locationId: number | null;
     locationName: string | null;
-    initialTypes: string[];
-  }>({ isOpen: false, locationId: null, locationName: null, initialTypes: [] });
+    isEditing: boolean;
+    initialData?: {
+      rating: number;
+      description: string;
+      types: string[];
+    }
+  }>({ isOpen: false, locationId: null, locationName: null, isEditing: false });
 
-  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false); // 3. Adicione o estado para o modal de ajuda
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -109,7 +115,7 @@ export default function MapPage() {
     setActiveModal(null);
   };
 
-  const handleReviewClick = (locationId: number) => {
+  const handleReviewClick = (locationId: number, isEditing = false) => {
     if (!isLoggedIn) {
       setActiveModal("login");
     } else {
@@ -119,7 +125,12 @@ export default function MapPage() {
           isOpen: true,
           locationId: locationToReview.id,
           locationName: locationToReview.name,
-          initialTypes: locationToReview.typeValues,
+          isEditing,
+          initialData: isEditing ? {
+            rating: locationToReview.rating,
+            description: locationToReview.description || "",
+            types: locationToReview.typeValues,
+          } : undefined,
         });
       }
     }
@@ -139,10 +150,10 @@ export default function MapPage() {
       );
 
       toast({
-        title: "Avaliação Salva!",
+        title: reviewModalState.isEditing ? "Avaliação Atualizada!" : "Avaliação Salva!",
         description: `Obrigado por contribuir com informações sobre ${reviewModalState.locationName}.`,
       });
-      setReviewModalState({ isOpen: false, locationId: null, locationName: null, initialTypes: [] });
+      setReviewModalState({ isOpen: false, locationId: null, locationName: null, isEditing: false });
     }
   };
 
@@ -170,6 +181,7 @@ export default function MapPage() {
         onSearchTermChange={setSearchTerm}
         onGlobalSearch={performGlobalSearch}
         onNavigate={(view) => setActiveModal(view)}
+        onOpenSettings={() => setIsSettingsOpen(true)}
       />
       <div className="flex-1 flex overflow-hidden relative">
         <div className="flex-1 relative z-10">
@@ -180,7 +192,8 @@ export default function MapPage() {
             onMapClick={handleMapClick}
             findMyLocation={findMyLocation}
             onMyLocationFound={() => setFindMyLocation(false)}
-            onRateClick={handleReviewClick}
+            onRateClick={(locationId) => handleReviewClick(locationId)}
+            onEditReviewClick={(locationId) => handleReviewClick(locationId, true)}
           />
         </div>
         <FloatingMenu
@@ -217,16 +230,22 @@ export default function MapPage() {
         <DialogContent className="z-50 max-w-[700px]"><DialogHeader><DialogTitle>Filtrar & Listar Locais</DialogTitle><DialogDescription>Selecione filtros para refinar a busca.</DialogDescription></DialogHeader><div className="py-4 max-h-[70vh] overflow-y-auto px-1"><FilterAndListComponent onFilterChange={setActiveFilters} activeFilters={activeFilters} locations={filteredLocations} totalLocations={allLocations.length} onLocationClick={handleLocationClick} selectedLocationId={selectedLocationId} /></div></DialogContent>
       </Dialog>
       
-      {isLoggedIn && activeModal === 'profile' && (
-         <UserProfilePage onClose={() => setActiveModal(null)} />
+      {isLoggedIn && isSettingsOpen && (
+         <UserSettingsPage
+            onClose={() => setIsSettingsOpen(false)}
+            userName={userName}
+            userNeeds={userNeeds}
+            onUpdateNeeds={updateNeeds}
+            onUpdateUser={updateUser}
+         />
       )}
 
       <ReviewLocationModal
         isOpen={reviewModalState.isOpen}
-        onClose={() => setReviewModalState({ isOpen: false, locationId: null, locationName: null, initialTypes: [] })}
+        onClose={() => setReviewModalState({ isOpen: false, locationId: null, locationName: null, isEditing: false })}
         onSubmit={handleSaveReview}
         locationName={reviewModalState.locationName}
-        initialTypes={reviewModalState.initialTypes}
+        initialData={reviewModalState.initialData}
       />
 
       <WelcomeModal isOpen={isHelpModalOpen} onClose={() => setIsHelpModalOpen(false)} />

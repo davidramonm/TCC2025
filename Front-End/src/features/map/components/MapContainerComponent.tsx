@@ -18,15 +18,18 @@ interface MapProps {
   findMyLocation: boolean;
   onMyLocationFound: () => void;
   onRateClick: (locationId: number) => void;
+  onEditReviewClick: (locationId: number) => void; // Nova prop para edição
 }
 
-const MapContent = ({ locations, searchLocation, onMapClick, findMyLocation, onMyLocationFound, onRateClick }: MapProps) => {
+const MapContent = ({ locations, searchLocation, onMapClick, findMyLocation, onMyLocationFound, onRateClick, onEditReviewClick }: MapProps) => {
   const map = useMapEvents({
     click: (e) => onMapClick(e.latlng),
   });
   const markersRef = useRef<L.Marker[]>([]);
   const locationMarkerRef = useRef<L.Marker | null>(null);
   const { toast } = useToast();
+  // Simulação: o ID do usuário logado. No futuro, isso viria do seu AuthContext.
+  const LOGGED_IN_USER_ID = "user123";
 
   useEffect(() => {
     if (findMyLocation) {
@@ -70,6 +73,9 @@ const MapContent = ({ locations, searchLocation, onMapClick, findMyLocation, onM
     markersRef.current = [];
 
     locations.forEach((location) => {
+      // Simulação: vamos assumir que algumas avaliações foram feitas pelo usuário logado
+      const userHasReviewed = location.id % 2 === 0; // Exemplo: usuário avaliou locais com ID par
+
       const tipo = tiposAcessibilidade.find((t) => t.value === location.typeValues[0]);
       const IconComponent = tipo?.icon || MapPin;
       const iconString = renderToStaticMarkup(<IconComponent color="white" size={20} />);
@@ -86,6 +92,11 @@ const MapContent = ({ locations, searchLocation, onMapClick, findMyLocation, onM
       
       const typesList = location.typeValues.map((type: string) => `<li>${getLocationTypeName(type)}</li>`).join('');
       
+      // Decide qual botão mostrar
+      const actionButton = userHasReviewed
+        ? `<button class="edit-review-button" data-location-id="${location.id}" style="margin-top: 10px; padding: 6px 12px; background-color: #f59e0b; color: white; border: none; border-radius: 4px; cursor: pointer;">Editar Avaliação</button>`
+        : `<button class="rate-button" data-location-id="${location.id}" style="margin-top: 10px; padding: 6px 12px; background-color: #333; color: white; border: none; border-radius: 4px; cursor: pointer;">Avaliar</button>`;
+
       const popupContent = `
         <div style="font-family: inherit; line-height: 1.5;">
           <h4 style="margin: 0 0 8px 0; font-size: 16px;">${location.name}</h4>
@@ -96,7 +107,7 @@ const MapContent = ({ locations, searchLocation, onMapClick, findMyLocation, onM
           </div>
           ${location.rating ? `<p style="margin: 4px 0; font-size: 14px;">Avaliação: ${"★".repeat(location.rating)}${"☆".repeat(5 - location.rating)}</p>` : ""}
           ${location.description ? `<p style="margin: 4px 0; font-size: 14px;">Descrição: ${location.description}</p>` : ""}
-          <button class="rate-button" data-location-id="${location.id}" style="margin-top: 10px; padding: 6px 12px; background-color: #333; color: white; border: none; border-radius: 4px; cursor: pointer;">Avaliar</button>
+          ${actionButton}
         </div>
       `;
 
@@ -105,17 +116,20 @@ const MapContent = ({ locations, searchLocation, onMapClick, findMyLocation, onM
       marker.on('popupopen', (e) => {
         const popup = e.popup;
         const rateButton = popup.getElement()?.querySelector('.rate-button');
+        const editButton = popup.getElement()?.querySelector('.edit-review-button');
+        
         if (rateButton) {
-          (rateButton as HTMLElement).onclick = () => {
-            onRateClick(location.id);
-          };
+          (rateButton as HTMLElement).onclick = () => onRateClick(location.id);
+        }
+        if (editButton) {
+          (editButton as HTMLElement).onclick = () => onEditReviewClick(location.id);
         }
       });
       
       markersRef.current.push(marker);
     });
 
-  }, [map, locations, onRateClick]);
+  }, [map, locations, onRateClick, onEditReviewClick]);
 
   useEffect(() => {
     if (searchLocation) {

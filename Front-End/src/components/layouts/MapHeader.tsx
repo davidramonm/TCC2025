@@ -1,33 +1,31 @@
-// src/components/layouts/MapHeader.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { MapPin, Search, LogOut, LogIn, User } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { MapPin, Search, LogOut, LogIn, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { Separator } from "@/components/ui/separator";
 
 interface MapHeaderProps {
   searchTerm: string;
   onSearchTermChange: (term: string) => void;
   onGlobalSearch: () => void;
-  onNavigate: (view: "profile" | "login") => void;
+  onNavigate: (view: "login") => void;
+  onOpenSettings: () => void;
 }
 
-/**
- * @description O cabeçalho principal da aplicação. Contém o logo, a barra de busca
- * e os controles de usuário (perfil/login). Consome o AuthContext para exibir
- * o estado de autenticação correto.
- */
 export default function MapHeader({
   searchTerm,
   onSearchTermChange,
   onGlobalSearch,
   onNavigate,
+  onOpenSettings,
 }: MapHeaderProps) {
   const { isLoggedIn, userName, logout } = useAuth();
-
   const firstName = userName.split(' ')[0];
+  const userEmail = `${userName.split(' ').join('.').toLowerCase()}@email.com`; // Email simulado
 
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 shadow-sm z-20 relative">
@@ -62,26 +60,39 @@ export default function MapHeader({
 
       <div className="flex items-center gap-3">
         {isLoggedIn ? (
-          <>
-            <Button variant="ghost" className="flex items-center gap-2" onClick={() => onNavigate("profile")}>
-              <Avatar className="w-9 h-9">
-                <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">
-                  {userName.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              {/* CORREÇÃO APLICADA AQUI */}
-              <span className="hidden md:inline font-medium">{firstName}</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={logout}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-              aria-label="Sair"
-            >
-              <LogOut className="w-4 h-4" />
-            </Button>
-          </>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" className="flex items-center gap-2 p-1 rounded-full">
+                <Avatar className="w-9 h-9">
+                  <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">
+                    {userName.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 mr-4" align="end">
+              <div className="flex flex-col items-center p-4">
+                <Avatar className="w-20 h-20 mb-2">
+                  <AvatarFallback className="text-4xl bg-gradient-to-br from-gray-600 to-gray-800 text-white">
+                    {userName.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <h2 className="text-lg font-semibold">Olá, {firstName}</h2>
+                <p className="text-sm text-muted-foreground">{userEmail}</p>
+                <Button variant="outline" className="mt-4" onClick={onOpenSettings}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  Gerenciar sua Conta
+                </Button>
+              </div>
+              <Separator />
+              <div className="p-2">
+                <Button variant="ghost" className="w-full justify-start text-red-600 hover:text-red-700" onClick={logout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sair
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
         ) : (
           <Button onClick={() => onNavigate("login")}>
             <LogIn className="mr-2 h-4 w-4" />

@@ -2,9 +2,11 @@ package com.unip.EstablishmentsService.models;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 
 import java.util.List;
 import java.util.UUID;
@@ -20,13 +22,18 @@ public class Establishment {
 
     private String name;
     private String address;
+    @NotNull
     private Double xCoords;
+    @NotNull
     private Double yCoords;
 
     @OneToMany(mappedBy = "establishment")
     private List<Review> reviewList;
 
 
+    public Establishment(UUID establishmentId){
+        this.establishmentId = establishmentId;
+    }
 
 
 }

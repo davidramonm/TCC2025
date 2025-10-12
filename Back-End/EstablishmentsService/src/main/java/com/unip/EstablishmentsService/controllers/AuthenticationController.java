@@ -9,6 +9,7 @@ import com.unip.EstablishmentsService.models.Role;
 import com.unip.EstablishmentsService.models.User;
 import com.unip.EstablishmentsService.repositories.UserRepository;
 import com.unip.EstablishmentsService.services.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("auth")
+@SecurityRequirement(name = "bearerToken")
 public class AuthenticationController {
 
     private final UserService service;

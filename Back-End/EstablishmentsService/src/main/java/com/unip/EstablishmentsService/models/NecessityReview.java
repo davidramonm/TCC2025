@@ -1,41 +1,30 @@
 package com.unip.EstablishmentsService.models;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "reviews")
+@Table(name = "necessities_reviews")
 @Data@AllArgsConstructor@NoArgsConstructor
-public class Review {
+public class NecessityReview {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID reviewId;
+    private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "establishment_id")
-    @JsonIgnore
-    private Establishment establishment;
-
-
-    @OneToMany(mappedBy = "review")
-    private List<NecessityReview> necessityReviews;
+    @JoinColumn(name = "necessity_id")
+    private Necessity necessity;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "review_id")
     @JsonIgnore
-    private User user;
+    private Review review;
 
-    private String comment;
-    private Integer rating;
-
-
-
+    private Boolean attends;
 }

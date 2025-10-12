@@ -6,9 +6,7 @@ import com.unip.EstablishmentsService.services.NecessityService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,5 +27,10 @@ public class NecessityController {
     @GetMapping("/{id}")
     public ResponseEntity<Necessity> getNecessityById(@PathVariable@Valid UUID id) {
         return ResponseEntity.ok().body(necessityService.getNecessityById(id));
+    }
+
+    @PostMapping()
+    public ResponseEntity<Necessity> createNecessity(@Valid @RequestBody Necessity necessity) {
+        return ResponseEntity.ok().body(necessityService.createNecessity(necessity));
     }
 }

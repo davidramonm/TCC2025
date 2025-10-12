@@ -21,4 +21,8 @@ public class NecessityService {
     public Necessity getNecessityById(UUID id) {
         return necessityRepository.findById(id).orElseThrow();
     }
+
+    public Necessity createNecessity(Necessity necessity) {
+        return necessityRepository.save(necessity);
+    }
 }

@@ -1,5 +1,55 @@
 // src/lib/api.ts
 import { Location } from '@/types';
+import axios from 'axios';
+import { tokenService } from './tokenService';
+
+const apiClient = axios.create({
+  baseURL: 'http://localhost:8080',
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+apiClient.interceptors.request.use(config => {
+  const token = tokenService.get();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        const res = await axios.post(
+          "http://localhost:8080/auth/refresh",
+          {},
+          { withCredentials: true }
+        );
+        const newToken = res.data.accessToken;
+        tokenService.set(newToken);
+
+        apiClient.defaults.headers.Authorization = `Bearer ${newToken}`;
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return apiClient(originalRequest);
+      } catch (err) {
+        tokenService.clear();
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default apiClient;
+
+
+
 
 /**
  * @description Busca a lista de locais. Atualmente, simula uma chamada de API
@@ -45,7 +95,7 @@ export async function fetchLocations(): Promise<Location[]> {
  */
 export async function getAddressFromCoordinates(lat: number, lng: number): Promise<string> {
   try {
-    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
+    const response = await fetch(`http://localhost:8089/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
     const data = await response.json();
 
     if (data && data.address) {
@@ -61,5 +111,97 @@ export async function getAddressFromCoordinates(lat: number, lng: number): Promi
   } catch (error) {
     console.error("Erro ao buscar endereço:", error);
     return "Não foi possível encontrar o endereço.";
+  }
+}
+
+export async function registerUser(email: string, password: string, fName: string, lName: string): Promise<any> {
+  try {
+    const response = await fetch('http://localhost:8080/auth/register', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, fName, lName })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.accessToken;
+  } catch (error) {
+    console.error("Erro ao registrar usuário:", error);
+    throw error;
+  }
+}
+
+export async function loginUser(email: string, password: string): Promise<any> {
+  try {
+    const response = await fetch('http://localhost:8080/auth/login', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    return data.accessToken;
+  } catch (error) {
+    console.error("Erro ao fazer login:", error);
+    throw error;
+  }
+}
+
+export async function refreshToken(): Promise<any> {
+  try {
+    const response = await fetch('http://localhost:8080/auth/refresh', {
+      method: 'POST',
+      credentials: 'include'
+    });
+    if (response.status === 401) {
+      window.location.href = '/login';
+      return;
+    }
+    
+    const data = await response.json();
+    return data.accessToken;
+  } catch (error) {
+    console.error("Erro ao atualizar token:", error);
+    throw error;
+  }
+}
+
+export async function fetchAllEstablishments(): Promise<any> {
+  try {
+    const response = await fetch('http://localhost:8080/establishments', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    }); 
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Erro ao buscar estabelecimentos:", error);
+    throw error;
+  }
+}
+
+export async function getEstablishmentDetails(id: number): Promise<any> {
+  try {
+    const response = await fetch(`http://localhost:8080/establishments/${id}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Erro ao buscar detalhes do estabelecimento:", error);
+    throw error;
   }
 }

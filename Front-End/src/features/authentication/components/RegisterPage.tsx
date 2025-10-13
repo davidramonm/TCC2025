@@ -4,7 +4,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, RegisterFormData } from "../schemas";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,7 +16,8 @@ import { tiposAcessibilidade } from "@/lib/constants";
 import { PasswordInput } from "@/components/ui/password-input";
 import { PasswordStrength } from "@/components/ui/password-strength";
 import AuthHeader from "@/components/layouts/AuthHeader";
-import { Card } from "@/components/ui/card"; 
+import { Card } from "@/components/ui/card"; // Import Card para o resumo
+import { registerUser } from "@/lib/api";
 
 interface RegisterPageProps {
   onNavigate: (view: "login") => void;
@@ -31,9 +32,9 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
 
   const { register, handleSubmit, watch, trigger, formState: { errors, isSubmitting } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
-    mode: "onTouched", 
+    mode: "onTouched", // Valida ao sair do campo
   });
-  
+
   const passwordValue = watch("password");
 
   const handleNextStep = async () => {
@@ -49,6 +50,11 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
       toast({ title: "Termos obrigatórios", description: "Você deve aceitar os termos.", variant: "destructive" });
       return;
     }
+
+    const token = await registerUser(data.email, data.password, data.firstName, data.lastName);
+
+    console.log("Token recebido:", token);
+
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const fullName = `${data.firstName} ${data.lastName}`;
     onRegister(fullName, selectedNeeds);
@@ -67,12 +73,12 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
       >
         <div className="flex items-center justify-center space-x-2 mt-6">
           <div className="flex items-center">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${registerStep >= 1 ? "bg-gray-600 text-white" : "bg-gray-200"}`}>{registerStep > 1 ? <Check/> : "1"}</div>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${registerStep >= 1 ? "bg-gray-600 text-white" : "bg-gray-200"}`}>{registerStep > 1 ? <Check /> : "1"}</div>
             <span className="ml-2 text-sm font-medium">Dados</span>
           </div>
           <div className={`w-8 h-1 rounded transition-all ${registerStep >= 2 ? "bg-gray-600" : "bg-gray-200"}`}></div>
           <div className="flex items-center">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${registerStep >= 2 ? "bg-gray-600 text-white" : "bg-gray-200"}`}>{registerStep > 2 ? <Check/> : "2"}</div>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${registerStep >= 2 ? "bg-gray-600 text-white" : "bg-gray-200"}`}>{registerStep > 2 ? <Check /> : "2"}</div>
             <span className="ml-2 text-sm font-medium">Preferências</span>
           </div>
           <div className={`w-8 h-1 rounded transition-all ${registerStep >= 3 ? "bg-gray-600" : "bg-gray-200"}`}></div>
@@ -114,8 +120,8 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
 
         {registerStep === 3 && (
           <div className="space-y-6">
-             <Card className="p-4 bg-gray-50"><h3 className="font-semibold mb-2">Resumo dos Dados</h3><div className="space-y-1 text-sm"><p><strong>Nome:</strong> {watch("firstName")} {watch("lastName")}</p><p><strong>E-mail:</strong> {watch("email")}</p></div></Card>
-             <Card className="p-4 bg-gray-50"><h3 className="font-semibold mb-2">Preferências</h3><div className="flex flex-wrap gap-2">{selectedNeeds.length > 0 ? selectedNeeds.map(need => <Badge key={need}>{tiposAcessibilidade.find(t=>t.value===need)?.label}</Badge>) : <p className="text-sm text-gray-500">Nenhuma preferência selecionada.</p>}</div></Card>
+            <Card className="p-4 bg-gray-50"><h3 className="font-semibold mb-2">Resumo dos Dados</h3><div className="space-y-1 text-sm"><p><strong>Nome:</strong> {watch("firstName")} {watch("lastName")}</p><p><strong>E-mail:</strong> {watch("email")}</p></div></Card>
+            <Card className="p-4 bg-gray-50"><h3 className="font-semibold mb-2">Preferências</h3><div className="flex flex-wrap gap-2">{selectedNeeds.length > 0 ? selectedNeeds.map(need => <Badge key={need}>{tiposAcessibilidade.find(t => t.value === need)?.label}</Badge>) : <p className="text-sm text-gray-500">Nenhuma preferência selecionada.</p>}</div></Card>
             <div className="flex items-start space-x-3 pt-2"><Checkbox id="terms" checked={acceptTerms} onCheckedChange={(c) => setAcceptTerms(c === true)} /><Label htmlFor="terms" className="text-sm font-normal cursor-pointer">Aceito os <a href="#" className="underline">termos de uso</a>.</Label></div>
             <div className="flex gap-3"><Button type="button" variant="outline" onClick={() => setRegisterStep(2)} className="w-full">Voltar</Button><Button type="submit" className="w-full" disabled={isSubmitting || !acceptTerms}>{isSubmitting ? <Loader2 className="animate-spin" /> : "Finalizar Cadastro"}</Button></div>
           </div>
@@ -129,4 +135,8 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
       </form>
     </>
   );
+}
+
+function setData(arg0: { email: string; password: string; fName: string; lName: string; }): any {
+  throw new Error("Function not implemented.");
 }

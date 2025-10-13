@@ -1,7 +1,9 @@
 // Front-End/contexts/AuthContext.tsx
 "use client";
 
-import { createContext, useState, useContext, ReactNode } from 'react';
+import { ref } from 'process';
+import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import { refreshToken } from "@/lib/api";
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -37,6 +39,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("Convidado");
   const [userNeeds, setUserNeeds] = useState<string[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const token = await refreshToken();
+      if (token) {
+        setIsLoggedIn(true);
+      }
+    })();
+  }, []);
 
   const login = (name: string) => {
     setUserName(name);

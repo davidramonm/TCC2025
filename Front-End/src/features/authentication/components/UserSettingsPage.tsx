@@ -1,4 +1,3 @@
-// src/features/authentication/components/UserSettingsPage.tsx
 "use client";
 
 import { useState } from "react";
@@ -21,14 +20,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-/**
- * @description Props para a página de configurações do usuário.
- * @param {() => void} onClose - Callback para fechar o modal de configurações.
- * @param {string} userName - O nome atual do usuário.
- * @param {string[]} userNeeds - As preferências de acessibilidade atuais do usuário.
- * @param {(newNeeds: string[]) => void} onUpdateNeeds - Callback para salvar as novas preferências.
- * @param {(newName: string) => void} onUpdateUser - Callback para salvar o novo nome do usuário.
- */
 interface UserSettingsPageProps {
   onClose: () => void;
   userName: string;
@@ -37,10 +28,6 @@ interface UserSettingsPageProps {
   onUpdateUser: (newName: string) => void;
 }
 
-/**
- * @description Um modal de overlay que permite ao usuário editar suas informações de perfil,
- * preferências de acessibilidade e configurações de segurança.
- */
 export default function UserSettingsPage({
   onClose,
   userName,
@@ -67,7 +54,6 @@ export default function UserSettingsPage({
     onClose();
   };
 
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[1100]">
       <Card className="w-full max-w-2xl bg-white shadow-2xl border-0">
@@ -87,109 +73,118 @@ export default function UserSettingsPage({
               <TabsTrigger value="security">Segurança</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="profile" className="pt-6">
-               <div className="space-y-4">
-                <div className="flex items-center gap-4">
+            <div className="pt-6 min-h-[350px]">
+              <TabsContent value="profile">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
                     <div className="relative">
-                        <img src="/placeholder-user.jpg" alt="Foto do usuário" className="w-24 h-24 rounded-full border" />
-                        <Button size="icon" className="absolute bottom-0 right-0 rounded-full w-8 h-8">
-                            <Camera className="w-4 h-4"/>
-                        </Button>
+                      <img src="/placeholder-user.jpg" alt="Foto do usuário" className="w-24 h-24 rounded-full border" />
+                      <Button size="icon" className="absolute bottom-0 right-0 rounded-full w-8 h-8">
+                        <Camera className="w-4 h-4" />
+                      </Button>
                     </div>
-                     <div>
-                        <h3 className="text-lg font-semibold">Alterar Foto de Perfil</h3>
-                        <p className="text-sm text-gray-500">Faça o upload de uma nova foto.</p>
+                    <div>
+                      <h3 className="text-lg font-semibold">Alterar Foto de Perfil</h3>
+                      <p className="text-sm text-gray-500">Faça o upload de uma nova foto.</p>
                     </div>
-                </div>
+                  </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <Label htmlFor="firstName">Nome</Label>
-                        <Input id="firstName" value={firstName} onChange={e => setFirstName(e.target.value)} />
+                      <Label htmlFor="firstName">Nome</Label>
+                      <Input id="firstName" value={firstName} onChange={e => setFirstName(e.target.value)} />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="lastName">Sobrenome</Label>
-                        <Input id="lastName" value={lastName} onChange={e => setLastName(e.target.value)} />
+                      <Label htmlFor="lastName">Sobrenome</Label>
+                      <Input id="lastName" value={lastName} onChange={e => setLastName(e.target.value)} />
                     </div>
-                </div>
-                 <div className="space-y-2">
+                  </div>
+                  <div className="space-y-2">
                     <Label htmlFor="email">E-mail</Label>
                     <Input id="email" type="email" value={email} readOnly disabled />
+                  </div>
                 </div>
-              </div>
-            </TabsContent>
+              </TabsContent>
 
-            <TabsContent value="accessibility" className="pt-6">
-              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <Heart className="w-5 h-5 text-gray-600" />
-                Minhas Preferências
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-64 overflow-y-auto p-1">
-                {tiposAcessibilidade.map((tipo) => {
-                  const IconComponent = tipo.icon;
-                  const isSelected = selectedNeeds.includes(tipo.value);
-                  return (
-                    <div
-                      key={tipo.value}
-                      className={`flex items-center space-x-3 p-3 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
-                        isSelected
-                          ? "border-gray-600 bg-gray-50 shadow-sm"
-                          : "border-gray-200 hover:border-gray-400"
-                      }`}
-                      onClick={() => toggleNeed(tipo.value)}
-                    >
-                      <IconComponent
-                        className={`w-5 h-5 transition-colors ${
-                          isSelected ? "text-gray-700" : "text-gray-500"
-                        }`}
-                      />
-                      <Label className="text-sm font-medium cursor-pointer flex-1">
-                        {tipo.label}
-                      </Label>
-                    </div>
-                  );
-                })}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="security" className="pt-6 space-y-6">
-               <div>
+              <TabsContent value="accessibility">
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-gray-600" />
-                  Segurança
+                  <Heart className="w-5 h-5 text-gray-600" />
+                  Minhas Preferências
                 </h3>
-                <Button variant="outline">
-                  Alterar Senha
-                </Button>
-              </div>
-               <div className="border-t pt-6">
-                 <h3 className="text-lg font-semibold mb-3">Excluir Conta</h3>
-                 <AlertDialog>
-                   <AlertDialogTrigger asChild>
-                    <Button variant="destructive">
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Excluir minha conta
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-64 overflow-y-auto p-1">
+                  {tiposAcessibilidade.map((tipo) => {
+                    const IconComponent = tipo.icon;
+                    const isSelected = selectedNeeds.includes(tipo.value);
+                    return (
+                      <div
+                        key={tipo.value}
+                        className={`flex items-center space-x-3 p-3 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                          isSelected
+                            ? "border-gray-800 bg-gray-800 text-white shadow-lg"
+                            : "border-gray-200 hover:border-gray-400"
+                        }`}
+                        onClick={() => toggleNeed(tipo.value)}
+                      >
+                        <IconComponent
+                          className={`w-5 h-5 transition-colors ${
+                            isSelected ? "text-white" : "text-gray-500"
+                          }`}
+                        />
+                        <Label className={`text-sm font-medium cursor-pointer flex-1 ${isSelected ? "text-white" : ""}`}>
+                          {tipo.label}
+                        </Label>
+                      </div>
+                    );
+                  })}
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="security">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                      <Shield className="w-5 h-5 text-gray-600" />
+                      Segurança
+                    </h3>
+                    <Button variant="outline">
+                      Alterar Senha
                     </Button>
-                   </AlertDialogTrigger>
-                   <AlertDialogContent>
-                     <AlertDialogHeader>
-                       <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                       <AlertDialogDescription>
-                         Essa ação não pode ser desfeita. Todos os seus dados serão permanentemente removidos.
-                       </AlertDialogDescription>
-                     </AlertDialogHeader>
-                     <AlertDialogFooter>
-                       <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                       <AlertDialogAction>Continuar</AlertDialogAction>
-                     </AlertDialogFooter>
-                   </AlertDialogContent>
-                 </AlertDialog>
-               </div>
-            </TabsContent>
+                  </div>
+                  <div className="border-t pt-6">
+                    <h3 className="text-lg font-semibold mb-3">Excluir Conta</h3>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive">
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Excluir minha conta
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Essa ação não pode ser desfeita. Todos os seus dados serão permanentemente removidos.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction className="bg-gray-800 hover:bg-gray-900">
+                            Continuar
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
+              </TabsContent>
+            </div>
           </Tabs>
 
           <div className="flex justify-end pt-6 border-t mt-6">
-            <Button onClick={handleSaveChanges}>
+            <Button 
+              onClick={handleSaveChanges}
+              className="bg-gray-800 hover:bg-gray-900"
+            >
               <Save className="w-4 h-4 mr-2" />
               Salvar Alterações
             </Button>

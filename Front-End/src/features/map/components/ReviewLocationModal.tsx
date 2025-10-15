@@ -15,20 +15,26 @@ interface ReviewLocationModalProps {
   onClose: () => void;
   onSubmit: (reviewData: { rating: number; selectedTypes: string[]; description: string }) => void;
   locationName: string | null;
-  initialTypes: string[];
+  initialData?: { // Prop para receber dados existentes
+    rating: number;
+    description: string;
+    types: string[];
+  };
 }
 
-export default function ReviewLocationModal({ isOpen, onClose, onSubmit, locationName, initialTypes }: ReviewLocationModalProps) {
+export default function ReviewLocationModal({ isOpen, onClose, onSubmit, locationName, initialData }: ReviewLocationModalProps) {
   const [rating, setRating] = useState(0);
   const [description, setDescription] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
 
   useEffect(() => {
-    // Pré-seleciona as acessibilidades existentes quando o modal é aberto
+    // Preenche o formulário com os dados iniciais quando o modal é aberto
     if (isOpen) {
-      setSelectedTypes(initialTypes);
+      setRating(initialData?.rating || 0);
+      setDescription(initialData?.description || "");
+      setSelectedTypes(initialData?.types || []);
     }
-  }, [isOpen, initialTypes]);
+  }, [isOpen, initialData]);
 
   const toggleAccessibilityType = (typeValue: string) => {
     setSelectedTypes((prev) =>
@@ -42,7 +48,7 @@ export default function ReviewLocationModal({ isOpen, onClose, onSubmit, locatio
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      // Limpa o estado ao fechar
+      // Limpa o estado ao fechar para a próxima utilização
       setRating(0);
       setDescription("");
       setSelectedTypes([]);
@@ -54,7 +60,7 @@ export default function ReviewLocationModal({ isOpen, onClose, onSubmit, locatio
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Avaliar o local: {locationName}</DialogTitle>
+          <DialogTitle>{initialData ? 'Editar Avaliação' : 'Avaliar Local'}: {locationName}</DialogTitle>
           <DialogDescription>
             Sua contribuição ajuda a comunidade. Adicione ou confirme as características de acessibilidade, deixe uma avaliação e um comentário.
           </DialogDescription>
@@ -109,7 +115,7 @@ export default function ReviewLocationModal({ isOpen, onClose, onSubmit, locatio
           </Button>
           <Button type="button" onClick={handleSubmit} disabled={rating === 0}>
             <Save className="w-4 h-4 mr-2" />
-            Salvar Avaliação
+            Salvar
           </Button>
         </DialogFooter>
       </DialogContent>

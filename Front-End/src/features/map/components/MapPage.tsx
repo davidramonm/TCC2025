@@ -20,7 +20,7 @@ import FloatingMenu from "./FloatingMenu";
 import LoginPage from "@/features/authentication/components/LoginPage";
 import RegisterPage from "@/features/authentication/components/RegisterPage";
 import RecoveryPage from "@/features/authentication/components/RecoveryPage";
-import UserProfilePage from "@/features/authentication/components/UserProfilePage";
+import UserSettingsPage from "@/features/authentication/components/UserSettingsPage";
 import MapPageSkeleton from "./MapPageSkeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
@@ -37,7 +37,7 @@ export default function MapPage() {
   const { toast } = useToast();
   const { isLoggedIn, userName, userNeeds, login, register, logout, updateUser, updateNeeds } = useAuth();
   
-  const [activeModal, setActiveModal] = useState<"login" | "register" | "recovery" | "add" | "filter" | "profile" | null>(null);
+  const [activeModal, setActiveModal] = useState<"login" | "register" | "recovery" | "add" | "filter" | null>(null);
   
   // --- Gerenciamento de Estado Corrigido ---
   const [allLocations, setAllLocations] = useState<Location[]>([]);
@@ -53,6 +53,21 @@ export default function MapPage() {
   const [searchLocation, setSearchLocation] = useState<Location | null>(null);
   const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
   const [findMyLocation, setFindMyLocation] = useState(false);
+  
+  const [reviewModalState, setReviewModalState] = useState<{
+    isOpen: boolean;
+    locationId: number | null;
+    locationName: string | null;
+    isEditing: boolean;
+    initialData?: {
+      rating: number;
+      description: string;
+      types: string[];
+    }
+  }>({ isOpen: false, locationId: null, locationName: null, isEditing: false });
+
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -123,6 +138,48 @@ export default function MapPage() {
     setActiveModal(null);
   };
 
+  const handleReviewClick = (locationId: number, isEditing = false) => {
+    if (!isLoggedIn) {
+      setActiveModal("login");
+    } else {
+      const locationToReview = allLocations.find(loc => loc.id === locationId);
+      if (locationToReview) {
+        setReviewModalState({
+          isOpen: true,
+          locationId: locationToReview.id,
+          locationName: locationToReview.name,
+          isEditing,
+          initialData: isEditing ? {
+            rating: locationToReview.rating,
+            description: locationToReview.description || "",
+            types: locationToReview.typeValues,
+          } : undefined,
+        });
+      }
+    }
+  };
+
+  const handleSaveReview = (reviewData: { rating: number; selectedTypes: string[]; description: string }) => {
+    if (reviewModalState.locationId) {
+      setAllLocations(prevLocations =>
+        prevLocations.map(loc =>
+          loc.id === reviewModalState.locationId ? {
+            ...loc,
+            rating: reviewData.rating,
+            typeValues: reviewData.selectedTypes,
+            description: reviewData.description || loc.description,
+          } : loc
+        )
+      );
+
+      toast({
+        title: reviewModalState.isEditing ? "Avaliação Atualizada!" : "Avaliação Salva!",
+        description: `Obrigado por contribuir com informações sobre ${reviewModalState.locationName}.`,
+      });
+      setReviewModalState({ isOpen: false, locationId: null, locationName: null, isEditing: false });
+    }
+  };
+
   const performGlobalSearch = () => {
     const normalizedQuery = searchTerm.toLowerCase().trim();
     if (!normalizedQuery) return;
@@ -147,6 +204,7 @@ export default function MapPage() {
         onSearchTermChange={setSearchTerm}
         onGlobalSearch={performGlobalSearch}
         onNavigate={(view) => setActiveModal(view)}
+        onOpenSettings={() => setIsSettingsOpen(true)}
       />
       <div className="flex-1 flex overflow-hidden relative">
         <div className="flex-1 relative z-10">
@@ -158,6 +216,8 @@ export default function MapPage() {
             onMarkerClick={handleLocationClick}
             findMyLocation={findMyLocation}
             onMyLocationFound={() => setFindMyLocation(false)}
+            onRateClick={(locationId) => handleReviewClick(locationId)}
+            onEditReviewClick={(locationId) => handleReviewClick(locationId, true)}
           />
         </div>
         <FloatingMenu
@@ -192,9 +252,25 @@ export default function MapPage() {
         <DialogContent className="z-50 max-w-[700px]"><DialogHeader><DialogTitle>Filtrar & Listar Locais</DialogTitle><DialogDescription>Selecione filtros para refinar a busca.</DialogDescription></DialogHeader><div className="py-4 max-h-[70vh] overflow-y-auto px-1"><FilterAndListComponent onFilterChange={setActiveFilters} activeFilters={activeFilters} locations={filteredLocations} totalLocations={allLocations.length} onLocationClick={handleLocationClick} selectedLocationId={selectedLocationId} /></div></DialogContent>
       </Dialog>
       
-    {isLoggedIn && activeModal === 'profile' && (
-      <UserProfilePage onClose={() => setActiveModal(null)} />
-    )}
+      {isLoggedIn && isSettingsOpen && (
+         <UserSettingsPage
+            onClose={() => setIsSettingsOpen(false)}
+            userName={userName}
+            userNeeds={userNeeds}
+            onUpdateNeeds={updateNeeds}
+            onUpdateUser={updateUser}
+         />
+      )}
+
+      <ReviewLocationModal
+        isOpen={reviewModalState.isOpen}
+        onClose={() => setReviewModalState({ isOpen: false, locationId: null, locationName: null, isEditing: false })}
+        onSubmit={handleSaveReview}
+        locationName={reviewModalState.locationName}
+        initialData={reviewModalState.initialData}
+      />
+
+      <WelcomeModal isOpen={isHelpModalOpen} onClose={() => setIsHelpModalOpen(false)} />
     </div>
   );
 }

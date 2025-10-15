@@ -170,13 +170,13 @@ export default function MapPage() {
       <Dialog open={activeModal === 'login'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogTitle className="sr-only">Login</DialogTitle>
-          <LoginPage onNavigate={(view) => setActiveModal(view)} onLogin={(name) => { login(name); setActiveModal(null); }} />
+          <LoginPage onNavigate={(view) => setActiveModal(view)} onLogin={(email, password) => { login(email, password); setActiveModal(null); }} />
         </DialogContent>
       </Dialog>
       <Dialog open={activeModal === 'register'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
         <DialogContent className="max-w-3xl">
           <DialogTitle className="sr-only">Criar Conta</DialogTitle>
-          <RegisterPage onNavigate={(view) => setActiveModal(view)} onRegister={(name, needs) => { register(name, needs); setActiveModal(null); }} />
+          <RegisterPage onNavigate={(view) => setActiveModal(view)} onRegister={(fName, lName, email, password, needs) => { register(fName, lName, email, password, needs); setActiveModal(null); }} />
         </DialogContent>
       </Dialog>
       <Dialog open={activeModal === 'recovery'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>

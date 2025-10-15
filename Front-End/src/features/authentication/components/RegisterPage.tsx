@@ -21,7 +21,7 @@ import { registerUser } from "@/lib/api";
 
 interface RegisterPageProps {
   onNavigate: (view: "login") => void;
-  onRegister: (name: string, needs: string[]) => void;
+  onRegister: (fName: string, lName: string, email: string, password: string, needs: string[]) => void;
 }
 
 export default function RegisterPage({ onNavigate, onRegister }: RegisterPageProps) {
@@ -51,13 +51,8 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
       return;
     }
 
-    const token = await registerUser(data.email, data.password, data.firstName, data.lastName);
-
-    console.log("Token recebido:", token);
-
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    const fullName = `${data.firstName} ${data.lastName}`;
-    onRegister(fullName, selectedNeeds);
+    onRegister(data.firstName, data.lastName, data.email, data.password, selectedNeeds);
   };
 
   const toggleNeed = (needValue: string) => {

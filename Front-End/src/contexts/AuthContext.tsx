@@ -3,14 +3,15 @@
 
 import { ref } from 'process';
 import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { refreshToken } from "@/lib/api";
+import apiClient, { refreshToken } from "@/lib/api";
+import { tokenService } from '@/lib/tokenService';
 
 interface AuthContextType {
   isLoggedIn: boolean;
   userName: string;
   userNeeds: string[];
-  login: (name: string) => void;
-  register: (name: string, needs: string[]) => void;
+  login: (email: string, password: string) => void;
+  register: (fName: string, lName: string, email: string, password: string, needs: string[]) => void;
   logout: () => void;
   updateUser: (name: string) => void;
   updateNeeds: (needs: string[]) => void;
@@ -42,25 +43,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     (async () => {
-      const token = await refreshToken();
-      if (token) {
+      try {
+        const res = await apiClient.post("/auth/refresh");
+        tokenService.set(res.data.accessToken);
+        setUserName(res.data.fName + " " + res.data.lName);
         setIsLoggedIn(true);
+      } catch {
+        setIsLoggedIn(false);
       }
+
+
     })();
   }, []);
 
-  const login = (name: string) => {
-    setUserName(name);
+  async function login(email: string, password: string) {
+    const res = await apiClient.post("/auth/login", { email, password });
+    setUserName(res.data.fName + " " + res.data.lName);
     setIsLoggedIn(true);
   };
 
-  const register = (name: string, needs: string[]) => {
-    setUserName(name);
+  async function register (fName: string, lName: string, email: string, password: string, needs: string[]) {
+    const res = await apiClient.post("/auth/register", {fName, lName, email, password });
+    setUserName(res.data.fName + " " + res.data.lName);
     setUserNeeds(needs);
     setIsLoggedIn(true);
   };
-  
-  const logout = () => {
+
+  async function logout() {
+    await apiClient.post("/auth/logout");
+    tokenService.clear();
     setUserName("Convidado");
     setUserNeeds([]);
     setIsLoggedIn(false);

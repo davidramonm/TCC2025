@@ -5,6 +5,7 @@ import com.unip.EstablishmentsService.dtos.LoginRequestDTO;
 import com.unip.EstablishmentsService.dtos.LoginResponseDTO;
 import com.unip.EstablishmentsService.dtos.RegisterRequestDTO;
 import com.unip.EstablishmentsService.infra.JwtService;
+import com.unip.EstablishmentsService.mappers.UserMapper;
 import com.unip.EstablishmentsService.models.Role;
 import com.unip.EstablishmentsService.models.Token;
 import com.unip.EstablishmentsService.models.User;
@@ -34,6 +35,7 @@ public class AuthenticationController {
     private final UserRepository repository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final UserMapper userMapper;
 
 
     @PostMapping("/login")
@@ -44,9 +46,9 @@ public class AuthenticationController {
 
         var usernamePassword = new UsernamePasswordAuthenticationToken(request.email(), request.password());
         var auth = authenticationManager.authenticate(usernamePassword);
-
-        String accessToken = jwtService.generateToken((User) auth.getPrincipal(), Token.ACCESS_TOKEN);
-        String refreshToken = jwtService.generateToken((User) auth.getPrincipal(), Token.REFRESH_TOKEN);
+        User user = (User) auth.getPrincipal();
+        String accessToken = jwtService.generateToken(user, Token.ACCESS_TOKEN);
+        String refreshToken = jwtService.generateToken(user, Token.REFRESH_TOKEN);
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
@@ -58,7 +60,7 @@ public class AuthenticationController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        return ResponseEntity.ok().body(new LoginResponseDTO(accessToken));
+        return ResponseEntity.ok().body(userMapper.userToLoginResponseDTO(user, accessToken));
     }
 
     @PostMapping("/register")
@@ -90,7 +92,7 @@ public class AuthenticationController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        return ResponseEntity.ok().body(new LoginResponseDTO(accessToken));
+        return ResponseEntity.ok().body(userMapper.userToLoginResponseDTO(user, accessToken));
     }
 
     @PostMapping("/refresh")
@@ -108,10 +110,26 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        String acessToken = jwtService.generateToken(user, Token.ACCESS_TOKEN);
-        return ResponseEntity.ok().body(new LoginResponseDTO(acessToken));
+        String accessToken = jwtService.generateToken(user, Token.ACCESS_TOKEN);
+        return ResponseEntity.ok().body(userMapper.userToLoginResponseDTO(user, accessToken));
 
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletResponse response) {
+        
+        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("Strict")
+                .path("/")
+                .maxAge(0) // expires immediately
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
+
+        return ResponseEntity.noContent().build(); // 204 No Content
+}
 
 
 }

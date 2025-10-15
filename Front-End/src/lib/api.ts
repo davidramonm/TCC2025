@@ -39,7 +39,6 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (err) {
         tokenService.clear();
-        window.location.href = "/login";
       }
     }
     return Promise.reject(error);
@@ -95,7 +94,7 @@ export async function fetchLocations(): Promise<Location[]> {
  */
 export async function getAddressFromCoordinates(lat: number, lng: number): Promise<string> {
   try {
-    const response = await fetch(`http://localhost:8089/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
+    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
     const data = await response.json();
 
     if (data && data.address) {
@@ -111,66 +110,6 @@ export async function getAddressFromCoordinates(lat: number, lng: number): Promi
   } catch (error) {
     console.error("Erro ao buscar endereço:", error);
     return "Não foi possível encontrar o endereço.";
-  }
-}
-
-export async function registerUser(email: string, password: string, fName: string, lName: string): Promise<any> {
-  try {
-    const response = await fetch('http://localhost:8080/auth/register', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, fName, lName })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Erro na requisição: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.accessToken;
-  } catch (error) {
-    console.error("Erro ao registrar usuário:", error);
-    throw error;
-  }
-}
-
-export async function loginUser(email: string, password: string): Promise<any> {
-  try {
-    const response = await fetch('http://localhost:8080/auth/login', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    if (!response.ok) {
-      throw new Error(`Erro na requisição: ${response.statusText}`);
-    }
-    
-    const data = await response.json();
-    return data.accessToken;
-  } catch (error) {
-    console.error("Erro ao fazer login:", error);
-    throw error;
-  }
-}
-
-export async function refreshToken(): Promise<any> {
-  try {
-    const response = await fetch('http://localhost:8080/auth/refresh', {
-      method: 'POST',
-      credentials: 'include'
-    });
-    if (response.status === 401) {
-      window.location.href = '/login';
-      return;
-    }
-    
-    const data = await response.json();
-    return data.accessToken;
-  } catch (error) {
-    console.error("Erro ao atualizar token:", error);
-    throw error;
   }
 }
 

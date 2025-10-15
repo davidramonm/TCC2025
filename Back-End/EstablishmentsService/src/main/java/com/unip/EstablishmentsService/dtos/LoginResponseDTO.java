@@ -1,5 +1,5 @@
 package com.unip.EstablishmentsService.dtos;
 
 public record LoginResponseDTO (
-        String accessToken
+        String fName, String lName, String email, String accessToken
 ){}

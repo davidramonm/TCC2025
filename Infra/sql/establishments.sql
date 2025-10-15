@@ -2,8 +2,8 @@ CREATE TABLE establishments (
     establishment_id UUID PRIMARY KEY,
     name VARCHAR(45) NOT NULL,
     address VARCHAR(100),
-    x_coords FLOAT,
-    y_coords FLOAT
+    x_coords FLOAT NOT NULL,
+    y_coords FLOAT NOT NULL
 );
 
 -- Dados para testes iniciais

@@ -21,7 +21,7 @@ interface AuthContextType {
   email: string;
   userNeeds: Necessity[];
   login: (email: string, password: string) => void;
-  register: (fName: string, lName: string, email: string, password: string, needs: string[]) => void;
+  register: (fName: string, lName: string, email: string, password: string, needs: Necessity[]) => void;
   logout: () => void;
   updateUserName: (fName: string, lName: string) => void;
   updateNeeds: (needs: Necessity[]) => void;
@@ -84,8 +84,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoggedIn(true);
   };
 
-  async function register (fName: string, lName: string, email: string, password: string, needs: string[]) {
-    const res = await apiClient.post("/auth/register", {fName, lName, email, password, needs});
+  async function register (fName: string, lName: string, email: string, password: string, necessities: Necessity[]) {
+    const res = await apiClient.post("/auth/register", {fName, lName, email, password, necessities});
     setFirstName(res.data.fName);
     setLastName(res.data.lName);
     setEmail(res.data.email);

@@ -1,11 +1,12 @@
 CREATE TABLE reviews (
     review_id UUID PRIMARY KEY,
     establishment_id UUID NOT NULL,
-    necessity_id UUID NOT NULL,
-    attends BOOLEAN NOT NULL,
+    user_id UUID NOT NULL,
+    comment VARCHAR(255),
+    rating INT CHECK (rating >= 1 AND rating <= 5),
 
     CONSTRAINT fk_establishment_review FOREIGN KEY (establishment_id) REFERENCES establishments(establishment_id),
-    CONSTRAINT fk_necessity_review FOREIGN KEY (necessity_id) REFERENCES necessities(necessity_id)
+    CONSTRAINT fk_user_review FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 

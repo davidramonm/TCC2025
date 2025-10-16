@@ -1,18 +1,34 @@
 // Front-End/contexts/AuthContext.tsx
 "use client";
 
-import { createContext, useState, useContext, ReactNode } from 'react';
+import { ref } from 'process';
+import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import apiClient from "@/lib/api";
+import { tokenService } from '@/lib/tokenService';
+import { set } from 'zod';
+
+export type Necessity = {
+  necessityId: string;
+  name: string;
+  description: string;
+  ngroup: string;
+};
 
 interface AuthContextType {
   isLoggedIn: boolean;
-  userName: string;
-  userNeeds: string[];
-  login: (name: string) => void;
-  register: (name: string, needs: string[]) => void;
+  firstName: string;
+  lastName: string;
+  email: string;
+  userNeeds: Necessity[];
+  login: (email: string, password: string) => void;
+  register: (fName: string, lName: string, email: string, password: string, needs: string[]) => void;
   logout: () => void;
-  updateUser: (name: string) => void;
-  updateNeeds: (needs: string[]) => void;
+  updateUserName: (fName: string, lName: string) => void;
+  updateNeeds: (needs: Necessity[]) => void;
 }
+
+
+ 
 
 // Criação do Contexto com um valor inicial nulo
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -35,34 +51,73 @@ export const useAuth = () => {
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState("Convidado");
-  const [userNeeds, setUserNeeds] = useState<string[]>([]);
-
-  const login = (name: string) => {
-    setUserName(name);
-    setIsLoggedIn(true);
-  };
-
-  const register = (name: string, needs: string[]) => {
-    setUserName(name);
-    setUserNeeds(needs);
-    setIsLoggedIn(true);
-  };
+  const [firstName, setFirstName] = useState("Convidado");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [userNeeds, setUserNeeds] = useState<Necessity[]>([]);
   
-  const logout = () => {
-    setUserName("Convidado");
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await apiClient.post("/auth/refresh");
+        tokenService.set(res.data.accessToken);
+        setFirstName(res.data.fName);
+        setLastName(res.data.lName);
+        setEmail(res.data.email);
+        setUserNeeds((res.data.necessities ?? []) as Necessity[]);
+        setIsLoggedIn(true);
+      } catch {
+        setIsLoggedIn(false);
+      }
+
+
+    })();
+  }, []);
+
+  async function login(email: string, password: string) {
+    const res = await apiClient.post("/auth/login", { email, password });
+    setFirstName(res.data.fName);
+    setLastName(res.data.lName);
+    setEmail(res.data.email);
+    setUserNeeds((res.data.necessities ?? []) as Necessity[]);
+    setIsLoggedIn(true);
+  };
+
+  async function register (fName: string, lName: string, email: string, password: string, needs: string[]) {
+    const res = await apiClient.post("/auth/register", {fName, lName, email, password, needs});
+    setFirstName(res.data.fName);
+    setLastName(res.data.lName);
+    setEmail(res.data.email);
+    setUserNeeds((res.data.necessities ?? []) as Necessity[]);
+    setIsLoggedIn(true);
+  };
+
+  async function logout() {
+    await apiClient.post("/auth/logout");
+    tokenService.clear();
+    setFirstName("Convidado");
+    setLastName("");
+    setEmail("");
     setUserNeeds([]);
     setIsLoggedIn(false);
   };
 
+  function updateUserName(fName: string, lName: string) {
+    setFirstName(fName);
+    setLastName(lName);
+  }
+
   const value = {
     isLoggedIn,
-    userName,
+    firstName,
+    lastName,
+    email,
     userNeeds,
     login,
     register,
     logout,
-    updateUser: setUserName,
+    updateUserName,
     updateNeeds: setUserNeeds,
   };
 

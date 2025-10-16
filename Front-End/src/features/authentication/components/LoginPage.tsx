@@ -10,10 +10,11 @@ import { Label } from "@/components/ui/label";
 import { UserPlus, Key, Mail, Loader2, Armchair as Wheelchair, Accessibility } from "lucide-react";
 import { PasswordInput } from "@/components/ui/password-input";
 import AuthHeader from "@/components/layouts/AuthHeader";
+import { loginUser } from "@/lib/api";
 
 interface LoginPageProps {
   onNavigate: (view: "register" | "recovery") => void;
-  onLogin: (name: string) => void;
+  onLogin: (name: string, password: string) => void;
 }
 
 export default function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
@@ -23,8 +24,10 @@ export default function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
 
   const handleLogin = async (data: LoginFormData) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
+
+
     const userFirstName = data.email.split('@')[0] || "Usuário";
-    onLogin(userFirstName);
+    onLogin(data.email, data.password);
   };
 
   return (

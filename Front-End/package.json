@@ -9,6 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "-": "^0.0.1",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-alert-dialog": "latest",
     "@radix-ui/react-avatar": "latest",
@@ -21,6 +22,7 @@
     "@radix-ui/react-tabs": "latest",
     "@tanstack/react-query": "^5.90.2",
     "autoprefixer": "^10.4.20",
+    "axios": "^1.4.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.22",

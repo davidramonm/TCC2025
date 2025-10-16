@@ -18,7 +18,8 @@ import java.util.UUID;
 @Controller
 @RequestMapping("reviews")
 @Tag(
-        name = "Avaliações"
+        name = "Avaliações",
+        description = "Endpoints para criar e editar avaliacoes feitas por usuarios sobre os estabelecimentos"
 )
 public class ReviewController {
 

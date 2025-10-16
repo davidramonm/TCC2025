@@ -12,6 +12,7 @@ public class UserMapper {
                 user.getFName(),
                 user.getLName(),
                 user.getEmail(),
+                user.getNecessities(),
                 sessionToken
         );
     }

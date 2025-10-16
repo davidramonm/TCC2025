@@ -3,19 +3,32 @@
 
 import { ref } from 'process';
 import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import apiClient, { refreshToken } from "@/lib/api";
+import apiClient from "@/lib/api";
 import { tokenService } from '@/lib/tokenService';
+import { set } from 'zod';
+
+export type Necessity = {
+  necessityId: string;
+  name: string;
+  description: string;
+  ngroup: string;
+};
 
 interface AuthContextType {
   isLoggedIn: boolean;
-  userName: string;
-  userNeeds: string[];
+  firstName: string;
+  lastName: string;
+  email: string;
+  userNeeds: Necessity[];
   login: (email: string, password: string) => void;
   register: (fName: string, lName: string, email: string, password: string, needs: string[]) => void;
   logout: () => void;
-  updateUser: (name: string) => void;
-  updateNeeds: (needs: string[]) => void;
+  updateUserName: (fName: string, lName: string) => void;
+  updateNeeds: (needs: Necessity[]) => void;
 }
+
+
+ 
 
 // Criação do Contexto com um valor inicial nulo
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -38,15 +51,21 @@ export const useAuth = () => {
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState("Convidado");
-  const [userNeeds, setUserNeeds] = useState<string[]>([]);
+  const [firstName, setFirstName] = useState("Convidado");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [userNeeds, setUserNeeds] = useState<Necessity[]>([]);
+  
 
   useEffect(() => {
     (async () => {
       try {
         const res = await apiClient.post("/auth/refresh");
         tokenService.set(res.data.accessToken);
-        setUserName(res.data.fName + " " + res.data.lName);
+        setFirstName(res.data.fName);
+        setLastName(res.data.lName);
+        setEmail(res.data.email);
+        setUserNeeds((res.data.necessities ?? []) as Necessity[]);
         setIsLoggedIn(true);
       } catch {
         setIsLoggedIn(false);
@@ -58,33 +77,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function login(email: string, password: string) {
     const res = await apiClient.post("/auth/login", { email, password });
-    setUserName(res.data.fName + " " + res.data.lName);
+    setFirstName(res.data.fName);
+    setLastName(res.data.lName);
+    setEmail(res.data.email);
+    setUserNeeds((res.data.necessities ?? []) as Necessity[]);
     setIsLoggedIn(true);
   };
 
   async function register (fName: string, lName: string, email: string, password: string, needs: string[]) {
-    const res = await apiClient.post("/auth/register", {fName, lName, email, password });
-    setUserName(res.data.fName + " " + res.data.lName);
-    setUserNeeds(needs);
+    const res = await apiClient.post("/auth/register", {fName, lName, email, password, needs});
+    setFirstName(res.data.fName);
+    setLastName(res.data.lName);
+    setEmail(res.data.email);
+    setUserNeeds((res.data.necessities ?? []) as Necessity[]);
     setIsLoggedIn(true);
   };
 
   async function logout() {
     await apiClient.post("/auth/logout");
     tokenService.clear();
-    setUserName("Convidado");
+    setFirstName("Convidado");
+    setLastName("");
+    setEmail("");
     setUserNeeds([]);
     setIsLoggedIn(false);
   };
 
+  function updateUserName(fName: string, lName: string) {
+    setFirstName(fName);
+    setLastName(lName);
+  }
+
   const value = {
     isLoggedIn,
-    userName,
+    firstName,
+    lastName,
+    email,
     userNeeds,
     login,
     register,
     logout,
-    updateUser: setUserName,
+    updateUserName,
     updateNeeds: setUserNeeds,
   };
 

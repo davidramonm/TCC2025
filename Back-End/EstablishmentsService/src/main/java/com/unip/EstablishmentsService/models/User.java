@@ -29,6 +29,15 @@ public class User implements UserDetails {
     private String email;
     private String password;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "users_necessities",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "necessity_id")
+    )
+    List<Necessity> necessities;
+
+
 
     @Enumerated(EnumType.STRING)
     private Role role;

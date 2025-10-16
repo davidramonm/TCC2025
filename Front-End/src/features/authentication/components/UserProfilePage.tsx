@@ -16,7 +16,7 @@ interface UserProfilePageProps {
 }
 
 export default function UserProfilePage({ onClose }: UserProfilePageProps) {
-  const { userName, userNeeds, updateUser, updateNeeds } = useAuth();
+  const { firstName, lastName, email, userNeeds, updateUserName, updateNeeds } = useAuth();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   return (
@@ -32,12 +32,12 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
               <div className="flex items-center gap-4">
                 <Avatar className="w-20 h-20">
                   <AvatarFallback className="text-3xl bg-gradient-to-br from-gray-600 to-gray-800 text-white">
-                    {userName.charAt(0).toUpperCase()}
+                    {firstName.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div>
                   {}
-                  <h2 className="text-2xl font-bold">{userName}</h2>
+                  <h2 className="text-2xl font-bold">{firstName}</h2>
                   <p className="text-gray-500">Membro desde 2024</p>
                 </div>
               </div>
@@ -52,10 +52,10 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
               <div className="flex flex-wrap gap-2">
                 {userNeeds.length > 0 ? (
                   userNeeds.map((need) => {
-                    const tipo = tiposAcessibilidade.find((n) => n.value === need);
+                    const tipo = tiposAcessibilidade.find((n) => n.necessityId === need.necessityId);
                     if (!tipo) return null;
                     return (
-                      <Badge key={need} variant="secondary" className="flex items-center gap-2 text-base px-3 py-1">
+                      <Badge key={need.name} variant="secondary" className="flex items-center gap-2 text-base px-3 py-1">
                         <tipo.icon className="w-4 h-4" />
                         {tipo.label}
                       </Badge>
@@ -72,10 +72,12 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
       {isSettingsOpen && (
         <UserSettingsPage
           onClose={() => { setIsSettingsOpen(false); }}
-          userName={userName}
+          firstName={firstName}
+          lastName={lastName}
+          email={email}
           userNeeds={userNeeds}
           onUpdateNeeds={updateNeeds}
-          onUpdateUser={updateUser}
+          onUpdateUser={updateUserName}
         />
       )}
     </>

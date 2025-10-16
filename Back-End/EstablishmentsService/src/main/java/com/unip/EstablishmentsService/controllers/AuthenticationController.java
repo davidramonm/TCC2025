@@ -4,12 +4,15 @@ package com.unip.EstablishmentsService.controllers;
 import com.unip.EstablishmentsService.dtos.LoginRequestDTO;
 import com.unip.EstablishmentsService.dtos.LoginResponseDTO;
 import com.unip.EstablishmentsService.dtos.RegisterRequestDTO;
+import com.unip.EstablishmentsService.dtos.UserRequestDTO;
 import com.unip.EstablishmentsService.infra.JwtService;
 import com.unip.EstablishmentsService.mappers.UserMapper;
+import com.unip.EstablishmentsService.models.Necessity;
 import com.unip.EstablishmentsService.models.Role;
 import com.unip.EstablishmentsService.models.Token;
 import com.unip.EstablishmentsService.models.User;
 import com.unip.EstablishmentsService.repositories.UserRepository;
+import com.unip.EstablishmentsService.services.NecessityService;
 import com.unip.EstablishmentsService.services.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,6 +28,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("auth")
@@ -33,6 +39,7 @@ public class AuthenticationController {
 
     private final UserService service;
     private final UserRepository repository;
+    private final NecessityService necessityService;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
@@ -69,10 +76,22 @@ public class AuthenticationController {
             HttpServletResponse response
     ){
 
+        List<Necessity> necessities = new ArrayList<>();
+        for (Necessity necessity: request.necessities()) {
+            try {
+                necessities.add(necessityService.getNecessityById(necessity.getNecessityId()));
+            } catch (Exception e) {
+                e.printStackTrace();
+                break;
+            }
+
+        }
+        System.out.println(request.necessities());
         User user = User.builder()
                 .email(request.email())
                 .fName(request.fName())
                 .lName(request.lName())
+                .necessities(necessities)
                 .password(new BCryptPasswordEncoder().encode(request.password()))
                 .role(Role.ROLE_USER)
                 .build();
@@ -91,6 +110,42 @@ public class AuthenticationController {
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return ResponseEntity.ok().body(userMapper.userToLoginResponseDTO(user, accessToken));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<LoginResponseDTO> update(
+            @RequestBody UserRequestDTO request,
+            @CookieValue(value = "refreshToken", required = false) String refreshToken
+    ) {
+        if (refreshToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String username = jwtService.extractUsername(refreshToken);
+        User user = ((User) repository.findByEmail(username));
+
+        if (!jwtService.isTokenValid(refreshToken, user, Token.REFRESH_TOKEN)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        List<Necessity> necessities = new ArrayList<>();
+        for (Necessity necessity: request.necessities()) {
+            try {
+                necessities.add(necessityService.getNecessityById(necessity.getNecessityId()));
+            } catch (Exception e) {
+                e.printStackTrace();
+                break;
+            }
+        }
+
+        user.setFName(request.fName());
+        user.setLName(request.lName());
+        user.setNecessities(necessities);
+
+        repository.save(user);
+        String accessToken = jwtService.generateToken(user, Token.ACCESS_TOKEN);
 
         return ResponseEntity.ok().body(userMapper.userToLoginResponseDTO(user, accessToken));
     }

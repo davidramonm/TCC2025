@@ -19,38 +19,65 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Necessity } from "@/contexts/AuthContext";
+import apiClient from "@/lib/api";
 
 interface UserSettingsPageProps {
   onClose: () => void;
-  userName: string;
-  userNeeds: string[];
-  onUpdateNeeds: (newNeeds: string[]) => void;
-  onUpdateUser: (newName: string) => void;
+  firstName: string;
+  lastName: string;
+  email: string;
+  userNeeds: Necessity[];
+  onUpdateNeeds: (newNeeds: Necessity[]) => void;
+  onUpdateUser: (firstName: string, lastName: string) => void;
 }
 
 export default function UserSettingsPage({
   onClose,
-  userName,
+  firstName,
+  lastName,
+  email,
   userNeeds,
   onUpdateNeeds,
   onUpdateUser,
 }: UserSettingsPageProps) {
-  const [selectedNeeds, setSelectedNeeds] = useState<string[]>(userNeeds);
-  const [firstName, setFirstName] = useState(userName.split(' ')[0] || "");
-  const [lastName, setLastName] = useState(userName.split(' ').slice(1).join(' ') || "");
-  const [email, setEmail] = useState("seu.email@exemplo.com"); // E-mail simulado
+  const [selectedNeeds, setSelectedNeeds] = useState<Necessity[]>(userNeeds ?? []);
+  const [newFirstName, setFirstName] = useState(firstName || "");
+  const [newLastName, setLastName] = useState(lastName || "");
+  const [newEmail, setEmail] = useState(email || ""); // E-mail simulado
 
   const toggleNeed = (needValue: string) => {
-    setSelectedNeeds((prev) =>
-      prev.includes(needValue)
-        ? prev.filter((n) => n !== needValue)
-        : [...prev, needValue]
-    );
+    setSelectedNeeds((prev) => {
+      const exists = prev.some(n => n.necessityId === needValue);
+      if (exists) {
+        return prev.filter(n => n.necessityId !== needValue);
+      }
+
+      const needToAdd = tiposAcessibilidade.find(n => n.value === needValue);
+      const newNeed: Necessity = {
+        necessityId: needValue,
+        name: needToAdd?.label ?? needValue,
+        description: "",
+        ngroup: ""
+      };
+
+      return [...prev, newNeed];
+    });
+
   };
 
   const handleSaveChanges = () => {
+    apiClient.put("auth/update", {
+      fName: newFirstName,
+      lName: newLastName,
+      necessities: selectedNeeds,
+    }).then(() => {
+      console.log("User updated successfully");
+    }).catch((error) => {
+      console.error("Error updating user:", error);
+    });
     onUpdateNeeds(selectedNeeds);
-    onUpdateUser(`${firstName} ${lastName}`);
+    onUpdateUser(newFirstName, newLastName);
     onClose();
   };
 
@@ -114,21 +141,19 @@ export default function UserSettingsPage({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-64 overflow-y-auto p-1">
                   {tiposAcessibilidade.map((tipo) => {
                     const IconComponent = tipo.icon;
-                    const isSelected = selectedNeeds.includes(tipo.value);
+                    const isSelected = selectedNeeds.some(n => n.necessityId === tipo.necessityId);
                     return (
                       <div
                         key={tipo.value}
-                        className={`flex items-center space-x-3 p-3 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
-                          isSelected
+                        className={`flex items-center space-x-3 p-3 border-2 rounded-lg cursor-pointer transition-all duration-200 ${isSelected
                             ? "border-gray-800 bg-gray-800 text-white shadow-lg"
                             : "border-gray-200 hover:border-gray-400"
-                        }`}
-                        onClick={() => toggleNeed(tipo.value)}
+                          }`}
+                        onClick={() => toggleNeed(tipo.necessityId)}
                       >
                         <IconComponent
-                          className={`w-5 h-5 transition-colors ${
-                            isSelected ? "text-white" : "text-gray-500"
-                          }`}
+                          className={`w-5 h-5 transition-colors ${isSelected ? "text-white" : "text-gray-500"
+                            }`}
                         />
                         <Label className={`text-sm font-medium cursor-pointer flex-1 ${isSelected ? "text-white" : ""}`}>
                           {tipo.label}
@@ -138,7 +163,7 @@ export default function UserSettingsPage({
                   })}
                 </div>
               </TabsContent>
-              
+
               <TabsContent value="security">
                 <div className="space-y-6">
                   <div>
@@ -181,7 +206,7 @@ export default function UserSettingsPage({
           </Tabs>
 
           <div className="flex justify-end pt-6 border-t mt-6">
-            <Button 
+            <Button
               onClick={handleSaveChanges}
               className="bg-gray-800 hover:bg-gray-900"
             >

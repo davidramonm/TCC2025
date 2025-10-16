@@ -23,9 +23,7 @@ export default function MapHeader({
   onNavigate,
   onOpenSettings,
 }: MapHeaderProps) {
-  const { isLoggedIn, userName, logout } = useAuth();
-  const firstName = userName.split(' ')[0];
-  const userEmail = `${userName.split(' ').join('.').toLowerCase()}@email.com`; // Email simulado
+  const { isLoggedIn, firstName, email, logout } = useAuth();
 
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 shadow-sm z-20 relative">
@@ -65,7 +63,7 @@ export default function MapHeader({
               <Button variant="ghost" className="flex items-center gap-2 p-1 rounded-full">
                 <Avatar className="w-9 h-9">
                   <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">
-                    {userName.charAt(0).toUpperCase()}
+                    {firstName.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
               </Button>
@@ -74,11 +72,11 @@ export default function MapHeader({
               <div className="flex flex-col items-center p-4">
                 <Avatar className="w-20 h-20 mb-2">
                   <AvatarFallback className="text-4xl bg-gradient-to-br from-gray-600 to-gray-800 text-white">
-                    {userName.charAt(0).toUpperCase()}
+                    {firstName.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <h2 className="text-lg font-semibold">Olá, {firstName}</h2>
-                <p className="text-sm text-muted-foreground">{userEmail}</p>
+                <p className="text-sm text-muted-foreground">{email}</p>
                 <Button variant="outline" className="mt-4" onClick={onOpenSettings}>
                   <Settings className="mr-2 h-4 w-4" />
                   Gerenciar sua Conta

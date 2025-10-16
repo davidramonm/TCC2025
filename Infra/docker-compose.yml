@@ -4,6 +4,7 @@ services:
     image: postgres
     volumes:
       - db_data:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       POSTGRES_USER: example
       POSTGRES_PASSWORD: example
@@ -43,7 +44,6 @@ services:
 networks:
   default:
     name: local-network
-    external: true
 
 volumes:
   db_data:

@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { UserPlus, Key, Mail, Loader2, Armchair as Wheelchair, Accessibility } from "lucide-react";
 import { PasswordInput } from "@/components/ui/password-input";
 import AuthHeader from "@/components/layouts/AuthHeader";
-import { loginUser } from "@/lib/api";
 
 interface LoginPageProps {
   onNavigate: (view: "register" | "recovery") => void;

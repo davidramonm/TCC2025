@@ -60,7 +60,8 @@ export default function MapHeader({
         {isLoggedIn ? (
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2 p-1 rounded-full">
+              <Button variant="ghost" className="flex items-center gap-2 rounded-full">
+                <span className="font-semibold text-gray-700 hidden sm:inline">Olá, {firstName}</span>
                 <Avatar className="w-9 h-9">
                   <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">
                     {firstName.charAt(0).toUpperCase()}
@@ -75,7 +76,7 @@ export default function MapHeader({
                     {firstName.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <h2 className="text-lg font-semibold">Olá, {firstName}</h2>
+                <h2 className="text-lg font-semibold">{firstName}</h2>
                 <p className="text-sm text-muted-foreground">{email}</p>
                 <Button variant="outline" className="mt-4" onClick={onOpenSettings}>
                   <Settings className="mr-2 h-4 w-4" />

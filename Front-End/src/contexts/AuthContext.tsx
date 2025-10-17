@@ -1,12 +1,11 @@
 // Front-End/contexts/AuthContext.tsx
 "use client";
 
-import { ref } from 'process';
 import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import apiClient from "@/lib/api";
 import { tokenService } from '@/lib/tokenService';
-import { set } from 'zod';
 import { Necessity } from '@/types';
+
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -20,10 +19,7 @@ interface AuthContextType {
   updateUserName: (fName: string, lName: string) => void;
   updateNeeds: (needs: Necessity[]) => void;
 }
-
-
  
-
 // Criação do Contexto com um valor inicial nulo
 const AuthContext = createContext<AuthContextType | null>(null);
 

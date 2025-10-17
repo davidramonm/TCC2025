@@ -6,13 +6,7 @@ import { createContext, useState, useContext, ReactNode, useEffect } from 'react
 import apiClient from "@/lib/api";
 import { tokenService } from '@/lib/tokenService';
 import { set } from 'zod';
-
-export type Necessity = {
-  necessityId: string;
-  name: string;
-  description: string;
-  ngroup: string;
-};
+import { Necessity } from '@/types';
 
 interface AuthContextType {
   isLoggedIn: boolean;

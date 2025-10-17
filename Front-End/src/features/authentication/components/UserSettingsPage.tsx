@@ -19,7 +19,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Necessity } from "@/contexts/AuthContext";
+import { Necessity } from '@/types';
 import apiClient from "@/lib/api";
 
 interface UserSettingsPageProps {

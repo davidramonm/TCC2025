@@ -56,6 +56,14 @@ export default apiClient;
  * @returns {Promise<Location[]>} Uma promessa que resolve para a lista de locais.
  */
 export async function fetchLocations(): Promise<Location[]> {
+
+  apiClient.get('/establishments').then(response => {
+    console.log(response.data as Location[]);
+    return response.data as Location[];
+  }).catch(error => {
+    console.error('Erro ao buscar estabelecimentos:', error);
+  });
+
   // Dados de exemplo estão agora dentro da função para simular uma fonte de dados
   const mockLocations: Location[] = [
     { 

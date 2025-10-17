@@ -17,7 +17,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { PasswordStrength } from "@/components/ui/password-strength";
 import AuthHeader from "@/components/layouts/AuthHeader";
 import { Card } from "@/components/ui/card"; // Import Card para o resumo
-import { Necessity } from "@/contexts/AuthContext";
+import { Necessity } from "@/types";
 
 interface RegisterPageProps {
   onNavigate: (view: "login") => void;

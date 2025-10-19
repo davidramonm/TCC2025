@@ -5,13 +5,6 @@ export interface User {
   name: string;
 }
 
-export interface Review {
-  id: number;
-  user: User;
-  rating: number;
-  description: string;
-}
-
 export interface Location {
   establishmentId: number;
   name: string;

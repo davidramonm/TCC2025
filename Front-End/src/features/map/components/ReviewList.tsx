@@ -15,7 +15,7 @@ export default function ReviewList({ reviews }: ReviewListProps) {
   return (
     <div>
       {reviews.map((review) => (
-        <ReviewItem key={review.id} review={review} />
+        <ReviewItem key={review.reviewId} review={review} />
       ))}
     </div>
   );

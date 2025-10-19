@@ -66,7 +66,7 @@ export async function fetchLocations(): Promise<Location[]> {
   }
 }
 
-export async function fetchEstablishmentById(id: number): Promise<Establishment> {
+export async function getEstablishmentById(id: number): Promise<Establishment | null> {
   try {
     const response = await apiClient.get(`/establishments/${id}`);
     return response.data as Establishment;

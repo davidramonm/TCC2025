@@ -10,7 +10,7 @@ import api from '@/lib/api';
 
 
 interface DecodedToken {
-  sub: string; 
+  sub: string;
   exp: number;
 }
 
@@ -19,8 +19,8 @@ interface LoginResponseData {
   fName: string;
   lName: string;
   email: string;
-  necessities: { name: string }[];
-  accessToken: string;
+  necessities: Necessity[];
+  userId: string;
 }
 
 interface AuthContextType {
@@ -29,12 +29,12 @@ interface AuthContextType {
   firstName: string;
   lastName: string;
   email: string;
-  userNeeds: string[];
+  userNeeds: Necessity[];
   login: (email: string, pass: string) => Promise<void>;
   logout: () => void;
-  register: (fName: string, lName: string, email: string, pass: string, needs: string[]) => Promise<void>;
+  register: (fName: string, lName: string, email: string, pass: string, needs: Necessity[]) => Promise<void>;
   updateUserName: (fName: string, lName: string) => void;
-  updateNeeds: (needs: string[]) => void;
+  updateNeeds: (needs: Necessity[]) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -45,46 +45,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [userNeeds, setUserNeeds] = useState<string[]>([]);
-  
+  const [userNeeds, setUserNeeds] = useState<Necessity[]>([]);
+
   // Função para popular o estado a partir da resposta completa do login
   const setUserDataFromResponse = (data: LoginResponseData) => {
-    const { accessToken, fName, lName, email, necessities } = data;
-    const decodedToken: DecodedToken = jwtDecode(accessToken);
+    const { userId, fName, lName, email, necessities } = data;
 
-    tokenService.set(accessToken);
-    
     setIsLoggedIn(true);
-    setUserId(decodedToken.sub);
+    setUserId(userId);
     setFirstName(fName);
     setLastName(lName);
     setEmail(email);
-    setUserNeeds(necessities.map(n => n.name));
+    setUserNeeds(necessities);
   };
 
   useEffect(() => {
-    const currentToken = tokenService.get();
-    if (currentToken) {
-      try {
-        const decoded: DecodedToken = jwtDecode(currentToken);
-        if (decoded.exp * 1000 > Date.now()) {
-          tokenService.set(currentToken);
+    (async () => {
+      const currentToken = tokenService.get();
+      if (!currentToken) {
+        try {
+          const res = await api.post("/auth/refresh");
+          tokenService.set(res.data.accessToken);
           setIsLoggedIn(true);
-          setUserId(decoded.sub);
-        } else {
+          setUserDataFromResponse(res.data);
+        } catch (error) {
           logout();
         }
-      } catch (error) {
-        logout();
       }
-    }
+    })();
   }, []);
 
   const login = async (email: string, pass: string) => {
     try {
       const response = await api.post<LoginResponseData>('/auth/login', { email, password: pass });
-      
-      if (response.data && typeof response.data.accessToken === 'string') {
+
+      if (response.data && response.data.userId) {
         setUserDataFromResponse(response.data);
       } else {
         throw new Error("Formato de resposta inválido recebido do servidor.");
@@ -96,13 +91,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const register = async (fName: string, lName: string, email: string, pass: string, needs: string[]) => {
+  const register = async (fName: string, lName: string, email: string, pass: string, needs: Necessity[]) => {
     await api.post('/auth/register', {
-      firstName: fName,
-      lastName: lName,
+      fName: fName,
+      lName: lName,
       email,
       password: pass,
-      necessidades: needs,
+      necessities: needs,
     });
     await login(email, pass);
   };
@@ -122,7 +117,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setLastName(lName);
   };
 
-  const updateNeeds = (needs: string[]) => {
+  const updateNeeds = (needs: Necessity[]) => {
     setUserNeeds(needs);
   };
 

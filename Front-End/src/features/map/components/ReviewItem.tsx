@@ -21,22 +21,22 @@ const StarRating = ({ rating }: { rating: number }) => (
 );
 
 export default function ReviewItem({ review }: ReviewItemProps) {
-  const fallback = review.user.name.charAt(0).toUpperCase();
+  const fallback = review.username.charAt(0).toUpperCase();
 
   return (
     <Card className="mb-4">
       <CardContent className="p-4">
         <div className="flex items-start space-x-4">
           <Avatar>
-            <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${review.user.name}`} alt={review.user.name} />
+            <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${review.username}`} alt={review.username} />
             <AvatarFallback>{fallback}</AvatarFallback>
           </Avatar>
           <div className="flex-1">
             <div className="flex items-center justify-between">
-              <p className="font-semibold">{review.user.name}</p>
+              <p className="font-semibold">{review.username}</p>
               <StarRating rating={review.rating} />
             </div>
-            <p className="mt-2 text-sm text-gray-600">{review.description}</p>
+            <p className="mt-2 text-sm text-gray-600">{review.comment}</p>
           </div>
         </div>
       </CardContent>

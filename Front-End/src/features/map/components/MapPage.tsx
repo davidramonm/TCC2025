@@ -155,7 +155,7 @@ export default function MapPage() {
 
   const handleSaveReview = async (reviewData: { rating: number; selectedTypes: Necessity[]; description: string }) => {
 
-    console.log(reviewData.selectedTypes)
+    console.log("aqui: " + reviewData.selectedTypes)
     const review = await saveReview({
       establishmentId: reviewModalState.locationId,
       userId: userId,

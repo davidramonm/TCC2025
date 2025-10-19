@@ -58,40 +58,42 @@ export default function MapHeader({
 
       <div className="flex items-center gap-3">
         {isLoggedIn ? (
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2 rounded-full">
-                <span className="font-semibold text-gray-700 hidden sm:inline">Olá, {firstName}</span>
-                <Avatar className="w-9 h-9">
-                  <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">
-                    {firstName.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80 mr-4" align="end">
-              <div className="flex flex-col items-center p-4">
-                <Avatar className="w-20 h-20 mb-2">
-                  <AvatarFallback className="text-4xl bg-gradient-to-br from-gray-600 to-gray-800 text-white">
-                    {firstName.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <h2 className="text-lg font-semibold">{firstName}</h2>
-                <p className="text-sm text-muted-foreground">{email}</p>
-                <Button variant="outline" className="mt-4" onClick={onOpenSettings}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Gerenciar sua Conta
+          <>
+            <span className="font-semibold text-gray-700 hidden sm:inline">Olá, {firstName}</span>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" className="rounded-full w-9 h-9 p-0">
+                  <Avatar className="w-9 h-9">
+                    <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">
+                      {firstName.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 </Button>
-              </div>
-              <Separator />
-              <div className="p-2">
-                <Button variant="ghost" className="w-full justify-start text-red-600 hover:text-red-700" onClick={logout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Sair
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 mr-4" align="end">
+                <div className="flex flex-col items-center p-4">
+                  <Avatar className="w-20 h-20 mb-2">
+                    <AvatarFallback className="text-4xl bg-gradient-to-br from-gray-600 to-gray-800 text-white">
+                      {firstName.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <h2 className="text-lg font-semibold">{firstName}</h2>
+                  <p className="text-sm text-muted-foreground">{email}</p>
+                  <Button variant="outline" className="mt-4" onClick={onOpenSettings}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Gerenciar sua Conta
+                  </Button>
+                </div>
+                <Separator />
+                <div className="p-2">
+                  <Button variant="ghost" className="w-full justify-start text-red-600 hover:text-red-700" onClick={logout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sair
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </>
         ) : (
           <Button onClick={() => onNavigate("login")}>
             <LogIn className="mr-2 h-4 w-4" />

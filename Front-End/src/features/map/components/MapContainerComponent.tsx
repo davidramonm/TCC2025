@@ -1,158 +1,120 @@
 // src/features/map/components/MapContainerComponent.tsx
+
 "use client";
 
-import { useEffect, useRef } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
-import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
-import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { MapPin, Navigation } from "lucide-react";
-import { tiposAcessibilidade, getLocationTypeName } from "@/lib/constants";
-import { useToast } from "@/hooks/use-toast";
+import "leaflet-defaulticon-compatibility";
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
+import { useEffect } from "react";
+import L from "leaflet";
+import { Location } from "@/types";
 
-interface MapProps {
-  locations: any[];
+// Props do componente
+interface MapContainerComponentProps {
+  locations: Location[];
   clickedPosition: { lat: number; lng: number } | null;
-  searchLocation: any | null;
+  searchLocation: Location | null;
   onMapClick: (latlng: { lat: number; lng: number }) => void;
   findMyLocation: boolean;
   onMyLocationFound: () => void;
+  onLocationSelect: (location: Location) => void;
   onRateClick: (locationId: number) => void;
-  onEditReviewClick: (locationId: number) => void; // Nova prop para edição
+  onEditReviewClick: (locationId: number) => void;
 }
 
-const MapContent = ({ locations, searchLocation, onMapClick, findMyLocation, onMyLocationFound, onRateClick, onEditReviewClick }: MapProps) => {
-  const map = useMapEvents({
-    click: (e) => onMapClick(e.latlng),
+// Ícone customizado
+const customIcon = new L.Icon({
+  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
+// Componente para lidar com eventos do mapa
+function MapEvents({ onMapClick }: { onMapClick: (latlng: { lat: number; lng: number }) => void }) {
+  useMapEvents({
+    click(e) {
+      onMapClick(e.latlng);
+    },
   });
-  const markersRef = useRef<L.Marker[]>([]);
-  const locationMarkerRef = useRef<L.Marker | null>(null);
-  const { toast } = useToast();
-  // Simulação: o ID do usuário logado. No futuro, isso viria do seu AuthContext.
-  const LOGGED_IN_USER_ID = "user123";
-
-  useEffect(() => {
-    if (findMyLocation) {
-      map.locate({ setView: true, maxZoom: 16, enableHighAccuracy: true });
-      onMyLocationFound();
-    }
-  }, [findMyLocation, map, onMyLocationFound]);
-
-  useEffect(() => {
-    const handleLocationFound = (e: L.LocationEvent) => {
-      const radius = e.accuracy;
-      if (locationMarkerRef.current) {
-        map.removeLayer(locationMarkerRef.current);
-      }
-      const iconString = renderToStaticMarkup(<Navigation color="white" size={16} />);
-      const iconHtml = `<div style="background: #2563eb; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">${iconString}</div>`;
-      const myLocationIcon = L.divIcon({
-        className: "my-location-marker",
-        html: iconHtml,
-        iconSize: [32, 32],
-      });
-      locationMarkerRef.current = L.marker(e.latlng, { icon: myLocationIcon }).addTo(map)
-        .bindPopup(`Você está aqui (margem de ${radius.toFixed(0)} metros de erro)`).openPopup();
-    };
-
-    const handleLocationError = (e: L.ErrorEvent) => {
-      toast({ title: "Erro de Localização", description: e.message, variant: "destructive" });
-    };
-
-    map.on('locationfound', handleLocationFound);
-    map.on('locationerror', handleLocationError);
-
-    return () => {
-      map.off('locationfound', handleLocationFound);
-      map.off('locationerror', handleLocationError);
-    };
-  }, [map, toast]);
-
-  useEffect(() => {
-    markersRef.current.forEach((marker) => marker.remove());
-    markersRef.current = [];
-
-    locations.forEach((location) => {
-      // Simulação: vamos assumir que algumas avaliações foram feitas pelo usuário logado
-      const userHasReviewed = location.id % 2 === 0; // Exemplo: usuário avaliou locais com ID par
-
-      const tipo = tiposAcessibilidade.find((t) => t.value === location.typeValues[0]);
-      const IconComponent = tipo?.icon || MapPin;
-      const iconString = renderToStaticMarkup(<IconComponent color="white" size={20} />);
-      const iconHtml = `<div style="background: ${tipo?.color || '#e5e7eb'}; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">${iconString}</div>`;
-      
-      const icon = L.divIcon({
-        className: "location-marker",
-        html: iconHtml,
-        iconSize: [40, 40],
-        iconAnchor: [20, 40],
-      });
-
-      const marker = L.marker([location.lat, location.lng], { icon }).addTo(map);
-      
-      const typesList = location.typeValues.map((type: string) => `<li>${getLocationTypeName(type)}</li>`).join('');
-      
-      // Decide qual botão mostrar
-      const actionButton = userHasReviewed
-        ? `<button class="edit-review-button" data-location-id="${location.id}" style="margin-top: 10px; padding: 6px 12px; background-color: #f59e0b; color: white; border: none; border-radius: 4px; cursor: pointer;">Editar Avaliação</button>`
-        : `<button class="rate-button" data-location-id="${location.id}" style="margin-top: 10px; padding: 6px 12px; background-color: #333; color: white; border: none; border-radius: 4px; cursor: pointer;">Avaliar</button>`;
-
-      const popupContent = `
-        <div style="font-family: inherit; line-height: 1.5;">
-          <h4 style="margin: 0 0 8px 0; font-size: 16px;">${location.name}</h4>
-          <p style="margin: 4px 0; font-size: 14px;">Endereço: ${location.address}</p>
-          <div style="margin: 4px 0; font-size: 14px;">
-            <strong>Acessibilidades:</strong>
-            <ul style="margin-top: 4px; padding-left: 18px;">${typesList}</ul>
-          </div>
-          ${location.rating ? `<p style="margin: 4px 0; font-size: 14px;">Avaliação: ${"★".repeat(location.rating)}${"☆".repeat(5 - location.rating)}</p>` : ""}
-          ${location.description ? `<p style="margin: 4px 0; font-size: 14px;">Descrição: ${location.description}</p>` : ""}
-          ${actionButton}
-        </div>
-      `;
-
-      marker.bindPopup(popupContent);
-
-      marker.on('popupopen', (e) => {
-        const popup = e.popup;
-        const rateButton = popup.getElement()?.querySelector('.rate-button');
-        const editButton = popup.getElement()?.querySelector('.edit-review-button');
-        
-        if (rateButton) {
-          (rateButton as HTMLElement).onclick = () => onRateClick(location.id);
-        }
-        if (editButton) {
-          (editButton as HTMLElement).onclick = () => onEditReviewClick(location.id);
-        }
-      });
-      
-      markersRef.current.push(marker);
-    });
-
-  }, [map, locations, onRateClick, onEditReviewClick]);
-
-  useEffect(() => {
-    if (searchLocation) {
-      map.flyTo([searchLocation.lat, searchLocation.lng], 18);
-    }
-  }, [map, searchLocation]);
-
   return null;
-};
+}
 
-export default function MapContainerComponent(props: MapProps) {
+// Componente para centralizar o mapa na localização do usuário
+function LocateUser({ findMyLocation, onMyLocationFound }: { findMyLocation: boolean, onMyLocationFound: () => void }) {
+    const map = useMap();
+    useEffect(() => {
+        if (findMyLocation) {
+            map.locate().on("locationfound", function (e) {
+                map.flyTo(e.latlng, 16);
+            });
+            onMyLocationFound();
+        }
+    }, [findMyLocation, map, onMyLocationFound]);
+    return null;
+}
+
+// ===== NOVO COMPONENTE INTERNO PARA CONTROLAR O MAPA =====
+// A lógica que estava causando o erro foi movida para cá.
+function MapController({ searchLocation }: { searchLocation: Location | null }) {
+    const map = useMap(); // Agora esta chamada é válida, pois está dentro de um componente que é filho do MapContainer
+    useEffect(() => {
+        if (searchLocation) {
+            map.flyTo([searchLocation.lat, searchLocation.lng], 16);
+        }
+    }, [searchLocation, map]);
+
+    return null; // Este componente não renderiza nada visualmente
+}
+
+// Componente principal do mapa
+export default function MapContainerComponent({
+  locations,
+  clickedPosition,
+  searchLocation,
+  onMapClick,
+  findMyLocation,
+  onMyLocationFound,
+  onLocationSelect,
+}: MapContainerComponentProps) {
   return (
     <MapContainer
-      center={[-23.52437655664778, -47.46314621710714]}
+      center={[-23.55052, -46.633308]}
       zoom={13}
-      scrollWheelZoom={true}
       style={{ height: "100%", width: "100%" }}
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      <MapContent {...props} />
+      
+      {/* Renderiza os componentes de controle DENTRO do MapContainer */}
+      <MapEvents onMapClick={onMapClick} />
+      <LocateUser findMyLocation={findMyLocation} onMyLocationFound={onMyLocationFound} />
+      <MapController searchLocation={searchLocation} />
+
+      {/* Marcador para a posição clicada */}
+      {clickedPosition && (
+        <Marker position={clickedPosition} icon={customIcon} />
+      )}
+
+      {/* Marcadores para as localizações */}
+      {locations.map((location) => (
+        <Marker
+          key={location.id}
+          position={[location.lat, location.lng]}
+          icon={customIcon}
+          eventHandlers={{
+            click: () => {
+              onLocationSelect(location);
+            },
+          }}
+        />
+      ))}
     </MapContainer>
   );
 }

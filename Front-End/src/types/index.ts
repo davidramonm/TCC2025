@@ -1,43 +1,25 @@
 // src/types/index.ts
 
-/**
- * @description Define a estrutura de dados para um local no mapa.
- */
+export interface User {
+  id: number;
+  name: string;
+}
+
+export interface Review {
+  id: number;
+  user: User;
+  rating: number;
+  description: string;
+}
+
 export interface Location {
   id: number;
   name: string;
   address: string;
   typeValues: string[];
-  description?: string;
-  rating: number;
+  description: string | null;
+  rating: number; // Média das avaliações
   lat: number;
   lng: number;
+  reviews?: Review[]; // Array de avaliações
 }
-
-export interface Establishment {
-  establishmentId: number;
-  name: string;
-  address: string;
-  reviewList : Review[];
-
-}
-
-export interface Review {
-  reviewId: string;
-  
-  comment: string;
-  rating: number;
-  necessityReviewList : NecessityReview[];
-}
-
-export interface NecessityReview {
-  necessityId: string;
-  attends: boolean;
-}
-
-export interface Necessity {
-  necessityId: string;
-  name: string;
-  description: string;
-  ngroup: string;
-};

@@ -25,8 +25,13 @@ public class Review {
     private Establishment establishment;
 
 
-    @OneToMany(mappedBy = "review")
-    private List<NecessityReview> necessityReviews;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "necessities_reviews",
+            joinColumns = @JoinColumn(name = "review_id"),
+            inverseJoinColumns = @JoinColumn(name = "necessity_id")
+    )
+    List<Necessity> necessities;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

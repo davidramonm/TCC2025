@@ -55,16 +55,15 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
     onRegister(data.firstName, data.lastName, data.email, data.password, selectedNeeds);
   };
 
-  const toggleNeed = (needValue: string) => {
+  const toggleNeed = (necessityId: string) => {
     setSelectedNeeds((prev) => {
-          const exists = prev.some(n => n.necessityId === needValue);
+          const exists = prev.some(n => n.necessityId === necessityId);
           if (exists) {
-            return prev.filter(n => n.necessityId !== needValue);
+            return prev.filter(n => n.necessityId !== necessityId);
           }
     
-          const needToAdd = tiposAcessibilidade.find(n => n.value === needValue);
           const newNeed: Necessity = {
-            necessityId: needValue,
+            necessityId: necessityId,
             name: "",
             description: "",
             ngroup: ""

@@ -9,24 +9,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { tiposAcessibilidade } from "@/lib/constants";
 import { Checkbox } from "@/components/ui/checkbox";
-import { NecessityReview } from "@/types";
+import { Necessity } from "@/types";
 
 interface ReviewLocationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (reviewData: { rating: number; selectedTypes: NecessityReview[]; description: string }) => void;
+  onSubmit: (reviewData: { rating: number; selectedTypes: Necessity[]; description: string }) => void;
   locationName: string | null;
   initialData?: { // Prop para receber dados existentes
     rating: number;
     description: string;
-    types: NecessityReview[];
+    types: Necessity[];
   };
 }
 
 export default function ReviewLocationModal({ isOpen, onClose, onSubmit, locationName, initialData }: ReviewLocationModalProps) {
   const [rating, setRating] = useState(0);
   const [description, setDescription] = useState("");
-  const [selectedTypes, setSelectedTypes] = useState<NecessityReview[]>([]);
+  const [selectedTypes, setSelectedTypes] = useState<Necessity[]>([]);
 
   useEffect(() => {
     // Preenche o formulário com os dados iniciais quando o modal é aberto
@@ -39,11 +39,18 @@ export default function ReviewLocationModal({ isOpen, onClose, onSubmit, locatio
 
   const toggleAccessibilityType = (necessityId: string) => {
     setSelectedTypes((prev) => {
-      const exists = prev.some(nr => nr.necessityId === necessityId);
+      const exists = prev.some(n => n.necessityId === necessityId);
       if (exists) {
-        return prev.filter((nr) => nr.necessityId !== necessityId);
+        return prev.filter(n => n.necessityId !== necessityId);
       }
-      return [...prev, { necessityId, attends: true }];
+
+      const newNeed: Necessity = {
+            necessityId: necessityId,
+            name: "",
+            description: "",
+            ngroup: ""
+          };
+      return [...prev, newNeed];
     });
   };
 

@@ -71,11 +71,12 @@ public class EstablishmentService {
             String city = root.path("address").path("city_district").asText();
             String state = root.path("address").path("state").asText();
 
+            String name = root.path("name").asText().equals(road) ? "" : root.path("name").asText();
             String address = String.format("%s - %s, %s - %s", road, suburb, city, state);
 
             return new EstablishmentResponseDTO(
                     null,
-                    root.path("name").asText(),
+                    name,
                     address,
                     null,
                     root.path("lat").asDouble(),

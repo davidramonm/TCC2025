@@ -13,6 +13,7 @@ import { Establishment, Location } from "@/types";
 import { set } from "zod";
 import { on } from "events";
 import { fetchEstablishmentById } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface MapProps {
   locations: Location[];
@@ -33,8 +34,7 @@ const MapContent = ({ locations, searchLocation, onMapClick, findMyLocation, onM
   const locationMarkerRef = useRef<L.Marker | null>(null);
   const { toast } = useToast();
   const detailsCache = useRef<Map<number, Establishment>>(new Map());
-  // Simulação: o ID do usuário logado. No futuro, isso viria do seu AuthContext.
-  const LOGGED_IN_USER_ID = "user123";
+  const userId = useAuth().userId;
 
   useEffect(() => {
     if (findMyLocation) {
@@ -162,7 +162,7 @@ const MapContent = ({ locations, searchLocation, onMapClick, findMyLocation, onM
         const actions = popupElement.querySelector('.popup-actions');
         if (!actions) return;
 
-        const userHasReviewed = details.reviewList && details.reviewList.length > 0;
+        const userHasReviewed = details.reviewList.find(review => review.userId === userId);
         actions.innerHTML = userHasReviewed
             ? `<button class="edit-review-button" data-location-id="${details.establishmentId}" style="padding:6px 12px;background:#f59e0b;color:white;border:none;border-radius:4px;cursor:pointer">Editar Avaliação</button>`
             : `<button class="rate-button" data-location-id="${details.establishmentId}" style="padding:6px 12px;background:#333;color:white;border:none;border-radius:4px;cursor:pointer">Avaliar</button>`;

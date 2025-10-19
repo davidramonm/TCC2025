@@ -1,5 +1,5 @@
 // src/lib/api.ts
-import { Establishment, Location } from '@/types';
+import { Establishment, Location, Review } from '@/types';
 import axios from 'axios';
 import { tokenService } from './tokenService';
 
@@ -85,6 +85,37 @@ export async function getEstablishmentFromCoordinates(xCoords: number, yCoords: 
   } catch (error) {
     console.error('Erro ao buscar estabelecimento por coordenadas:', error);
     return null;
+  }
+}
+
+export async function saveEstablishment(establishmentData: any): Promise<Establishment> {
+  try {
+    const response = await apiClient.post('/establishments', establishmentData);
+    return response.data as Establishment;
+  } catch (error) {
+    console.error('Erro ao salvar estabelecimento:', error);
+    throw error;
+  }
+}
+
+export async function saveReview(reviewData: any): Promise<Review> {
+  try {
+    const response = await apiClient.post(`/reviews`, reviewData);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao salvar avaliação:', error);
+    throw error;
+  }
+}
+
+export async function updateReview(reviewId: string, reviewData: any): Promise<Review> {
+  try {
+    const response = await apiClient.put(`/reviews/${reviewId}`, reviewData);
+    return response.data;
+  }
+  catch (error) {
+    console.error('Erro ao atualizar avaliação:', error);
+    throw error;
   }
 }
 

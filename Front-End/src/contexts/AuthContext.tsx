@@ -5,10 +5,12 @@ import { createContext, useState, useContext, ReactNode, useEffect } from 'react
 import apiClient from "@/lib/api";
 import { tokenService } from '@/lib/tokenService';
 import { Necessity } from '@/types';
+import { set } from 'zod';
 
 
 interface AuthContextType {
   isLoggedIn: boolean;
+  userId: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -40,6 +42,7 @@ export const useAuth = () => {
  * Envolve a aplicação e disponibiliza o estado de sessão para todos os componentes filhos.
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const [userId, setUserId] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [firstName, setFirstName] = useState("Convidado");
   const [lastName, setLastName] = useState("");
@@ -52,6 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const res = await apiClient.post("/auth/refresh");
         tokenService.set(res.data.accessToken);
+        setUserId(res.data.userId);
         setFirstName(res.data.fName);
         setLastName(res.data.lName);
         setEmail(res.data.email);
@@ -67,6 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function login(email: string, password: string) {
     const res = await apiClient.post("/auth/login", { email, password });
+    setUserId(res.data.userId);
     setFirstName(res.data.fName);
     setLastName(res.data.lName);
     setEmail(res.data.email);
@@ -76,6 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function register (fName: string, lName: string, email: string, password: string, necessities: Necessity[]) {
     const res = await apiClient.post("/auth/register", {fName, lName, email, password, necessities});
+    setUserId(res.data.userId);
     setFirstName(res.data.fName);
     setLastName(res.data.lName);
     setEmail(res.data.email);
@@ -86,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function logout() {
     await apiClient.post("/auth/logout");
     tokenService.clear();
+    setUserId("");
     setFirstName("Convidado");
     setLastName("");
     setEmail("");
@@ -100,6 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = {
     isLoggedIn,
+    userId,
     firstName,
     lastName,
     email,

@@ -3,7 +3,8 @@ package com.unip.EstablishmentsService.dtos;
 import com.unip.EstablishmentsService.models.Necessity;
 
 import java.util.List;
+import java.util.UUID;
 
 public record LoginResponseDTO (
-        String fName, String lName, String email, List<Necessity> necessities, String accessToken
+        UUID userId,String fName, String lName, String email, List<Necessity> necessities, String accessToken
 ){}

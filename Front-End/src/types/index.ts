@@ -22,15 +22,11 @@ export interface Establishment {
 
 export interface Review {
   reviewId: string;
+  userId: string;
   username: string;
   comment: string;
   rating: number;
-  necessityReviewList : NecessityReview[];
-}
-
-export interface NecessityReview {
-  necessityId: string;
-  attends: boolean;
+  necessities: Necessity[];
 }
 
 export interface Necessity {

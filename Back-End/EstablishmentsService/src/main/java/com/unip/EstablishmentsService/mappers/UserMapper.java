@@ -9,6 +9,7 @@ public class UserMapper {
 
     public LoginResponseDTO userToLoginResponseDTO(User user, String sessionToken) {
         return new LoginResponseDTO(
+                user.getUserId(),
                 user.getFName(),
                 user.getLName(),
                 user.getEmail(),

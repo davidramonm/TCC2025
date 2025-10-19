@@ -77,7 +77,7 @@ export function AddLocationForm({ onSaveLocation, clickedPosition, initialData }
           ))}
         </div>
       </div>
-      {/* <div className="space-y-2">
+      <div className="space-y-2">
         <Label htmlFor="description">Descrição</Label>
         <Textarea id="description" placeholder="Descreva os recursos de acessibilidade disponíveis..." value={formData.description} onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))} />
       </div>
@@ -92,7 +92,7 @@ export function AddLocationForm({ onSaveLocation, clickedPosition, initialData }
       </div>
       <Button type="submit" className="w-full" disabled={!clickedPosition || selectedAccessibilityTypes.length === 0}>
         <Save className="w-4 h-4 mr-2" /> Salvar Local
-      </Button> */}
+      </Button>
     </form>
   );
 }

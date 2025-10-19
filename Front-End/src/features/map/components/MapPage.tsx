@@ -55,14 +55,14 @@ export default function MapPage() {
   const [establishmentFromClick, setEstablishmentFromClick] = useState<Establishment | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchLocation, setSearchLocation] = useState<Location | null>(null);
-  const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
+  const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [findMyLocation, setFindMyLocation] = useState(false);
   
   const [selectedEstablishment, setSelectedEstablishment] = useState<Establishment | null>(null);
 
   const [reviewModalState, setReviewModalState] = useState<{
     isOpen: boolean;
-    locationId: number | null;
+    locationId: string | null;
     locationName: string | null;
     isEditing: boolean;
     initialData?: {
@@ -112,14 +112,16 @@ export default function MapPage() {
 
   };
 
-  const handleSaveLocation = (formData: any, clickedPosition: any, selectedTypes: any, rating: number) => {
+  const handleSaveEstablishment = async (formData: any, clickedPosition: any, selectedTypes: any, rating: number) => {
     const newLocation: Location = {
-      establishmentId: Date.now(), // Gera um ID temporário
+      establishmentId: "", // Gera um ID temporário
+      address: formData.address.trim(),
       name: formData.name.trim(),
       xCoords: clickedPosition.lat,
       yCoords: clickedPosition.lng,
     };
-    setAllLocations((prevLocations) => [...prevLocations, newLocation]);
+    const location = await saveEstablishment(newLocation);
+    setAllLocations((prevLocations) => [...prevLocations,  location]);
     toast({ title: "Local salvo com sucesso!" });
     setActiveModal(null);
   };
@@ -277,7 +279,7 @@ export default function MapPage() {
         </DialogContent>
       </Dialog>
       <Dialog open={activeModal === 'add'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
-        <DialogContent className="z-50 sm:max-w-[425px] md:max-w-[600px]"><DialogHeader><DialogTitle>Adicionar Local</DialogTitle><DialogDescription>Preencha as informações do novo local.</DialogDescription></DialogHeader><div className="py-4 max-h-[70vh] overflow-y-auto px-2"><AddLocationForm onSaveLocation={handleSaveLocation} clickedPosition={clickedPosition} initialData={establishmentFromClick} /></div></DialogContent>
+        <DialogContent className="z-50 sm:max-w-[425px] md:max-w-[600px]"><DialogHeader><DialogTitle>Adicionar Local</DialogTitle><DialogDescription>Preencha as informações do novo local.</DialogDescription></DialogHeader><div className="py-4 max-h-[70vh] overflow-y-auto px-2"><AddLocationForm onSaveLocation={handleSaveEstablishment} clickedPosition={clickedPosition} initialData={establishmentFromClick} /></div></DialogContent>
       </Dialog>
       <Dialog open={activeModal === 'filter'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
         <DialogContent className="z-50 max-w-[700px]"><DialogHeader><DialogTitle>Filtrar & Listar Locais</DialogTitle><DialogDescription>Selecione filtros para refinar a busca.</DialogDescription></DialogHeader><div className="py-4 max-h-[70vh] overflow-y-auto px-1"><FilterAndListComponent onFilterChange={setActiveFilters} activeFilters={activeFilters} locations={filteredLocations} totalLocations={allLocations.length} onLocationClick={handleLocationClick} selectedLocationId={selectedLocationId} /></div></DialogContent>

@@ -12,7 +12,7 @@ interface FilterAndListComponentProps {
   locations: any[];
   totalLocations: number;
   onLocationClick: (location: any) => void;
-  selectedLocationId?: number | null;
+  selectedLocationId?: string | null;
 }
 
 export default function FilterAndListComponent({

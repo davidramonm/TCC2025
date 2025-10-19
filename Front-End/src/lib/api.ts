@@ -66,7 +66,7 @@ export async function fetchLocations(): Promise<Location[]> {
   }
 }
 
-export async function getEstablishmentById(id: number): Promise<Establishment | null> {
+export async function getEstablishmentById(id: string): Promise<Establishment | null> {
   try {
     const response = await apiClient.get(`/establishments/${id}`);
     return response.data as Establishment;
@@ -88,10 +88,11 @@ export async function getEstablishmentFromCoordinates(xCoords: number, yCoords: 
   }
 }
 
-export async function saveEstablishment(establishmentData: any): Promise<Establishment> {
+export async function saveEstablishment(establishmentData: Location): Promise<Location> {
   try {
+
     const response = await apiClient.post('/establishments', establishmentData);
-    return response.data as Establishment;
+    return response.data as Location;
   } catch (error) {
     console.error('Erro ao salvar estabelecimento:', error);
     throw error;

@@ -8,6 +8,7 @@ import com.unip.EstablishmentsService.models.Establishment;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,10 @@ public class EstablishmentMapper {
     }
 
     public EstablishmentResponseDTO toEstablishmentResponseDTO(Establishment establishment) {
-        List<ReviewResponseDTO> responseDTOList = reviewMapper.reviewsToReviewDTOs(establishment.getReviewList());
+        List<ReviewResponseDTO> responseDTOList = new ArrayList<>();
+        if (establishment.getReviewList() != null) {
+             responseDTOList = reviewMapper.reviewsToReviewDTOs(establishment.getReviewList());
+        }
         return new EstablishmentResponseDTO(
                 establishment.getEstablishmentId(),
                 establishment.getName(),

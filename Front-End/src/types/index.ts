@@ -1,19 +1,20 @@
 // src/types/index.ts
 
 export interface User {
-  id: number;
+  userId: string;
   name: string;
 }
 
 export interface Location {
-  establishmentId: number;
+  establishmentId: string;
   name: string;
+  address: string;
   xCoords: number;
   yCoords: number;
 }
 
 export interface Establishment {
-  establishmentId: number;
+  establishmentId: string;
   name: string;
   address: string;
   reviewList : Review[];

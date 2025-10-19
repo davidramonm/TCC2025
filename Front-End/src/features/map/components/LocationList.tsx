@@ -10,7 +10,7 @@ interface LocationListProps {
   locations: any[];
   totalLocations: number;
   onLocationClick: (location: any) => void;
-  selectedLocationId?: number | null;
+  selectedLocationId?: string | null;
   hasActiveFilters: boolean;
 }
 

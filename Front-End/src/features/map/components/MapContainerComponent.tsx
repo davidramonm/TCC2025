@@ -58,17 +58,15 @@ function LocateUser({ findMyLocation, onMyLocationFound }: { findMyLocation: boo
     return null;
 }
 
-// ===== NOVO COMPONENTE INTERNO PARA CONTROLAR O MAPA =====
-// A lógica que estava causando o erro foi movida para cá.
 function MapController({ searchLocation }: { searchLocation: Location | null }) {
-    const map = useMap(); // Agora esta chamada é válida, pois está dentro de um componente que é filho do MapContainer
+    const map = useMap(); 
     useEffect(() => {
         if (searchLocation) {
             map.flyTo([searchLocation.lat, searchLocation.lng], 16);
         }
     }, [searchLocation, map]);
 
-    return null; // Este componente não renderiza nada visualmente
+    return null;
 }
 
 // Componente principal do mapa

@@ -1,4 +1,5 @@
 // src/features/map/components/MapPage.tsx
+
 "use client";
 
 import { useState, useEffect, use } from "react";
@@ -6,7 +7,7 @@ import dynamic from "next/dynamic";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocations } from "../hooks/useLocations";
-import { getAddressFromCoordinates, fetchLocations, getEstablishmentFromCoordinates, saveEstablishment, saveReview } from "@/lib/api";
+import apiClient, { getAddressFromCoordinates, fetchLocations, getEstablishmentFromCoordinates, saveEstablishment, saveReview, getEstablishmentById} from "@/lib/api";
 import MapHeader from "@/components/layouts/MapHeader";
 import { AddLocationForm } from "./AddLocationForm";
 import FilterAndListComponent from "./FilterAndListComponent";
@@ -22,10 +23,20 @@ import { Establishment, Location, Necessity } from "@/types";
 import ReviewLocationModal from "./ReviewLocationModal";
 import FloatingHelpButton from "@/components/layouts/FloatingHelpButton";
 import WelcomeModal from "@/components/layouts/WelcomeModal";
+import LocationDetailCard from "./LocationDetailCard"; // Importando o novo card
 
 const MapContainerComponent = dynamic(() => import("./MapContainerComponent"), {
   ssr: false,
   loading: () => <div className="flex-1 bg-gray-200 animate-pulse" />,
+});
+
+const MOCK_REVIEWS = [
+  { id: 1, user: { id: 2, name: "Maria Silva" }, rating: 5, description: "Excelente acesso com rampas bem construídas!" },
+  { id: 2, user: { id: 3, name: "João Santos" }, rating: 4, description: "Banheiro adaptado muito bom, mas a entrada principal é um pouco estreita." },
+];
+
+const MOCK_USER_REVIEW = (userId: number, userName: string) => ({
+    id: 99, user: { id: userId, name: `${userName} (Você)`}, rating: 3, description: "Faltou piso tátil na área externa."
 });
 
 export default function MapPage() {
@@ -46,6 +57,8 @@ export default function MapPage() {
   const [searchLocation, setSearchLocation] = useState<Location | null>(null);
   const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
   const [findMyLocation, setFindMyLocation] = useState(false);
+  
+  const [selectedEstablishment, setSelectedEstablishment] = useState<Establishment | null>(null);
 
   const [reviewModalState, setReviewModalState] = useState<{
     isOpen: boolean;
@@ -80,7 +93,7 @@ export default function MapPage() {
       }
     };
     loadData();
-  }, [toast]);
+  }, [toast, userId, firstName]);
 
   const handleMapClick = async (latlng: { lat: number; lng: number }) => {
     if (!isLoggedIn) {
@@ -88,8 +101,7 @@ export default function MapPage() {
       setActiveModal("login");
       return;
     }
-
-
+    setSelectedEstablishment(null);
     setClickedPosition(latlng);
     const establishment = await getEstablishmentFromCoordinates(latlng.lat, latlng.lng);
 
@@ -112,9 +124,11 @@ export default function MapPage() {
     setActiveModal(null);
   };
 
-  const handleLocationClick = (location: Location) => {
+  const handleLocationClick = async (location: Location) => {
     setSearchLocation({ ...location });
     setSelectedLocationId(location.establishmentId);
+    const establishment = await getEstablishmentById(location.establishmentId);
+    setSelectedEstablishment(establishment ?? null);
     setActiveModal(null);
   };
 
@@ -153,17 +167,23 @@ export default function MapPage() {
     console.log('Estabelecimento salvo:', review);
     if (reviewModalState.locationId) {
       
-
-      setAllLocations(prevLocations =>
-        prevLocations.map(loc =>
-          loc.establishmentId === reviewModalState.locationId ? {
-            ...loc,
-            rating: reviewData.rating,
-            typeValues: reviewData.selectedTypes,
-            description: reviewData.description || "",
-          } : loc
-        )
+      const updatedLocations = allLocations.map(loc =>
+        loc.establishmentId === reviewModalState.locationId ? {
+          ...loc,
+          rating: reviewData.rating,
+          typeValues: reviewData.selectedTypes,
+          description: reviewData.description || "",
+        } : loc
       );
+      setAllLocations(updatedLocations);
+      
+      if (selectedEstablishment && selectedEstablishment.establishmentId === reviewModalState.locationId) {
+          const updatedSelected = updatedLocations.find(loc => loc.establishmentId === reviewModalState.locationId);
+          if (updatedSelected) {
+            const establishment = await getEstablishmentById(updatedSelected.establishmentId);
+              setSelectedEstablishment(establishment);
+          }
+      }
 
       toast({
         title: reviewModalState.isEditing ? "Avaliação Atualizada!" : "Avaliação Salva!",
@@ -187,6 +207,11 @@ export default function MapPage() {
       toast({ title: "Nenhum resultado encontrado", variant: "destructive" });
     }
   };
+  
+  const checkUserReview = (establishment: Establishment | null): boolean => {
+      if (!establishment || !establishment.reviewList || !isLoggedIn || !userId) return false;
+      return establishment.reviewList.some(review => review.userId === userId);
+  };
 
   if (isLoading) return <MapPageSkeleton />;
 
@@ -200,7 +225,7 @@ export default function MapPage() {
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
       <div className="flex-1 flex overflow-hidden relative">
-        <div className="flex-1 relative z-10">
+        <div className={`flex-1 relative z-10 transition-all duration-300 ease-in-out ${selectedEstablishment ? 'mr-0 md:mr-[28rem]' : 'mr-0'}`}>
           <MapContainerComponent
             locations={filteredLocations}
             clickedPosition={clickedPosition}
@@ -210,8 +235,20 @@ export default function MapPage() {
             onMyLocationFound={() => setFindMyLocation(false)}
             onRateClick={(establishment) => handleReviewClick(establishment)}
             onEditReviewClick={(establishment) => handleReviewClick(establishment)}
+            onLocationSelect={handleLocationClick}
           />
         </div>
+        
+        {selectedEstablishment && (
+          <LocationDetailCard
+            establishment={selectedEstablishment}
+            isUserReview={checkUserReview(selectedEstablishment)}
+            onClose={() => setSelectedEstablishment(null)}
+            onAddReview={(establishment) => handleReviewClick(establishment)}
+            onEditReview={(establishment) => handleReviewClick(establishment)}
+          />
+        )}
+        
         <FloatingMenu
           onAddClick={() => isLoggedIn ? setActiveModal("add") : setActiveModal("login")}
           onFilterAndListClick={() => setActiveModal("filter")}

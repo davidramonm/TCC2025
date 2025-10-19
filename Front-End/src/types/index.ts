@@ -1,8 +1,17 @@
 // src/types/index.ts
 
-/**
- * @description Define a estrutura de dados para um local no mapa.
- */
+export interface User {
+  id: number;
+  name: string;
+}
+
+export interface Review {
+  id: number;
+  user: User;
+  rating: number;
+  description: string;
+}
+
 export interface Location {
   establishmentId: number;
   name: string;

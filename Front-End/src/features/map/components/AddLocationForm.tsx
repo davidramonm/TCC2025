@@ -10,23 +10,25 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { MapPin, Navigation, CheckCircle, AlertCircle, Save } from "lucide-react";
 import { tiposAcessibilidade } from "@/lib/constants";
 import { StarRating } from "@/components/ui/star-rating";
+import { Establishment } from "@/types";
 
 interface AddLocationFormProps {
   onSaveLocation: (formData: any, clickedPosition: any, selectedTypes: any, rating: number) => void;
   clickedPosition: { lat: number; lng: number } | null;
-  initialAddress: string;
+  initialData: Establishment | null;
 }
 
-export function AddLocationForm({ onSaveLocation, clickedPosition, initialAddress }: AddLocationFormProps) {
+export function AddLocationForm({ onSaveLocation, clickedPosition, initialData }: AddLocationFormProps) {
   const [formData, setFormData] = useState({ name: "", address: "", description: "" });
   const [selectedAccessibilityTypes, setSelectedAccessibilityTypes] = useState<string[]>([]);
   const [selectedRating, setSelectedRating] = useState(0);
 
+
   useEffect(() => {
-    if (initialAddress) {
-      setFormData((prev) => ({ ...prev, address: initialAddress }));
+    if (initialData) {
+      setFormData((prev) => ({ ...prev, name: initialData.name, address: initialData.address || "" }));
     }
-  }, [initialAddress]);
+  }, [initialData]);
 
   const toggleAccessibilityType = (typeValue: string) => {
     setSelectedAccessibilityTypes((prev) =>

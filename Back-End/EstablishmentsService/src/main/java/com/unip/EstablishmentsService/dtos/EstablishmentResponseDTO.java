@@ -10,6 +10,8 @@ public record EstablishmentResponseDTO(
         UUID establishmentId,
         String name,
         String address,
-        List<Review> reviewList
+        List<ReviewResponseDTO> reviewList,
+        Double xCoords,
+        Double yCoords
 ) {
 }

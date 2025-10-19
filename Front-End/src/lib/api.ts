@@ -1,5 +1,5 @@
 // src/lib/api.ts
-import { Location } from '@/types';
+import { Establishment, Location, Review } from '@/types';
 import axios from 'axios';
 import { tokenService } from './tokenService';
 
@@ -57,41 +57,97 @@ export default apiClient;
  */
 export async function fetchLocations(): Promise<Location[]> {
 
-  apiClient.get('/establishments').then(response => {
-    console.log(response.data as Location[]);
+  try {
+    const response = await apiClient.get('/establishments');
     return response.data as Location[];
-  }).catch(error => {
+  } catch (error) {
     console.error('Erro ao buscar estabelecimentos:', error);
-  });
-
-  // Dados de exemplo estão agora dentro da função para simular uma fonte de dados
-  const mockLocations: Location[] = [
-    { 
-      id: 1, 
-      name: "Shopping Center Acessível", 
-      address: "Rua das Flores, 123, São Paulo", 
-      typeValues: ["rampa", "banheiro"], 
-      rating: 5, 
-      lat: -23.5505, 
-      lng: -46.6333, 
-      description: "Ótimo shopping com rampas de acesso em todas as entradas e banheiros adaptados em todos os andares." 
-    },
-    { 
-      id: 2, 
-      name: "Praça da Paz", 
-      address: "Avenida da Liberdade, 456, São Paulo", 
-      typeValues: ["circulacao", "piso"], 
-      rating: 4, 
-      lat: -23.54, 
-      lng: -46.65, 
-      description: "Praça ampla com piso tátil bem sinalizado e muito espaço para circulação." 
-    },
-  ];
-
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  return mockLocations;
+    return [];
+  }
 }
+
+export async function getEstablishmentById(id: string): Promise<Establishment | null> {
+  try {
+    const response = await apiClient.get(`/establishments/${id}`);
+    return response.data as Establishment;
+  } catch (error) {
+    console.error('Erro ao buscar estabelecimento:', error);
+    throw error;
+  }
+}
+
+export async function getEstablishmentFromCoordinates(xCoords: number, yCoords: number): Promise<Establishment | null> {
+  try {
+    const response = await apiClient.get(`/establishments/coordinates`, {
+      params: { xCoords, yCoords }
+    });
+    return response.data as Establishment;
+  } catch (error) {
+    console.error('Erro ao buscar estabelecimento por coordenadas:', error);
+    return null;
+  }
+}
+
+export async function saveEstablishment(establishmentData: Location): Promise<Location> {
+  try {
+
+    const response = await apiClient.post('/establishments', establishmentData);
+    return response.data as Location;
+  } catch (error) {
+    console.error('Erro ao salvar estabelecimento:', error);
+    throw error;
+  }
+}
+
+export async function saveReview(reviewData: any): Promise<Review> {
+  try {
+    const response = await apiClient.post(`/reviews`, reviewData);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao salvar avaliação:', error);
+    throw error;
+  }
+}
+
+export async function updateReview(reviewId: string, reviewData: any): Promise<Review> {
+  try {
+    const response = await apiClient.put(`/reviews/${reviewId}`, reviewData);
+    return response.data;
+  }
+  catch (error) {
+    console.error('Erro ao atualizar avaliação:', error);
+    throw error;
+  }
+}
+
+// Dados de exemplo estão agora dentro da função para simular uma fonte de dados
+// const mockLocations: Location[] = [
+//   {
+//     id: 1,
+//     name: "Shopping Center Acessível",
+//     address: "Rua das Flores, 123, São Paulo",
+//     typeValues: ["rampa", "banheiro"],
+//     rating: 5,
+//     lat: -23.5505,
+//     lng: -46.6333,
+//     description: "Ótimo shopping com rampas de acesso em todas as entradas e banheiros adaptados em todos os andares."
+//   },
+//   {
+//     id: 2,
+//     name: "Praça da Paz",
+//     address: "Avenida da Liberdade, 456, São Paulo",
+//     typeValues: ["circulacao", "piso"],
+//     rating: 4,
+//     lat: -23.54,
+//     lng: -46.65,
+//     description: "Praça ampla com piso tátil bem sinalizado e muito espaço para circulação."
+//   },
+// ];
+
+
+
+// return mockLocations;
+
 
 /**
  * @description Busca um endereço legível a partir de coordenadas geográficas.
@@ -110,7 +166,7 @@ export async function getAddressFromCoordinates(lat: number, lng: number): Promi
       const addressParts = [
         road || '', house_number || '', suburb || '', city || town || village || ''
       ].filter(Boolean);
-      
+
       const uniqueAddressParts = [...new Set(addressParts)];
       return uniqueAddressParts.join(', ');
     }
@@ -126,7 +182,7 @@ export async function fetchAllEstablishments(): Promise<any> {
     const response = await fetch('http://localhost:8080/establishments', {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
-    }); 
+    });
     if (!response.ok) {
       throw new Error(`Erro na requisição: ${response.statusText}`);
     }

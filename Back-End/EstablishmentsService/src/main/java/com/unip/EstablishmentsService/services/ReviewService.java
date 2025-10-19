@@ -5,33 +5,25 @@ import com.unip.EstablishmentsService.dtos.ReviewResponseDTO;
 import com.unip.EstablishmentsService.mappers.ReviewMapper;
 import com.unip.EstablishmentsService.models.*;
 import com.unip.EstablishmentsService.repositories.*;
+import lombok.Data;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Data
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final EstablishmentRepository establishmentRepository;
     private final UserRepository userRepository;
-    private final NecessityReviewService necessityReviewService;
+    private final NecessityService necessityService;
 
     private final ReviewMapper reviewMapper;
 
-    public ReviewService(
-            ReviewRepository reviewRepository,
-            EstablishmentRepository establishmentRepository,
-            UserRepository userRepository,
-            NecessityReviewService necessityReviewService,
-            ReviewMapper reviewMapper) {
-        this.reviewRepository = reviewRepository;
-        this.establishmentRepository = establishmentRepository;
-        this.userRepository = userRepository;
-        this.necessityReviewService = necessityReviewService;
-        this.reviewMapper = reviewMapper;
-    }
 
     public List<ReviewResponseDTO> getAllReviews() {
         return reviewMapper.reviewsToReviewDTOs(reviewRepository.findAll());
@@ -41,15 +33,23 @@ public class ReviewService {
         return reviewMapper.reviewToReviewDTO(reviewRepository.findById(id).orElseThrow());
     }
 
-    public ReviewResponseDTO createReview(ReviewRequestDTO reviewRequest) {
-        Establishment establishment = establishmentRepository.findById(reviewRequest.establishmentId()).orElseThrow();
-        User user = userRepository.findById(reviewRequest.userId()).orElseThrow();
 
-        Review review = reviewMapper.reviewRequestDTOToReview(reviewRequest, establishment, user);
+    public ReviewResponseDTO createReview(ReviewRequestDTO reviewRequest) {
+
+
+        Review review = reviewMapper.reviewRequestDTOToReview(reviewRequest);
+
+        User user = userRepository.findById(review.getUser().getUserId()).orElseThrow();
+        Establishment establishment = establishmentRepository.findById(review.getEstablishment().getEstablishmentId()).orElseThrow();
+        Optional<Review> optionalReview = reviewRepository.findByUserAndEstablishment(user, establishment);
+        if (optionalReview.isPresent()) {
+            return updateReview(optionalReview.get().getReviewId(), reviewRequest);
+        }
+
         review = reviewRepository.save(review);
-        review.setNecessityReviews(
-                necessityReviewService.createAllNecessityReviews(reviewRequest.necessityReviews(), review)
-                );
+        System.out.println(review);
+
+
 
 
         return reviewMapper.reviewToReviewDTO(review);
@@ -59,10 +59,10 @@ public class ReviewService {
         Review review = reviewRepository.findById(id).orElseThrow();
         review.setComment(reviewRequest.comment());
         review.setRating(reviewRequest.rating());
-        review.setNecessityReviews(
-                necessityReviewService.createAllNecessityReviews(reviewRequest.necessityReviews(), review)
-        );
-        return null;
+        review.setNecessities(reviewRequest.necessities());
+
+        reviewRepository.save(review);
+        return reviewMapper.reviewToReviewDTO(review);
     }
 
 }

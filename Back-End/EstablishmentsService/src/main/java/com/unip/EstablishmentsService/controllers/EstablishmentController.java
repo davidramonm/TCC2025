@@ -44,6 +44,11 @@ public class EstablishmentController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/coordinates")
+    public ResponseEntity<EstablishmentResponseDTO> getEstablishmentFromCoordinates (@RequestParam Double xCoords, @RequestParam Double yCoords){
+        return ResponseEntity.ok().body(service.getEstablishmentByCoordinates(xCoords, yCoords));
+    }
+
 
 
 

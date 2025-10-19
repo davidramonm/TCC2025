@@ -4,14 +4,10 @@
  * @description Define a estrutura de dados para um local no mapa.
  */
 export interface Location {
-  id: number;
+  establishmentId: number;
   name: string;
-  address: string;
-  typeValues: string[];
-  description?: string;
-  rating: number;
-  lat: number;
-  lng: number;
+  xCoords: number;
+  yCoords: number;
 }
 
 export interface Establishment {
@@ -19,12 +15,14 @@ export interface Establishment {
   name: string;
   address: string;
   reviewList : Review[];
+  xCoords: number;
+  yCoords: number;
 
 }
 
 export interface Review {
   reviewId: string;
-  
+  username: string;
   comment: string;
   rating: number;
   necessityReviewList : NecessityReview[];

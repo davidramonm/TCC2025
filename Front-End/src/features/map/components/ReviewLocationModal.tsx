@@ -9,23 +9,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { tiposAcessibilidade } from "@/lib/constants";
 import { Checkbox } from "@/components/ui/checkbox";
+import { NecessityReview } from "@/types";
 
 interface ReviewLocationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (reviewData: { rating: number; selectedTypes: string[]; description: string }) => void;
+  onSubmit: (reviewData: { rating: number; selectedTypes: NecessityReview[]; description: string }) => void;
   locationName: string | null;
   initialData?: { // Prop para receber dados existentes
     rating: number;
     description: string;
-    types: string[];
+    types: NecessityReview[];
   };
 }
 
 export default function ReviewLocationModal({ isOpen, onClose, onSubmit, locationName, initialData }: ReviewLocationModalProps) {
   const [rating, setRating] = useState(0);
   const [description, setDescription] = useState("");
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedTypes, setSelectedTypes] = useState<NecessityReview[]>([]);
 
   useEffect(() => {
     // Preenche o formulário com os dados iniciais quando o modal é aberto
@@ -36,10 +37,14 @@ export default function ReviewLocationModal({ isOpen, onClose, onSubmit, locatio
     }
   }, [isOpen, initialData]);
 
-  const toggleAccessibilityType = (typeValue: string) => {
-    setSelectedTypes((prev) =>
-      prev.includes(typeValue) ? prev.filter((t) => t !== typeValue) : [...prev, typeValue]
-    );
+  const toggleAccessibilityType = (necessityId: string) => {
+    setSelectedTypes((prev) => {
+      const exists = prev.some(nr => nr.necessityId === necessityId);
+      if (exists) {
+        return prev.filter((nr) => nr.necessityId !== necessityId);
+      }
+      return [...prev, { necessityId, attends: true }];
+    });
   };
 
   const handleSubmit = () => {
@@ -66,48 +71,48 @@ export default function ReviewLocationModal({ isOpen, onClose, onSubmit, locatio
           </DialogDescription>
         </DialogHeader>
         <div className="py-4 space-y-6 max-h-[60vh] overflow-y-auto pr-2">
-            {/* Seção de Acessibilidades */}
-            <div>
-                <Label className="text-base font-semibold mb-3 flex items-center gap-2">
-                    <Heart className="w-5 h-5 text-gray-600" />
-                    Confirmar Acessibilidades
-                </Label>
-                <div className="grid grid-cols-2 gap-3 p-3 border rounded-lg bg-gray-50/50">
-                    {tiposAcessibilidade.map((tipo) => (
-                        <div key={tipo.value} className="flex items-center gap-3">
-                            <Checkbox
-                                id={`review-${tipo.value}`}
-                                checked={selectedTypes.includes(tipo.value)}
-                                onCheckedChange={() => toggleAccessibilityType(tipo.value)}
-                            />
-                            <Label htmlFor={`review-${tipo.value}`} className="flex items-center gap-2 cursor-pointer font-normal">
-                                <tipo.icon className="w-5 h-5" style={{ color: tipo.color }} />
-                                {tipo.label}
-                            </Label>
-                        </div>
-                    ))}
+          {/* Seção de Acessibilidades */}
+          <div>
+            <Label className="text-base font-semibold mb-3 flex items-center gap-2">
+              <Heart className="w-5 h-5 text-gray-600" />
+              Confirmar Acessibilidades
+            </Label>
+            <div className="grid grid-cols-2 gap-3 p-3 border rounded-lg bg-gray-50/50">
+              {tiposAcessibilidade.map((tipo) => (
+                <div key={tipo.value} className="flex items-center gap-3">
+                  <Checkbox
+                    id={`review-${tipo.value}`}
+                    checked={selectedTypes.some(nr => nr.necessityId === tipo.necessityId)}
+                    onCheckedChange={() => toggleAccessibilityType(tipo.necessityId)}
+                  />
+                  <Label htmlFor={`review-${tipo.value}`} className="flex items-center gap-2 cursor-pointer font-normal">
+                    <tipo.icon className="w-5 h-5" style={{ color: tipo.color }} />
+                    {tipo.label}
+                  </Label>
                 </div>
+              ))}
             </div>
+          </div>
 
-            {/* Seção de Avaliação */}
-            <div className="text-center space-y-2">
-                <Label className="text-base font-semibold">Sua Avaliação Geral *</Label>
-                <div className="flex justify-center">
-                    <StarRating rating={rating} onRatingChange={setRating} interactive size={8} />
-                </div>
+          {/* Seção de Avaliação */}
+          <div className="text-center space-y-2">
+            <Label className="text-base font-semibold">Sua Avaliação Geral *</Label>
+            <div className="flex justify-center">
+              <StarRating rating={rating} onRatingChange={setRating} interactive size={8} />
             </div>
+          </div>
 
-            {/* Seção de Descrição */}
-            <div>
-                <Label htmlFor="review-description" className="text-base font-semibold">Comentário (Opcional)</Label>
-                <Textarea
-                    id="review-description"
-                    placeholder="Descreva sua experiência neste local, como os recursos de acessibilidade funcionam, etc."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="mt-2"
-                />
-            </div>
+          {/* Seção de Descrição */}
+          <div>
+            <Label htmlFor="review-description" className="text-base font-semibold">Comentário (Opcional)</Label>
+            <Textarea
+              id="review-description"
+              placeholder="Descreva sua experiência neste local, como os recursos de acessibilidade funcionam, etc."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="mt-2"
+            />
+          </div>
         </div>
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onClose}>

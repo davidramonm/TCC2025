@@ -9,16 +9,20 @@ import "leaflet/dist/leaflet.css";
 import { MapPin, Navigation } from "lucide-react";
 import { tiposAcessibilidade, getLocationTypeName } from "@/lib/constants";
 import { useToast } from "@/hooks/use-toast";
+import { Establishment, Location } from "@/types";
+import { set } from "zod";
+import { on } from "events";
+import { fetchEstablishmentById } from "@/lib/api";
 
 interface MapProps {
-  locations: any[];
+  locations: Location[];
   clickedPosition: { lat: number; lng: number } | null;
   searchLocation: any | null;
   onMapClick: (latlng: { lat: number; lng: number }) => void;
   findMyLocation: boolean;
   onMyLocationFound: () => void;
-  onRateClick: (locationId: number) => void;
-  onEditReviewClick: (locationId: number) => void; // Nova prop para edição
+  onRateClick: (establishment: Establishment) => void;
+  onEditReviewClick: (establishment: Establishment) => void; // Nova prop para edição
 }
 
 const MapContent = ({ locations, searchLocation, onMapClick, findMyLocation, onMyLocationFound, onRateClick, onEditReviewClick }: MapProps) => {
@@ -28,6 +32,7 @@ const MapContent = ({ locations, searchLocation, onMapClick, findMyLocation, onM
   const markersRef = useRef<L.Marker[]>([]);
   const locationMarkerRef = useRef<L.Marker | null>(null);
   const { toast } = useToast();
+  const detailsCache = useRef<Map<number, Establishment>>(new Map());
   // Simulação: o ID do usuário logado. No futuro, isso viria do seu AuthContext.
   const LOGGED_IN_USER_ID = "user123";
 
@@ -72,15 +77,16 @@ const MapContent = ({ locations, searchLocation, onMapClick, findMyLocation, onM
     markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
 
-    locations.forEach((location) => {
-      // Simulação: vamos assumir que algumas avaliações foram feitas pelo usuário logado
-      const userHasReviewed = location.id % 2 === 0; // Exemplo: usuário avaliou locais com ID par
 
-      const tipo = tiposAcessibilidade.find((t) => t.value === location.typeValues[0]);
-      const IconComponent = tipo?.icon || MapPin;
+    locations.forEach((location) => {
+
+      //const tipo = tiposAcessibilidade.find((t) => t.necessityId === location.[0]);
+      //const IconComponent = tipo?.icon || MapPin;
+      const IconComponent = MapPin;
       const iconString = renderToStaticMarkup(<IconComponent color="white" size={20} />);
-      const iconHtml = `<div style="background: ${tipo?.color || '#e5e7eb'}; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">${iconString}</div>`;
-      
+      //const iconHtml = `<div style="background: ${tipo?.color || '#e5e7eb'}; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">${iconString}</div>`;
+      const iconHtml = `<div style="background: '#e5e7eb'; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">${iconString}</div>`;
+
       const icon = L.divIcon({
         className: "location-marker",
         html: iconHtml,
@@ -88,46 +94,87 @@ const MapContent = ({ locations, searchLocation, onMapClick, findMyLocation, onM
         iconAnchor: [20, 40],
       });
 
-      const marker = L.marker([location.lat, location.lng], { icon }).addTo(map);
-      
-      const typesList = location.typeValues.map((type: string) => `<li>${getLocationTypeName(type)}</li>`).join('');
-      
-      // Decide qual botão mostrar
-      const actionButton = userHasReviewed
-        ? `<button class="edit-review-button" data-location-id="${location.id}" style="margin-top: 10px; padding: 6px 12px; background-color: #f59e0b; color: white; border: none; border-radius: 4px; cursor: pointer;">Editar Avaliação</button>`
-        : `<button class="rate-button" data-location-id="${location.id}" style="margin-top: 10px; padding: 6px 12px; background-color: #333; color: white; border: none; border-radius: 4px; cursor: pointer;">Avaliar</button>`;
+      const marker = L.marker([location.xCoords, location.yCoords], { icon }).addTo(map);
 
-      const popupContent = `
+      //const typesList = location.typeValues.map((type: string) => `<li>${getLocationTypeName(type)}</li>`).join('');
+
+
+
+      const popupContentBasic = `
         <div style="font-family: inherit; line-height: 1.5;">
           <h4 style="margin: 0 0 8px 0; font-size: 16px;">${location.name}</h4>
-          <p style="margin: 4px 0; font-size: 14px;">Endereço: ${location.address}</p>
-          <div style="margin: 4px 0; font-size: 14px;">
-            <strong>Acessibilidades:</strong>
-            <ul style="margin-top: 4px; padding-left: 18px;">${typesList}</ul>
-          </div>
-          ${location.rating ? `<p style="margin: 4px 0; font-size: 14px;">Avaliação: ${"★".repeat(location.rating)}${"☆".repeat(5 - location.rating)}</p>` : ""}
-          ${location.description ? `<p style="margin: 4px 0; font-size: 14px;">Descrição: ${location.description}</p>` : ""}
-          ${actionButton}
+          <div class="popup-details"><p>Carregando...</p></div>
+          <div class="popup-actions" style="margin-top:8px;"></div>
         </div>
       `;
 
-      marker.bindPopup(popupContent);
 
-      marker.on('popupopen', (e) => {
+      marker.bindPopup(popupContentBasic);
+
+      marker.on('popupopen', async (e) => {
         const popup = e.popup;
-        const rateButton = popup.getElement()?.querySelector('.rate-button');
-        const editButton = popup.getElement()?.querySelector('.edit-review-button');
-        
-        if (rateButton) {
-          (rateButton as HTMLElement).onclick = () => onRateClick(location.id);
+        const id = location.establishmentId;
+
+        const cachedDetails = detailsCache.current.get(id);
+        if (cachedDetails) {
+          fillPopupWithDetails(popup, cachedDetails)
+          return;
         }
-        if (editButton) {
-          (editButton as HTMLElement).onclick = () => onEditReviewClick(location.id);
+
+        try {
+          const response = await fetchEstablishmentById(id);
+          console.log('Detalhes do estabelecimento:', response);
+          detailsCache.current.set(id, response);
+          fillPopupWithDetails(popup, response);
+        } catch (error) {
+          popup.setContent(`<div style="font-family: inherit; line-height: 1.5;">
+            <h4 style="margin: 0 0 8px 0; font-size: 16px;">${location.name}</h4>
+            <p style="color: red;">Erro ao carregar detalhes.</p>
+          </div>`);
         }
       });
-      
-      markersRef.current.push(marker);
+
     });
+
+    function fillPopupWithDetails(popup: L.Popup, details: Establishment) {
+      const typesList = (details.reviewList || [])
+        .map(review => `<li>
+          <p>${review.username}: ${review.rating}★ - ${review.comment ?? ''} </p>
+          </li>`).join('');
+      const html = `
+        <div style="font-family: inherit; line-height: 1.5;">
+          <h4 style="margin: 0 0 8px 0; font-size: 16px;">${details.name}</h4>
+          <p style="margin: 4px 0; font-size: 14px;">Endereço: ${details.address}</p>
+          <div style="margin: 4px 0; font-size: 14px;">
+            <strong>Avaliações:</strong>
+            <ul style="margin-top: 4px; padding-left: 18px;">${typesList}</ul>
+          </div>
+          
+          <div class="popup-actions" style="margin-top:8px;"></div>
+        </div>
+      `;
+      popup.setContent(html);
+
+      setTimeout(() => {
+        const popupElement = popup.getElement();
+        if (!popupElement) return;
+
+        const actions = popupElement.querySelector('.popup-actions');
+        if (!actions) return;
+
+        const userHasReviewed = details.reviewList && details.reviewList.length > 0;
+        actions.innerHTML = userHasReviewed
+            ? `<button class="edit-review-button" data-location-id="${details.establishmentId}" style="padding:6px 12px;background:#f59e0b;color:white;border:none;border-radius:4px;cursor:pointer">Editar Avaliação</button>`
+            : `<button class="rate-button" data-location-id="${details.establishmentId}" style="padding:6px 12px;background:#333;color:white;border:none;border-radius:4px;cursor:pointer">Avaliar</button>`;
+
+
+        const rateButton = popupElement.querySelector('.rate-button') as HTMLElement;
+        const editButton = popupElement.querySelector('.edit-review-button') as HTMLElement;
+        if (rateButton) rateButton.onclick = () => onRateClick(details);
+        if (editButton) editButton.onclick = () => onEditReviewClick(details);
+      }, 50);
+
+    }
 
   }, [map, locations, onRateClick, onEditReviewClick]);
 
@@ -156,3 +203,5 @@ export default function MapContainerComponent(props: MapProps) {
     </MapContainer>
   );
 }
+
+

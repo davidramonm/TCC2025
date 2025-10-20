@@ -5,8 +5,10 @@ import com.unip.EstablishmentsService.dtos.EstablishmentRequestDTO;
 import com.unip.EstablishmentsService.dtos.EstablishmentResponseDTO;
 import com.unip.EstablishmentsService.dtos.ReviewResponseDTO;
 import com.unip.EstablishmentsService.models.Establishment;
+import com.unip.EstablishmentsService.models.Review;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.Mapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,18 +33,23 @@ public class EstablishmentMapper {
         ).collect(Collectors.toList());
     }
 
+
     public EstablishmentResponseDTO toEstablishmentResponseDTO(Establishment establishment) {
         List<ReviewResponseDTO> responseDTOList = new ArrayList<>();
         if (establishment.getReviewList() != null) {
              responseDTOList = reviewMapper.reviewsToReviewDTOs(establishment.getReviewList());
+
+
         }
         return new EstablishmentResponseDTO(
                 establishment.getEstablishmentId(),
                 establishment.getName(),
                 establishment.getAddress(),
-                responseDTOList,
+                null,
                 establishment.getXCoords(),
-                establishment.getYCoords()
+                establishment.getYCoords(),
+                null,
+                responseDTOList
         );
     }
 

@@ -1,6 +1,7 @@
 package com.unip.EstablishmentsService.dtos;
 
 
+import com.unip.EstablishmentsService.models.Necessity;
 import com.unip.EstablishmentsService.models.Review;
 
 import java.util.List;
@@ -10,8 +11,11 @@ public record EstablishmentResponseDTO(
         UUID establishmentId,
         String name,
         String address,
-        List<ReviewResponseDTO> reviewList,
+        Double rating,
         Double xCoords,
-        Double yCoords
+        Double yCoords,
+        List<String> topNecessities,
+        List<ReviewResponseDTO> reviewList
+
 ) {
 }

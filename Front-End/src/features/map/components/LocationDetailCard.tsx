@@ -39,7 +39,7 @@ export default function LocationDetailCard({
         <div className="flex items-center pt-2">
           <Star className="mr-1 h-5 w-5 text-yellow-400 fill-yellow-400" />
           {/* <span className="font-bold">{establishment.rating.toFixed(1)}</span> */}
-          <span className="font-bold">{1}</span>
+          <span className="font-bold">{establishment.rating}</span>
           <span className="ml-2 text-sm text-gray-500">({establishment.reviewList?.length ?? 0} avaliações)</span>
         </div>
       </CardHeader>
@@ -50,8 +50,8 @@ export default function LocationDetailCard({
         <div className="mb-6">
           <h3 className="mb-2 font-semibold">Tipos de Acessibilidade</h3>
           <div className="flex flex-wrap gap-2">
-            {establishment.reviewList.map((type) => (
-              <Badge key={type.reviewId} variant="secondary">{getLocationTypeName(type.userId)}</Badge>
+            {establishment.topNecessities.map((type) => (
+              <Badge key={type} variant="secondary">{getLocationTypeName(type)}</Badge>
             ))}
           </div>
         </div>

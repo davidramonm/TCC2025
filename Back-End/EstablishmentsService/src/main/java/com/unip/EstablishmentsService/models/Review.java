@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -24,13 +25,21 @@ public class Review {
     private Establishment establishment;
 
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "necessities_reviews",
+            joinColumns = @JoinColumn(name = "review_id"),
+            inverseJoinColumns = @JoinColumn(name = "necessity_id")
+    )
+    List<Necessity> necessities;
+
     @ManyToOne
-    @JoinColumn(name = "necessity_id")
+    @JoinColumn(name = "user_id")
     @JsonIgnore
-    private Necessity necessity;
+    private User user;
 
-    private Boolean attends;
-
+    private String comment;
+    private Integer rating;
 
 
 

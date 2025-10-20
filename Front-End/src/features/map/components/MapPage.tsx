@@ -1,18 +1,13 @@
 // src/features/map/components/MapPage.tsx
+
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import dynamic from "next/dynamic";
-
-// --- Hooks e Contexto ---
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocations } from "../hooks/useLocations";
-
-// --- Camada de API ---
-import { getAddressFromCoordinates } from "@/lib/api";
-
-// --- Componentes ---
+import apiClient, { getAddressFromCoordinates, fetchLocations, getEstablishmentFromCoordinates, saveEstablishment, saveReview, getEstablishmentById} from "@/lib/api";
 import MapHeader from "@/components/layouts/MapHeader";
 import { AddLocationForm } from "./AddLocationForm";
 import FilterAndListComponent from "./FilterAndListComponent";
@@ -20,94 +15,193 @@ import FloatingMenu from "./FloatingMenu";
 import LoginPage from "@/features/authentication/components/LoginPage";
 import RegisterPage from "@/features/authentication/components/RegisterPage";
 import RecoveryPage from "@/features/authentication/components/RecoveryPage";
-import UserProfilePage from "@/features/authentication/components/UserProfilePage";
+import UserSettingsPage from "@/features/authentication/components/UserSettingsPage";
 import MapPageSkeleton from "./MapPageSkeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-
-// --- Tipos e Constantes ---
 import { getLocationTypeName } from "@/lib/constants";
-import { Location } from "@/types";
+import { Establishment, Location, Necessity } from "@/types";
+import ReviewLocationModal from "./ReviewLocationModal";
+import FloatingHelpButton from "@/components/layouts/FloatingHelpButton";
+import WelcomeModal from "@/components/layouts/WelcomeModal";
+import LocationDetailCard from "./LocationDetailCard"; // Importando o novo card
 
-const MapContainerComponent = dynamic(() => import("./MapContainerComponent"), { 
+const MapContainerComponent = dynamic(() => import("./MapContainerComponent"), {
   ssr: false,
   loading: () => <div className="flex-1 bg-gray-200 animate-pulse" />,
 });
 
+const MOCK_REVIEWS = [
+  { id: 1, user: { id: 2, name: "Maria Silva" }, rating: 5, description: "Excelente acesso com rampas bem construídas!" },
+  { id: 2, user: { id: 3, name: "João Santos" }, rating: 4, description: "Banheiro adaptado muito bom, mas a entrada principal é um pouco estreita." },
+];
+
+const MOCK_USER_REVIEW = (userId: number, userName: string) => ({
+    id: 99, user: { id: userId, name: `${userName} (Você)`}, rating: 3, description: "Faltou piso tátil na área externa."
+});
+
 export default function MapPage() {
   const { toast } = useToast();
-  const { isLoggedIn, userName, userNeeds, login, register, logout, updateUser, updateNeeds } = useAuth();
-  
-  const [activeModal, setActiveModal] = useState<"login" | "register" | "recovery" | "add" | "filter" | "profile" | null>(null);
-  
-  // --- Gerenciamento de Estado Corrigido ---
+  const { isLoggedIn, userId, login, register, firstName, lastName, email, userNeeds, updateUserName, updateNeeds } = useAuth();
+
+  const [activeModal, setActiveModal] = useState<"login" | "register" | "recovery" | "add" | "filter" | null>(null);
+
   const [allLocations, setAllLocations] = useState<Location[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  
-  // A ordem agora está correta: 'allLocations' e 'activeFilters' são passados para o hook.
+
   const { filteredLocations } = useLocations(allLocations, activeFilters);
-  
+
   const [clickedPosition, setClickedPosition] = useState<{ lat: number; lng: number } | null>(null);
-  const [addressFromClick, setAddressFromClick] = useState("");
+  const [establishmentFromClick, setEstablishmentFromClick] = useState<Establishment | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchLocation, setSearchLocation] = useState<Location | null>(null);
-  const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
+  const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [findMyLocation, setFindMyLocation] = useState(false);
+  
+  const [selectedEstablishment, setSelectedEstablishment] = useState<Establishment | null>(null);
+
+  const [reviewModalState, setReviewModalState] = useState<{
+    isOpen: boolean;
+    locationId: string | null;
+    locationName: string | null;
+    isEditing: boolean;
+    initialData?: {
+      rating: number;
+      description: string;
+      types: Necessity[];
+    }
+  }>({ isOpen: false, locationId: null, locationName: null, isEditing: false });
+
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   useEffect(() => {
-    const fetchInitialData = async () => {
+    const loadData = async () => {
       setIsLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setAllLocations([
-        { id: 1, name: "Shopping Center Acessível", address: "Rua das Flores, 123, São Paulo", typeValues: ["rampa", "banheiro"], rating: 5, lat: -23.5505, lng: -46.6333, description: "Ótimo shopping." },
-        { id: 2, name: "Praça da Paz", address: "Avenida da Liberdade, 456, São Paulo", typeValues: ["circulacao", "piso"], rating: 4, lat: -23.54, lng: -46.65, description: "Praça ampla." },
-      ]);
-      setIsLoading(false);
+      try {
+        const locations = await fetchLocations();
+        console.log(locations);
+        setAllLocations(locations);
+      } catch (error) {
+        toast({
+          title: "Erro ao carregar locais",
+          description: "Não foi possível buscar os dados. Tente novamente mais tarde.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
     };
-    fetchInitialData();
-  }, []);
+    loadData();
+  }, [toast, userId, firstName]);
 
   const handleMapClick = async (latlng: { lat: number; lng: number }) => {
     if (!isLoggedIn) {
-      toast({ title: "Ação restrita", description: "Faça login para adicionar novos locais.", variant: "destructive"});
+      toast({ title: "Ação restrita", description: "Faça login para adicionar novos locais.", variant: "destructive" });
       setActiveModal("login");
       return;
     }
+    setSelectedEstablishment(null);
     setClickedPosition(latlng);
+    const establishment = await getEstablishmentFromCoordinates(latlng.lat, latlng.lng);
+
+
     setActiveModal("add");
-    const address = await getAddressFromCoordinates(latlng.lat, latlng.lng);
-    setAddressFromClick(address);
+    setEstablishmentFromClick(establishment);
+
+
   };
 
-  const handleSaveLocation = (formData: any, clickedPosition: any, selectedTypes: any, rating: number) => {
+  const handleSaveEstablishment = async (formData: any, clickedPosition: any, selectedTypes: any, rating: number) => {
     const newLocation: Location = {
-      id: Date.now(),
-      name: formData.name.trim(),
+      establishmentId: "", // Gera um ID temporário
       address: formData.address.trim(),
-      typeValues: selectedTypes,
-      description: formData.description.trim(),
-      rating: rating,
-      lat: clickedPosition.lat,
-      lng: clickedPosition.lng,
+      name: formData.name.trim(),
+      xCoords: clickedPosition.lat,
+      yCoords: clickedPosition.lng,
     };
-    setAllLocations((prevLocations) => [...prevLocations, newLocation]);
+    const location = await saveEstablishment(newLocation);
+    setAllLocations((prevLocations) => [...prevLocations,  location]);
     toast({ title: "Local salvo com sucesso!" });
     setActiveModal(null);
   };
-  
-  const handleLocationClick = (location: Location) => {
-    setSearchLocation(location);
-    setSelectedLocationId(location.id);
+
+  const handleLocationClick = async (location: Location) => {
+    setSearchLocation({ ...location });
+    setSelectedLocationId(location.establishmentId);
+    const establishment = await getEstablishmentById(location.establishmentId);
+    setSelectedEstablishment(establishment ?? null);
     setActiveModal(null);
+  };
+
+  const handleReviewClick = (establishment: Establishment) => {
+    if (!isLoggedIn) {
+      setActiveModal("login");
+    } else {
+
+      const userReview = establishment.reviewList.find(review => review.userId === userId);
+      setReviewModalState({
+        isOpen: true,
+        locationId: establishment.establishmentId,
+        locationName: establishment.name,
+        isEditing: !!userReview,
+        initialData: userReview ? {
+          rating: userReview.rating,
+          description: userReview.comment,
+          types: userReview.necessities,
+        } : undefined,
+      });
+
+    }
+  };
+
+  const handleSaveReview = async (reviewData: { rating: number; selectedTypes: Necessity[]; description: string }) => {
+
+    console.log("aqui: " + reviewData.selectedTypes)
+    const review = await saveReview({
+      establishmentId: reviewModalState.locationId,
+      userId: userId,
+      rating: reviewData.rating,
+      comment: reviewData.description,
+      necessities: reviewData.selectedTypes,
+    });
+
+    console.log('Estabelecimento salvo:', review);
+    if (reviewModalState.locationId) {
+      
+      const updatedLocations = allLocations.map(loc =>
+        loc.establishmentId === reviewModalState.locationId ? {
+          ...loc,
+          rating: reviewData.rating,
+          typeValues: reviewData.selectedTypes,
+          description: reviewData.description || "",
+        } : loc
+      );
+      setAllLocations(updatedLocations);
+      
+      if (selectedEstablishment && selectedEstablishment.establishmentId === reviewModalState.locationId) {
+          const updatedSelected = updatedLocations.find(loc => loc.establishmentId === reviewModalState.locationId);
+          if (updatedSelected) {
+            const establishment = await getEstablishmentById(updatedSelected.establishmentId);
+              setSelectedEstablishment(establishment);
+          }
+      }
+
+      toast({
+        title: reviewModalState.isEditing ? "Avaliação Atualizada!" : "Avaliação Salva!",
+        description: `Obrigado por contribuir com informações sobre ${reviewModalState.locationName}.`,
+      });
+      setReviewModalState({ isOpen: false, locationId: null, locationName: null, isEditing: false });
+    }
   };
 
   const performGlobalSearch = () => {
     const normalizedQuery = searchTerm.toLowerCase().trim();
     if (!normalizedQuery) return;
     const searchResults = allLocations.filter((location) =>
-      location.name.toLowerCase().includes(normalizedQuery) ||
-      location.address.toLowerCase().includes(normalizedQuery) ||
-      location.typeValues.some((type: string) => getLocationTypeName(type).toLowerCase().includes(normalizedQuery))
+      location.name.toLowerCase().includes(normalizedQuery)  //||
+      // location.address.toLowerCase().includes(normalizedQuery) ||
+      // location.typeValues.some((type: string) => getLocationTypeName(type).toLowerCase().includes(normalizedQuery))
     );
     if (searchResults.length > 0) {
       handleLocationClick(searchResults[0]);
@@ -116,6 +210,11 @@ export default function MapPage() {
     }
   };
   
+  const checkUserReview = (establishment: Establishment | null): boolean => {
+      if (!establishment || !establishment.reviewList || !isLoggedIn || !userId) return false;
+      return establishment.reviewList.some(review => review.userId === userId);
+  };
+
   if (isLoading) return <MapPageSkeleton />;
 
   return (
@@ -125,36 +224,52 @@ export default function MapPage() {
         onSearchTermChange={setSearchTerm}
         onGlobalSearch={performGlobalSearch}
         onNavigate={(view) => setActiveModal(view)}
+        onOpenSettings={() => setIsSettingsOpen(true)}
       />
       <div className="flex-1 flex overflow-hidden relative">
-        <div className="flex-1 relative z-10">
+        <div className={`flex-1 relative z-10 transition-all duration-300 ease-in-out ${selectedEstablishment ? 'mr-0 md:mr-[28rem]' : 'mr-0'}`}>
           <MapContainerComponent
             locations={filteredLocations}
             clickedPosition={clickedPosition}
             searchLocation={searchLocation}
             onMapClick={handleMapClick}
-            onMarkerClick={handleLocationClick}
             findMyLocation={findMyLocation}
             onMyLocationFound={() => setFindMyLocation(false)}
+            onRateClick={(establishment) => handleReviewClick(establishment)}
+            onEditReviewClick={(establishment) => handleReviewClick(establishment)}
+            onLocationSelect={handleLocationClick}
           />
         </div>
+        
+        {selectedEstablishment && (
+          <LocationDetailCard
+            establishment={selectedEstablishment}
+            isUserReview={checkUserReview(selectedEstablishment)}
+            onClose={() => setSelectedEstablishment(null)}
+            onAddReview={(establishment) => handleReviewClick(establishment)}
+            onEditReview={(establishment) => handleReviewClick(establishment)}
+          />
+        )}
+        
         <FloatingMenu
           onAddClick={() => isLoggedIn ? setActiveModal("add") : setActiveModal("login")}
           onFilterAndListClick={() => setActiveModal("filter")}
           onMyLocationClick={() => setFindMyLocation(true)}
         />
+        <FloatingHelpButton onClick={() => setIsHelpModalOpen(true)} />
       </div>
 
+      {/* --- Modais --- */}
       <Dialog open={activeModal === 'login'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogTitle className="sr-only">Login</DialogTitle>
-          <LoginPage onNavigate={(view) => setActiveModal(view)} onLogin={(name) => { login(name); setActiveModal(null); }} />
+          <LoginPage onNavigate={(view) => setActiveModal(view)} onLogin={(email, password) => { login(email, password); setActiveModal(null); }} />
         </DialogContent>
       </Dialog>
       <Dialog open={activeModal === 'register'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
         <DialogContent className="max-w-3xl">
           <DialogTitle className="sr-only">Criar Conta</DialogTitle>
-          <RegisterPage onNavigate={(view) => setActiveModal(view)} onRegister={(name, needs) => { register(name, needs); setActiveModal(null); }} />
+          <RegisterPage onNavigate={(view) => setActiveModal(view)} onRegister={(fName, lName, email, password, needs) => { register(fName, lName, email, password, needs); setActiveModal(null); }} />
         </DialogContent>
       </Dialog>
       <Dialog open={activeModal === 'recovery'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
@@ -164,15 +279,33 @@ export default function MapPage() {
         </DialogContent>
       </Dialog>
       <Dialog open={activeModal === 'add'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
-        <DialogContent className="z-50 sm:max-w-[425px] md:max-w-[600px]"><DialogHeader><DialogTitle>Adicionar Local</DialogTitle><DialogDescription>Preencha as informações do novo local.</DialogDescription></DialogHeader><div className="py-4 max-h-[70vh] overflow-y-auto px-2"><AddLocationForm onSaveLocation={handleSaveLocation} clickedPosition={clickedPosition} initialAddress={addressFromClick} /></div></DialogContent>
+        <DialogContent className="z-50 sm:max-w-[425px] md:max-w-[600px]"><DialogHeader><DialogTitle>Adicionar Local</DialogTitle><DialogDescription>Preencha as informações do novo local.</DialogDescription></DialogHeader><div className="py-4 max-h-[70vh] overflow-y-auto px-2"><AddLocationForm onSaveLocation={handleSaveEstablishment} clickedPosition={clickedPosition} initialData={establishmentFromClick} /></div></DialogContent>
       </Dialog>
       <Dialog open={activeModal === 'filter'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
         <DialogContent className="z-50 max-w-[700px]"><DialogHeader><DialogTitle>Filtrar & Listar Locais</DialogTitle><DialogDescription>Selecione filtros para refinar a busca.</DialogDescription></DialogHeader><div className="py-4 max-h-[70vh] overflow-y-auto px-1"><FilterAndListComponent onFilterChange={setActiveFilters} activeFilters={activeFilters} locations={filteredLocations} totalLocations={allLocations.length} onLocationClick={handleLocationClick} selectedLocationId={selectedLocationId} /></div></DialogContent>
       </Dialog>
-      
-      {isLoggedIn && activeModal === 'profile' && (
-         <UserProfilePage onClose={() => setActiveModal(null)} userNeeds={userNeeds} onUpdateUser={updateUser} onUpdateNeeds={updateNeeds} userName={""} />
+
+      {isLoggedIn && isSettingsOpen && (
+        <UserSettingsPage
+          onClose={() => setIsSettingsOpen(false)}
+          firstName={firstName}
+          lastName={lastName}
+          email={email}
+          userNeeds={userNeeds}
+          onUpdateNeeds={updateNeeds}
+          onUpdateUser={updateUserName}
+        />
       )}
+
+      <ReviewLocationModal
+        isOpen={reviewModalState.isOpen}
+        onClose={() => setReviewModalState({ isOpen: false, locationId: null, locationName: null, isEditing: false })}
+        onSubmit={handleSaveReview}
+        locationName={reviewModalState.locationName}
+        initialData={reviewModalState.initialData}
+      />
+
+      <WelcomeModal isOpen={isHelpModalOpen} onClose={() => setIsHelpModalOpen(false)} />
     </div>
   );
 }

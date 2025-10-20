@@ -23,4 +23,7 @@ public class Necessity {
     private String nGroup;
 
 
+    public Necessity(UUID necessityId){
+        this.necessityId = necessityId;
+    }
 }

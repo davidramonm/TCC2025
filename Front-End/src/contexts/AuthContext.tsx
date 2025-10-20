@@ -1,75 +1,147 @@
-// Front-End/contexts/AuthContext.tsx
+// src/contexts/AuthContext.tsx
+
 "use client";
 
-import { createContext, useState, useContext, ReactNode } from 'react';
+import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import { jwtDecode } from 'jwt-decode';
+import { tokenService } from '@/lib/tokenService';
+import { Necessity } from '@/types';
+import api from '@/lib/api';
 
-// Tipagem para os dados do usuário e as funções do contexto
-interface AuthContextType {
-  isLoggedIn: boolean;
-  userName: string;
-  userNeeds: string[];
-  login: (name: string) => void;
-  register: (name: string, needs: string[]) => void;
-  logout: () => void;
-  updateUser: (name: string) => void;
-  updateNeeds: (needs: string[]) => void;
+
+interface DecodedToken {
+  sub: string;
+  exp: number;
 }
 
-// Criação do Contexto com um valor inicial nulo
-const AuthContext = createContext<AuthContextType | null>(null);
 
-/**
- * @description Hook customizado para consumir o AuthContext de forma segura.
- * Garante que o contexto só seja usado dentro de um AuthProvider.
- */
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
-  }
-  return context;
-};
+interface LoginResponseData {
+  fName: string;
+  lName: string;
+  email: string;
+  necessities: Necessity[];
+  userId: string;
+}
 
-/**
- * @description Provedor de estado global para a autenticação.
- * Envolve a aplicação e disponibiliza o estado de sessão para todos os componentes filhos.
- */
-export function AuthProvider({ children }: { children: ReactNode }) {
+interface AuthContextType {
+  isLoggedIn: boolean;
+  userId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  userNeeds: Necessity[];
+  login: (email: string, pass: string) => Promise<void>;
+  logout: () => void;
+  register: (fName: string, lName: string, email: string, pass: string, needs: Necessity[]) => Promise<void>;
+  updateUserName: (fName: string, lName: string) => void;
+  updateNeeds: (needs: Necessity[]) => void;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState("Convidado");
-  const [userNeeds, setUserNeeds] = useState<string[]>([]);
+  const [userId, setUserId] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [userNeeds, setUserNeeds] = useState<Necessity[]>([]);
 
-  const login = (name: string) => {
-    setUserName(name);
+  // Função para popular o estado a partir da resposta completa do login
+  const setUserDataFromResponse = (data: LoginResponseData) => {
+    const { userId, fName, lName, email, necessities } = data;
+
     setIsLoggedIn(true);
+    setUserId(userId);
+    setFirstName(fName);
+    setLastName(lName);
+    setEmail(email);
+    setUserNeeds(necessities);
   };
 
-  const register = (name: string, needs: string[]) => {
-    setUserName(name);
-    setUserNeeds(needs);
-    setIsLoggedIn(true);
+  useEffect(() => {
+    (async () => {
+      const currentToken = tokenService.get();
+      if (!currentToken) {
+        try {
+          const res = await api.post("/auth/refresh");
+          tokenService.set(res.data.accessToken);
+          setIsLoggedIn(true);
+          setUserDataFromResponse(res.data);
+        } catch (error) {
+          logout();
+        }
+      }
+    })();
+  }, []);
+
+  const login = async (email: string, pass: string) => {
+    try {
+      const response = await api.post<LoginResponseData>('/auth/login', { email, password: pass });
+
+      if (response.data && response.data.userId) {
+        setUserDataFromResponse(response.data);
+      } else {
+        throw new Error("Formato de resposta inválido recebido do servidor.");
+      }
+    } catch (error) {
+      console.error("Falha no login:", error);
+      logout();
+      throw error;
+    }
   };
-  
+
+  const register = async (fName: string, lName: string, email: string, pass: string, needs: Necessity[]) => {
+    await api.post('/auth/register', {
+      fName: fName,
+      lName: lName,
+      email,
+      password: pass,
+      necessities: needs,
+    });
+    await login(email, pass);
+  };
+
   const logout = () => {
-    setUserName("Convidado");
-    setUserNeeds([]);
+    tokenService.clear();
     setIsLoggedIn(false);
+    setUserId("");
+    setFirstName('');
+    setLastName('');
+    setEmail('');
+    setUserNeeds([]);
+  };
+
+  const updateUserName = (fName: string, lName: string) => {
+    setFirstName(fName);
+    setLastName(lName);
+  };
+
+  const updateNeeds = (needs: Necessity[]) => {
+    setUserNeeds(needs);
   };
 
   const value = {
     isLoggedIn,
-    userName,
+    userId,
+    firstName,
+    lastName,
+    email,
     userNeeds,
     login,
-    register,
     logout,
-    updateUser: setUserName,
-    updateNeeds: setUserNeeds,
+    register,
+    updateUserName,
+    updateNeeds,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

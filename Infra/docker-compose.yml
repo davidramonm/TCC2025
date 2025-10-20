@@ -1,13 +1,15 @@
 services:
-
   db:
     image: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       POSTGRES_USER: example
       POSTGRES_PASSWORD: example
     ports:
       - "5432:5432"
-  
+
   pgadmin:
     image: dpage/pgadmin4:latest
     environment:
@@ -15,8 +17,32 @@ services:
       PGADMIN_DEFAULT_PASSWORD: password
     ports:
       - "8082:80"
-  
+
+  backend:
+    build:
+      context: ../Back-End/EstablishmentsService
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/example
+      SPRING_DATASOURCE_USERNAME: example
+      SPRING_DATASOURCE_PASSWORD: example
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ../Front-End
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
 networks:
   default:
     name: local-network
-    external: true
+
+volumes:
+  db_data:

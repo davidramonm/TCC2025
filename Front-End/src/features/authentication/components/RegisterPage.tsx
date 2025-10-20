@@ -4,7 +4,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, RegisterFormData } from "../schemas";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,23 +17,24 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { PasswordStrength } from "@/components/ui/password-strength";
 import AuthHeader from "@/components/layouts/AuthHeader";
 import { Card } from "@/components/ui/card"; // Import Card para o resumo
+import { Necessity } from "@/types";
 
 interface RegisterPageProps {
   onNavigate: (view: "login") => void;
-  onRegister: (name: string, needs: string[]) => void;
+  onRegister: (fName: string, lName: string, email: string, password: string, needs: Necessity[]) => void;
 }
 
 export default function RegisterPage({ onNavigate, onRegister }: RegisterPageProps) {
   const { toast } = useToast();
   const [registerStep, setRegisterStep] = useState(1);
-  const [selectedNeeds, setSelectedNeeds] = useState<string[]>([]);
+  const [selectedNeeds, setSelectedNeeds] = useState<Necessity[]>([]);
   const [acceptTerms, setAcceptTerms] = useState(false);
 
   const { register, handleSubmit, watch, trigger, formState: { errors, isSubmitting } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     mode: "onTouched", // Valida ao sair do campo
   });
-  
+
   const passwordValue = watch("password");
 
   const handleNextStep = async () => {
@@ -49,13 +50,27 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
       toast({ title: "Termos obrigatórios", description: "Você deve aceitar os termos.", variant: "destructive" });
       return;
     }
+
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    const fullName = `${data.firstName} ${data.lastName}`;
-    onRegister(fullName, selectedNeeds);
+    onRegister(data.firstName, data.lastName, data.email, data.password, selectedNeeds);
   };
 
-  const toggleNeed = (needValue: string) => {
-    setSelectedNeeds((prev) => (prev.includes(needValue) ? prev.filter((n) => n !== needValue) : [...prev, needValue]));
+  const toggleNeed = (necessityId: string) => {
+    setSelectedNeeds((prev) => {
+          const exists = prev.some(n => n.necessityId === necessityId);
+          if (exists) {
+            return prev.filter(n => n.necessityId !== necessityId);
+          }
+    
+          const newNeed: Necessity = {
+            necessityId: necessityId,
+            name: "",
+            description: "",
+            ngroup: ""
+          };
+    
+          return [...prev, newNeed];
+        });
   };
 
   return (
@@ -67,12 +82,12 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
       >
         <div className="flex items-center justify-center space-x-2 mt-6">
           <div className="flex items-center">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${registerStep >= 1 ? "bg-gray-600 text-white" : "bg-gray-200"}`}>{registerStep > 1 ? <Check/> : "1"}</div>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${registerStep >= 1 ? "bg-gray-600 text-white" : "bg-gray-200"}`}>{registerStep > 1 ? <Check /> : "1"}</div>
             <span className="ml-2 text-sm font-medium">Dados</span>
           </div>
           <div className={`w-8 h-1 rounded transition-all ${registerStep >= 2 ? "bg-gray-600" : "bg-gray-200"}`}></div>
           <div className="flex items-center">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${registerStep >= 2 ? "bg-gray-600 text-white" : "bg-gray-200"}`}>{registerStep > 2 ? <Check/> : "2"}</div>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${registerStep >= 2 ? "bg-gray-600 text-white" : "bg-gray-200"}`}>{registerStep > 2 ? <Check /> : "2"}</div>
             <span className="ml-2 text-sm font-medium">Preferências</span>
           </div>
           <div className={`w-8 h-1 rounded transition-all ${registerStep >= 3 ? "bg-gray-600" : "bg-gray-200"}`}></div>
@@ -102,8 +117,8 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
             <Label className="text-base">Selecione suas preferências (opcional)</Label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-64 overflow-y-auto p-1 border rounded-lg">
               {tiposAcessibilidade.map((tipo) => (
-                <div key={tipo.value} className={`flex items-center space-x-3 p-3 border-2 rounded-lg cursor-pointer ${selectedNeeds.includes(tipo.value) ? "border-gray-600 bg-gray-50" : "border-gray-200 hover:border-gray-400"}`} onClick={() => toggleNeed(tipo.value)}>
-                  <tipo.icon className={`w-5 h-5 ${selectedNeeds.includes(tipo.value) ? "text-gray-700" : "text-gray-500"}`} />
+                <div key={tipo.value} className={`flex items-center space-x-3 p-3 border-2 rounded-lg cursor-pointer ${selectedNeeds.some(n => n.necessityId === tipo.necessityId) ? "border-gray-600 bg-gray-50" : "border-gray-200 hover:border-gray-400"}`} onClick={() => toggleNeed(tipo.necessityId)}>
+                  <tipo.icon className={`w-5 h-5 ${selectedNeeds.some(n => n.necessityId === tipo.necessityId) ? "text-gray-700" : "text-gray-500"}`} />
                   <Label className="text-sm font-medium cursor-pointer flex-1">{tipo.label}</Label>
                 </div>
               ))}
@@ -114,8 +129,8 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
 
         {registerStep === 3 && (
           <div className="space-y-6">
-             <Card className="p-4 bg-gray-50"><h3 className="font-semibold mb-2">Resumo dos Dados</h3><div className="space-y-1 text-sm"><p><strong>Nome:</strong> {watch("firstName")} {watch("lastName")}</p><p><strong>E-mail:</strong> {watch("email")}</p></div></Card>
-             <Card className="p-4 bg-gray-50"><h3 className="font-semibold mb-2">Preferências</h3><div className="flex flex-wrap gap-2">{selectedNeeds.length > 0 ? selectedNeeds.map(need => <Badge key={need}>{tiposAcessibilidade.find(t=>t.value===need)?.label}</Badge>) : <p className="text-sm text-gray-500">Nenhuma preferência selecionada.</p>}</div></Card>
+            <Card className="p-4 bg-gray-50"><h3 className="font-semibold mb-2">Resumo dos Dados</h3><div className="space-y-1 text-sm"><p><strong>Nome:</strong> {watch("firstName")} {watch("lastName")}</p><p><strong>E-mail:</strong> {watch("email")}</p></div></Card>
+            <Card className="p-4 bg-gray-50"><h3 className="font-semibold mb-2">Preferências</h3><div className="flex flex-wrap gap-2">{selectedNeeds.length > 0 ? selectedNeeds.map(need => <Badge key={need.necessityId}>{tiposAcessibilidade.find(n => n.necessityId === need.necessityId)?.label}</Badge>) : <p className="text-sm text-gray-500">Nenhuma preferência selecionada.</p>}</div></Card>
             <div className="flex items-start space-x-3 pt-2"><Checkbox id="terms" checked={acceptTerms} onCheckedChange={(c) => setAcceptTerms(c === true)} /><Label htmlFor="terms" className="text-sm font-normal cursor-pointer">Aceito os <a href="#" className="underline">termos de uso</a>.</Label></div>
             <div className="flex gap-3"><Button type="button" variant="outline" onClick={() => setRegisterStep(2)} className="w-full">Voltar</Button><Button type="submit" className="w-full" disabled={isSubmitting || !acceptTerms}>{isSubmitting ? <Loader2 className="animate-spin" /> : "Finalizar Cadastro"}</Button></div>
           </div>
@@ -129,4 +144,8 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
       </form>
     </>
   );
+}
+
+function setData(arg0: { email: string; password: string; fName: string; lName: string; }): any {
+  throw new Error("Function not implemented.");
 }

@@ -1,7 +1,9 @@
 package com.unip.EstablishmentsService.controllers;
 
 
-import com.unip.EstablishmentsService.dtos.EstablishmentCoordsResponseDTO;
+import com.unip.EstablishmentsService.dtos.AllEstablishmentResponseDTO;
+import com.unip.EstablishmentsService.dtos.EstablishmentRequestDTO;
+import com.unip.EstablishmentsService.dtos.EstablishmentResponseDTO;
 import com.unip.EstablishmentsService.models.Establishment;
 import com.unip.EstablishmentsService.services.EstablishmentService;
 import jakarta.validation.Valid;
@@ -22,23 +24,29 @@ public class EstablishmentController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<EstablishmentCoordsResponseDTO>> getAllEstablishments (){
+    public ResponseEntity<List<AllEstablishmentResponseDTO>> getAllEstablishments (){
         return ResponseEntity.ok().body(service.getAllEstablishments());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Establishment> getEstablishmentById (@PathVariable @Valid UUID id){
+    public ResponseEntity<EstablishmentResponseDTO> getEstablishmentById (@PathVariable @Valid UUID id){
         return ResponseEntity.ok().body(service.getEstablishmentById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Void> createEstablishment(@RequestBody Establishment establishment){
-        return ResponseEntity.ok().build();
+    public ResponseEntity<EstablishmentResponseDTO> createEstablishment(@RequestBody EstablishmentRequestDTO establishment){
+
+        return ResponseEntity.ok().body(service.createEstablishment(establishment));
     }
 
     @PutMapping
     public ResponseEntity<Void> updateEstablishment(@RequestBody Establishment establishment){
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/coordinates")
+    public ResponseEntity<EstablishmentResponseDTO> getEstablishmentFromCoordinates (@RequestParam Double xCoords, @RequestParam Double yCoords){
+        return ResponseEntity.ok().body(service.getEstablishmentByCoordinates(xCoords, yCoords));
     }
 
 

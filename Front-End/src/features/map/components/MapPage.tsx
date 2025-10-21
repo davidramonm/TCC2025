@@ -23,7 +23,7 @@ import { Establishment, Location, Necessity } from "@/types";
 import ReviewLocationModal from "./ReviewLocationModal";
 import FloatingHelpButton from "@/components/layouts/FloatingHelpButton";
 import WelcomeModal from "@/components/layouts/WelcomeModal";
-import LocationDetailCard from "./LocationDetailCard"; // Importando o novo card
+import LocationDetailCard from "./LocationDetailCard";
 
 const MapContainerComponent = dynamic(() => import("./MapContainerComponent"), {
   ssr: false,

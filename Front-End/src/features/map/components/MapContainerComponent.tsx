@@ -9,6 +9,8 @@ import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-lea
 import { useEffect } from "react";
 import L from "leaflet";
 import { Establishment, Location } from "@/types";
+import { MapPin } from "lucide-react";
+import { renderToStaticMarkup } from "react-dom/server";
 
 // Props do componente
 interface MapContainerComponentProps {
@@ -24,14 +26,20 @@ interface MapContainerComponentProps {
 }
 
 // Ícone customizado
-const customIcon = new L.Icon({
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
+const IconComponent = MapPin;
+
+const iconString = renderToStaticMarkup(<IconComponent color="white" size={20} />);
+
+const iconHtml = `<div style="background: linear-gradient( to bottom right, #4b5563,#1f2937); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">${iconString}</div>`;
+
+
+const customIcon = L.divIcon({
+
+  className: "location-marker",
+  html: iconHtml,
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+
 });
 
 // Componente para lidar com eventos do mapa

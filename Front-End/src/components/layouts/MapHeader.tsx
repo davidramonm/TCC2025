@@ -81,9 +81,15 @@ export default function MapHeader({
               <PopoverContent className="w-80 mr-4" align="end">
                 <div className="flex flex-col items-center p-4">
                   <Avatar className="w-20 h-20 mb-2">
-                    <AvatarFallback className="text-4xl bg-gradient-to-br from-gray-600 to-gray-800 text-white">
-                      {firstName.charAt(0).toUpperCase()}
-                    </AvatarFallback>
+                    {
+                      profileImage ? (
+                        <AvatarImage src={profileImage} alt={firstName} />
+                      ) : (
+                        <AvatarFallback className="text-4xl bg-gradient-to-br from-gray-600 to-gray-800 text-white">
+                          {firstName.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      )
+                    }
                   </Avatar>
                   <h2 className="text-lg font-semibold">{firstName}</h2>
                   <p className="text-sm text-muted-foreground">{email}</p>

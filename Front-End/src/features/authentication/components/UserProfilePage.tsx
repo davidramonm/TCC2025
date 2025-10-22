@@ -17,7 +17,7 @@ interface UserProfilePageProps {
 }
 
 export default function UserProfilePage({ onClose }: UserProfilePageProps) {
-  const { firstName, lastName, email, userNeeds, profileImage, updateUserName, updateNeeds } = useAuth();
+  const { firstName, lastName, email, userNeeds, profileImage, updateUser, updateNeeds } = useAuth();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   return (
@@ -83,8 +83,9 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
           lastName={lastName}
           email={email}
           userNeeds={userNeeds}
+          profileImage={profileImage || ""}
           onUpdateNeeds={updateNeeds}
-          onUpdateUser={updateUserName}
+          onUpdateUser={updateUser}
         />
       )}
     </>

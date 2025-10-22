@@ -9,23 +9,34 @@ import { Label } from "@/components/ui/label";
 import { UserPlus, Key, Mail, Loader2, Armchair as Wheelchair, Accessibility } from "lucide-react";
 import { PasswordInput } from "@/components/ui/password-input";
 import AuthHeader from "@/components/layouts/AuthHeader";
+import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
 
 interface LoginPageProps {
   onNavigate: (view: "register" | "recovery") => void;
-  onLogin: (name: string, password: string) => void;
+  onLoginSuccess: () => void;
 }
 
-export default function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
+export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps) {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const { login, isLoggedIn } = useAuth();
 
   const handleLogin = async (data: LoginFormData) => {
+    setLoginError(null);
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
+    try {
+      await login(data.email, data.password);
+      onLoginSuccess();
+    } catch (error: Error | any) {
+      setLoginError(error.props);
+    }
 
-    const userFirstName = data.email.split('@')[0] || "Usuário";
-    onLogin(data.email, data.password);
+
+
   };
 
   return (
@@ -63,6 +74,12 @@ export default function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
           />
           {errors.password && <p className="text-xs text-red-500 mt-1" role="alert">{errors.password.message}</p>}
         </div>
+
+        {loginError && (
+          <p className="text-sm text-red-600 font-medium text-center mt-2" role="alert">
+            {loginError}
+          </p>
+        )}
 
         <Button type="submit" className="w-full h-12" disabled={isSubmitting} aria-busy={isSubmitting}>
           {isSubmitting ? <Loader2 className="animate-spin" aria-hidden="true" /> : 'Entrar'}

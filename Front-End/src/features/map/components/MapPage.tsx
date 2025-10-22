@@ -42,7 +42,7 @@ const MOCK_USER_REVIEW = (userId: number, userName: string) => ({
 
 export default function MapPage() {
   const { toast } = useToast();
-  const { isLoggedIn, userId, login, register, firstName, lastName, email, userNeeds, updateUserName, updateNeeds } = useAuth();
+  const { isLoggedIn, userId, register, firstName, lastName, email, userNeeds, updateUserName, updateNeeds } = useAuth();
 
   const [activeModal, setActiveModal] = useState<"login" | "register" | "recovery" | "add" | "filter" | null>(null);
 
@@ -301,7 +301,7 @@ export default function MapPage() {
       <Dialog open={activeModal === 'login'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogTitle className="sr-only">Login</DialogTitle>
-          <LoginPage onNavigate={(view) => setActiveModal(view)} onLogin={(email, password) => { login(email, password); setActiveModal(null); }} />
+          <LoginPage onNavigate={(view) => setActiveModal(view)} onLoginSuccess={() => {  setActiveModal(null); }} />
         </DialogContent>
       </Dialog>
       <Dialog open={activeModal === 'register'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>

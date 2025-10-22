@@ -8,6 +8,7 @@ import com.unip.EstablishmentsService.users.dtos.UserRequestDTO;
 import com.unip.EstablishmentsService.infra.JwtService;
 import com.unip.EstablishmentsService.necessities.Necessity;
 import com.unip.EstablishmentsService.necessities.NecessityService;
+import com.unip.EstablishmentsService.users.exceptions.UserNotFoundException;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -44,23 +45,28 @@ public class AuthenticationController {
             HttpServletResponse response
     ){
 
-        var usernamePassword = new UsernamePasswordAuthenticationToken(request.email(), request.password());
-        var auth = authenticationManager.authenticate(usernamePassword);
-        User user = (User) auth.getPrincipal();
-        String accessToken = jwtService.generateToken(user, Token.ACCESS_TOKEN);
-        String refreshToken = jwtService.generateToken(user, Token.REFRESH_TOKEN);
+        try {
+            var usernamePassword = new UsernamePasswordAuthenticationToken(request.email(), request.password());
+            var auth = authenticationManager.authenticate(usernamePassword);
+            User user = (User) auth.getPrincipal();
+            String accessToken = jwtService.generateToken(user, Token.ACCESS_TOKEN);
+            String refreshToken = jwtService.generateToken(user, Token.REFRESH_TOKEN);
 
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("Strict")
-                .path("/")
-                .maxAge(7 * 24 * 60 * 60)
-                .build();
+            ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+                    .httpOnly(true)
+                    .secure(true)
+                    .sameSite("Strict")
+                    .path("/")
+                    .maxAge(7 * 24 * 60 * 60)
+                    .build();
 
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        return ResponseEntity.ok().body(userMapper.userToLoginResponseDTO(user, accessToken));
+            return ResponseEntity.ok().body(userMapper.userToLoginResponseDTO(user, accessToken));
+        } catch (Exception e){
+            throw new UserNotFoundException("Usuario não encontrado");
+        }
+
     }
 
     @PostMapping("/register")

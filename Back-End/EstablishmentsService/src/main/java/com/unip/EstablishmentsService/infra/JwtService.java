@@ -6,8 +6,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.unip.EstablishmentsService.models.Token;
-import com.unip.EstablishmentsService.models.User;
+import com.unip.EstablishmentsService.users.Token;
+import com.unip.EstablishmentsService.users.User;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;

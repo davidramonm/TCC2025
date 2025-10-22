@@ -8,28 +8,56 @@ import { Establishment, Location } from "@/types";
 import { Star, X } from "lucide-react";
 import { getLocationTypeName } from "@/lib/constants";
 import ReviewList from "./ReviewList";
+import { create } from "domain";
+import { useState } from "react";
+import { set } from "zod";
 
 interface LocationDetailCardProps {
   establishment: Establishment;
   isUserReview: boolean; // Flag para saber se o usuário logado já avaliou
+  createNew: boolean;
   onClose: () => void;
   onAddReview: (establishment: Establishment) => void;
   onEditReview: (establishment: Establishment) => void;
 }
 
+
+
 export default function LocationDetailCard({
   establishment,
   isUserReview,
+  createNew,
   onClose,
   onAddReview,
   onEditReview,
 }: LocationDetailCardProps) {
+
+  const totalNecessities = establishment.topNecessities?.length ?? 0;
+  const visibleNecessities = (establishment.topNecessities ?? []).slice(0, 4)
+  const remainingCount = Math.max(0, totalNecessities - visibleNecessities.length);
+  const [name, setName] = useState(establishment.name);
+
   return (
     <div className="absolute top-0 right-0 z-[1000] h-full w-full max-w-md bg-white shadow-lg flex flex-col">
       <CardHeader className="flex-shrink-0">
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle>{establishment.name}</CardTitle>
+            {createNew ? (
+              <>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => { setName(e.target.value) }}
+                  className="mb-2 text-2xl font-bold leading-none outline-none border-b border-gray-300"
+                  placeholder="Nome do Estabelecimento"
+                />
+              </>
+            ) : (
+              <>
+              <CardTitle>{establishment.name}</CardTitle>
+              </>
+            )
+            }
             <CardDescription>{establishment.address}</CardDescription>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose}>
@@ -50,9 +78,12 @@ export default function LocationDetailCard({
         <div className="mb-6">
           <h3 className="mb-2 font-semibold">Tipos de Acessibilidade</h3>
           <div className="flex flex-wrap gap-2">
-            {establishment.topNecessities.map((type) => (
+            {visibleNecessities.map((type) => (
               <Badge key={type} variant="secondary">{getLocationTypeName(type)}</Badge>
             ))}
+            {remainingCount > 0 && (
+              <Badge variant="outline">+{remainingCount}</Badge>
+            )}
           </div>
         </div>
 

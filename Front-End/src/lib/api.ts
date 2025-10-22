@@ -4,7 +4,7 @@ import axios from 'axios';
 import { tokenService } from './tokenService';
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: "http://localhost:8080", 
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const res = await axios.post(
-          "http://localhost:8080/auth/refresh",
+          `http://localhost:8080/auth/refresh`,
           {},
           { withCredentials: true }
         );

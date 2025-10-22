@@ -42,6 +42,17 @@ const customIcon = L.divIcon({
 
 });
 
+// Ícone customizado
+// const customIcon = new L.Icon({
+//   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+//   iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+//   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+//   iconSize: [25, 41],
+//   iconAnchor: [12, 41],
+//   popupAnchor: [1, -34],
+//   shadowSize: [41, 41],
+// });
+
 // Componente para lidar com eventos do mapa
 function MapEvents({ onMapClick }: { onMapClick: (latlng: { lat: number; lng: number }) => void }) {
   useMapEvents({
@@ -54,27 +65,27 @@ function MapEvents({ onMapClick }: { onMapClick: (latlng: { lat: number; lng: nu
 
 // Componente para centralizar o mapa na localização do usuário
 function LocateUser({ findMyLocation, onMyLocationFound }: { findMyLocation: boolean, onMyLocationFound: () => void }) {
-    const map = useMap();
-    useEffect(() => {
-        if (findMyLocation) {
-            map.locate().on("locationfound", function (e) {
-                map.flyTo(e.latlng, 16);
-            });
-            onMyLocationFound();
-        }
-    }, [findMyLocation, map, onMyLocationFound]);
-    return null;
+  const map = useMap();
+  useEffect(() => {
+    if (findMyLocation) {
+      map.locate().on("locationfound", function (e) {
+        map.flyTo(e.latlng, 16);
+      });
+      onMyLocationFound();
+    }
+  }, [findMyLocation, map, onMyLocationFound]);
+  return null;
 }
 
 function MapController({ searchLocation }: { searchLocation: Location | null }) {
-    const map = useMap(); 
-    useEffect(() => {
-        if (searchLocation) {
-            map.flyTo([searchLocation.xCoords, searchLocation.yCoords], 16);
-        }
-    }, [searchLocation, map]);
+  const map = useMap();
+  useEffect(() => {
+    if (searchLocation) {
+      map.flyTo([searchLocation.xCoords, searchLocation.yCoords], 16);
+    }
+  }, [searchLocation, map]);
 
-    return null;
+  return null;
 }
 
 // Componente principal do mapa
@@ -97,7 +108,7 @@ export default function MapContainerComponent({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      
+
       {/* Renderiza os componentes de controle DENTRO do MapContainer */}
       <MapEvents onMapClick={onMapClick} />
       <LocateUser findMyLocation={findMyLocation} onMyLocationFound={onMyLocationFound} />

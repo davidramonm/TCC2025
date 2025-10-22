@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,16 +21,17 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Necessity } from '@/types';
 import apiClient from "@/lib/api";
+import { set } from "zod";
 
 interface UserSettingsPageProps {
   onClose: () => void;
   firstName: string;
   lastName: string;
   email: string;
-  profileImage?: string;
+  profileImage: string;
   userNeeds: Necessity[];
   onUpdateNeeds: (newNeeds: Necessity[]) => void;
-  onUpdateUser: (firstName: string, lastName: string) => void;
+  onUpdateUser: (firstName: string, lastName: string, profileImage: string) => void;
 }
 
 export default function UserSettingsPage({
@@ -46,6 +47,12 @@ export default function UserSettingsPage({
   const [selectedNeeds, setSelectedNeeds] = useState<Necessity[]>(userNeeds ?? []);
   const [newFirstName, setFirstName] = useState(firstName || "");
   const [newLastName, setLastName] = useState(lastName || "");
+  const [localProfileImage, setLocalProfileImage] = useState<string | "">(profileImage || "");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    setLocalProfileImage(profileImage);
+  }, [profileImage]);
 
   const toggleNeed = (needValue: string) => {
     setSelectedNeeds((prev) => {
@@ -67,7 +74,7 @@ export default function UserSettingsPage({
 
   };
 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     apiClient.put("auth/update", {
       fName: newFirstName,
       lName: newLastName,
@@ -77,9 +84,46 @@ export default function UserSettingsPage({
     }).catch((error) => {
       console.error("Error updating user:", error);
     });
-    onUpdateNeeds(selectedNeeds);
-    onUpdateUser(newFirstName, newLastName);
-    onClose();
+
+    try {
+      const form = new FormData();
+      if (fileInputRef.current?.files?.[0]) {
+        form.append("file", fileInputRef.current.files[0]);
+      }
+
+      const response = await apiClient.post("/users/me/profile-picture", form, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response?.data?.profileImage) {
+        setLocalProfileImage(response.data.profileImage);
+      }
+
+      onUpdateNeeds(selectedNeeds);
+      onUpdateUser(newFirstName, newLastName, localProfileImage);
+      onClose();
+
+    } catch (error) {
+      console.error("Erro ao atualizar a imagem de perfil:", error);
+    }
+  };
+
+  const updateProfileImage = () => {
+
+    fileInputRef.current?.click();
+
+  };
+
+  const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+
+
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const previewUrl = URL.createObjectURL(file);
+    setLocalProfileImage(previewUrl);
   };
 
   return (
@@ -107,14 +151,21 @@ export default function UserSettingsPage({
                   <div className="flex items-center gap-4">
                     <div className="relative">
                       {
-                        profileImage ? (
-                          <img src={profileImage} alt="Foto do usuário" className="w-24 h-24 rounded-full border" />
+                        localProfileImage ? (
+                          <img src={localProfileImage} alt="Foto do usuário" className="w-24 h-24 rounded-full border" />
                         ) : (
                           <img src="/placeholder-user.jpg" alt="Foto do usuário" className="w-24 h-24 rounded-full border" />
                         )
                       }
-                    
-                      <Button size="icon" className="absolute bottom-0 right-0 rounded-full w-8 h-8">
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleProfileImageChange}
+                      />
+
+                      <Button onClick={updateProfileImage} size="icon" className="absolute bottom-0 right-0 rounded-full w-8 h-8">
                         <Camera className="w-4 h-4" />
                       </Button>
                     </div>
@@ -154,8 +205,8 @@ export default function UserSettingsPage({
                       <div
                         key={tipo.value}
                         className={`flex items-center space-x-3 p-3 border-2 rounded-lg cursor-pointer transition-all duration-200 ${isSelected
-                            ? "border-gray-800 bg-gray-800 text-white shadow-lg"
-                            : "border-gray-200 hover:border-gray-400"
+                          ? "border-gray-800 bg-gray-800 text-white shadow-lg"
+                          : "border-gray-200 hover:border-gray-400"
                           }`}
                         onClick={() => toggleNeed(tipo.necessityId)}
                       >
@@ -227,3 +278,4 @@ export default function UserSettingsPage({
     </div>
   );
 }
+

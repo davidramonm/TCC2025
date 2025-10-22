@@ -42,7 +42,7 @@ const MOCK_USER_REVIEW = (userId: number, userName: string) => ({
 
 export default function MapPage() {
   const { toast } = useToast();
-  const { isLoggedIn, userId, register, firstName, lastName, email, userNeeds, updateUserName, updateNeeds } = useAuth();
+  const { isLoggedIn, userId, register, firstName, lastName, email, userNeeds, updateUser, updateNeeds } = useAuth();
 
   const [activeModal, setActiveModal] = useState<"login" | "register" | "recovery" | "add" | "filter" | null>(null);
 
@@ -330,9 +330,9 @@ export default function MapPage() {
           lastName={lastName}
           email={email}
           userNeeds={userNeeds}
-          profileImage={useAuth().profileImage}
+          profileImage={useAuth().profileImage || ""}
           onUpdateNeeds={updateNeeds}
-          onUpdateUser={updateUserName}
+          onUpdateUser={updateUser}
         />
       )}
 

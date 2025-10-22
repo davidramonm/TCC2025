@@ -7,7 +7,7 @@ import { jwtDecode } from 'jwt-decode';
 import { tokenService } from '@/lib/tokenService';
 import { Necessity } from '@/types';
 import api from '@/lib/api';
-import Error from 'next/error';
+import { set } from 'zod';
 
 
 interface DecodedToken {
@@ -36,7 +36,7 @@ interface AuthContextType {
   login: (email: string, pass: string) => Promise<void>;
   logout: () => void;
   register: (fName: string, lName: string, email: string, pass: string, needs: Necessity[]) => Promise<void>;
-  updateUserName: (fName: string, lName: string) => void;
+  updateUser: (fName: string, lName: string, profileImage: string) => void;
   updateNeeds: (needs: Necessity[]) => void;
 }
 
@@ -117,9 +117,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUserNeeds([]);
   };
 
-  const updateUserName = (fName: string, lName: string) => {
+  const updateUser = (fName: string, lName: string, profileImage: string) => {
     setFirstName(fName);
     setLastName(lName);
+    setProfileImage(profileImage);
   };
 
   const updateNeeds = (needs: Necessity[]) => {
@@ -137,7 +138,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     login,
     logout,
     register,
-    updateUserName,
+    updateUser,
     updateNeeds,
   };
 

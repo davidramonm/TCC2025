@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { MapPin, Search, LogOut, LogIn, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Separator } from "@/components/ui/separator";
+import { AvatarImage } from "@radix-ui/react-avatar";
 
 interface MapHeaderProps {
   searchTerm: string;
@@ -23,7 +24,7 @@ export default function MapHeader({
   onNavigate,
   onOpenSettings,
 }: MapHeaderProps) {
-  const { isLoggedIn, firstName, email, logout } = useAuth();
+  const { isLoggedIn, firstName, email, profileImage, logout } = useAuth();
 
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 shadow-sm z-20 relative">
@@ -64,9 +65,16 @@ export default function MapHeader({
               <PopoverTrigger asChild>
                 <Button variant="ghost" className="rounded-full w-9 h-9 p-0">
                   <Avatar className="w-9 h-9">
-                    <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">
-                      {firstName.charAt(0).toUpperCase()}
-                    </AvatarFallback>
+                    {
+                      profileImage ? (
+                        <AvatarImage src={profileImage} alt={firstName} />
+                      ) : (
+                        <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">
+                          {firstName.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      )
+                    }
+
                   </Avatar>
                 </Button>
               </PopoverTrigger>

@@ -330,6 +330,7 @@ export default function MapPage() {
           lastName={lastName}
           email={email}
           userNeeds={userNeeds}
+          profileImage={useAuth().profileImage}
           onUpdateNeeds={updateNeeds}
           onUpdateUser={updateUserName}
         />

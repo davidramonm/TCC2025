@@ -29,6 +29,7 @@ public class User implements UserDetails {
     private String lName;
     private String email;
     private String password;
+    private String profileImage;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

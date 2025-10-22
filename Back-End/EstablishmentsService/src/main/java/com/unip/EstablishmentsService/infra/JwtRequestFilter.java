@@ -1,6 +1,6 @@
 package com.unip.EstablishmentsService.infra;
 
-import com.unip.EstablishmentsService.repositories.UserRepository;
+import com.unip.EstablishmentsService.users.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,0 +1,26 @@
+package com.unip.EstablishmentsService.necessities;
+
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class NecessityService {
+
+    private final NecessityRepository necessityRepository;
+
+    public NecessityService(NecessityRepository necessityRepository) { this.necessityRepository = necessityRepository; }
+
+    public List<Necessity> getAllNecessities() {
+        return necessityRepository.findAll();
+    }
+
+    public Necessity getNecessityById(UUID id) {
+        return necessityRepository.findById(id).orElseThrow();
+    }
+
+    public Necessity createNecessity(Necessity necessity) {
+        return necessityRepository.save(necessity);
+    }
+}

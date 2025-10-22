@@ -17,9 +17,11 @@ export interface Establishment {
   establishmentId: string;
   name: string;
   address: string;
-  reviewList : Review[];
+  rating: number;
   xCoords: number;
   yCoords: number;
+  topNecessities: string[];
+  reviewList : Review[];
 
 }
 

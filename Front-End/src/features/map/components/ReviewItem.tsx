@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star } from "lucide-react";
 import { Review } from "@/types";
+import { Badge } from "@/components/ui/badge";
 
 interface ReviewItemProps {
   review: Review;
@@ -47,7 +48,9 @@ export default function ReviewItem({ review }: ReviewItemProps) {
           </Avatar>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
+
               <p className="font-semibold">{review.username}</p>
+
               <StarRating rating={review.rating} />
             </div>
             

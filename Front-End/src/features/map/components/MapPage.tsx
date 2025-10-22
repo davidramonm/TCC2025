@@ -7,7 +7,7 @@ import dynamic from "next/dynamic";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocations } from "../hooks/useLocations";
-import apiClient, { getAddressFromCoordinates, fetchLocations, getEstablishmentFromCoordinates, saveEstablishment, saveReview, getEstablishmentById} from "@/lib/api";
+import apiClient, { getAddressFromCoordinates, fetchLocations, getEstablishmentFromCoordinates, saveEstablishment, saveReview, getEstablishmentById } from "@/lib/api";
 import MapHeader from "@/components/layouts/MapHeader";
 import { AddLocationForm } from "./AddLocationForm";
 import FilterAndListComponent from "./FilterAndListComponent";
@@ -19,11 +19,12 @@ import UserSettingsPage from "@/features/authentication/components/UserSettingsP
 import MapPageSkeleton from "./MapPageSkeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { getLocationTypeName } from "@/lib/constants";
-import { Establishment, Location, Necessity } from "@/types";
+import { Establishment, Location, Necessity, Review } from "@/types";
 import ReviewLocationModal from "./ReviewLocationModal";
 import FloatingHelpButton from "@/components/layouts/FloatingHelpButton";
 import WelcomeModal from "@/components/layouts/WelcomeModal";
 import LocationDetailCard from "./LocationDetailCard";
+import { set } from "zod";
 
 const MapContainerComponent = dynamic(() => import("./MapContainerComponent"), {
   ssr: false,
@@ -36,12 +37,12 @@ const MOCK_REVIEWS = [
 ];
 
 const MOCK_USER_REVIEW = (userId: number, userName: string) => ({
-    id: 99, user: { id: userId, name: `${userName} (Você)`}, rating: 3, description: "Faltou piso tátil na área externa."
+  id: 99, user: { id: userId, name: `${userName} (Você)` }, rating: 3, description: "Faltou piso tátil na área externa."
 });
 
 export default function MapPage() {
   const { toast } = useToast();
-  const { isLoggedIn, userId, login, register, firstName, lastName, email, userNeeds, updateUserName, updateNeeds } = useAuth();
+  const { isLoggedIn, userId, register, firstName, lastName, email, userNeeds, updateUserName, updateNeeds } = useAuth();
 
   const [activeModal, setActiveModal] = useState<"login" | "register" | "recovery" | "add" | "filter" | null>(null);
 
@@ -57,20 +58,21 @@ export default function MapPage() {
   const [searchLocation, setSearchLocation] = useState<Location | null>(null);
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [findMyLocation, setFindMyLocation] = useState(false);
-  
+
   const [selectedEstablishment, setSelectedEstablishment] = useState<Establishment | null>(null);
 
   const [reviewModalState, setReviewModalState] = useState<{
     isOpen: boolean;
-    locationId: string | null;
-    locationName: string | null;
+    establishment: Establishment | null;
     isEditing: boolean;
+    createNew?: boolean;
+    newName?: string;
     initialData?: {
       rating: number;
       description: string;
       types: Necessity[];
     }
-  }>({ isOpen: false, locationId: null, locationName: null, isEditing: false });
+  }>({ isOpen: false, establishment: null, isEditing: false });
 
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -105,9 +107,14 @@ export default function MapPage() {
     setClickedPosition(latlng);
     const establishment = await getEstablishmentFromCoordinates(latlng.lat, latlng.lng);
 
+    if (establishment) {
+      setEstablishmentFromClick(establishment);
+      console.log(establishment.establishmentId)
+      setSelectedEstablishment(establishment);
+      setActiveModal(null);
+    }
+    // setActiveModal("add");
 
-    setActiveModal("add");
-    setEstablishmentFromClick(establishment);
 
 
   };
@@ -121,7 +128,7 @@ export default function MapPage() {
       yCoords: clickedPosition.lng,
     };
     const location = await saveEstablishment(newLocation);
-    setAllLocations((prevLocations) => [...prevLocations,  location]);
+    setAllLocations((prevLocations) => [...prevLocations, location]);
     toast({ title: "Local salvo com sucesso!" });
     setActiveModal(null);
   };
@@ -134,17 +141,19 @@ export default function MapPage() {
     setActiveModal(null);
   };
 
-  const handleReviewClick = (establishment: Establishment) => {
+  const handleReviewClick = (establishment: Establishment, newName?: string) => {
     if (!isLoggedIn) {
       setActiveModal("login");
     } else {
 
-      const userReview = establishment.reviewList.find(review => review.userId === userId);
+
+      const userReview = establishment.reviewList?.find(review => review.userId === userId) ?? undefined;
       setReviewModalState({
         isOpen: true,
-        locationId: establishment.establishmentId,
-        locationName: establishment.name,
+        establishment: establishment,
         isEditing: !!userReview,
+        createNew: establishment.establishmentId === null,
+        newName: newName,
         initialData: userReview ? {
           rating: userReview.rating,
           description: userReview.comment,
@@ -157,41 +166,69 @@ export default function MapPage() {
 
   const handleSaveReview = async (reviewData: { rating: number; selectedTypes: Necessity[]; description: string }) => {
 
-    console.log("aqui: " + reviewData.selectedTypes)
+    let establishment = reviewModalState.establishment!;
+    console.log(reviewModalState.createNew)
+    if (reviewModalState.createNew) {
+      console.log('Criando novo estabelecimento antes de salvar a avaliação...');
+      const newEstablishment = await saveEstablishment(
+        {
+          establishmentId: "",
+          name: reviewModalState.newName || "",
+          address: reviewModalState.establishment?.address || "",
+          xCoords: reviewModalState.establishment?.xCoords || 0,
+          yCoords: reviewModalState.establishment?.yCoords || 0
+        }
+      );
+      establishment = {
+        establishmentId: newEstablishment.establishmentId,
+        name: newEstablishment.name,
+        address: newEstablishment.address,
+        rating: 0,
+        xCoords: newEstablishment.xCoords,
+        yCoords: newEstablishment.yCoords,
+        topNecessities: [],
+        reviewList: []
+      };
+
+      setSelectedEstablishment(establishment);
+      setAllLocations((prevLocations) => [...prevLocations, newEstablishment]);
+    }
+
     const review = await saveReview({
-      establishmentId: reviewModalState.locationId,
+      establishmentId: establishment.establishmentId,
       userId: userId,
       rating: reviewData.rating,
       comment: reviewData.description,
       necessities: reviewData.selectedTypes,
     });
 
-    console.log('Estabelecimento salvo:', review);
-    if (reviewModalState.locationId) {
-      
-      const updatedLocations = allLocations.map(loc =>
-        loc.establishmentId === reviewModalState.locationId ? {
-          ...loc,
-          rating: reviewData.rating,
-          typeValues: reviewData.selectedTypes,
-          description: reviewData.description || "",
-        } : loc
-      );
-      setAllLocations(updatedLocations);
-      
-      if (selectedEstablishment && selectedEstablishment.establishmentId === reviewModalState.locationId) {
-          const updatedSelected = updatedLocations.find(loc => loc.establishmentId === reviewModalState.locationId);
-          if (updatedSelected) {
-            const establishment = await getEstablishmentById(updatedSelected.establishmentId);
-              setSelectedEstablishment(establishment);
-          }
+    if (establishment.establishmentId) {
+
+      if (selectedEstablishment?.establishmentId === establishment.establishmentId) {
+        const updated = await getEstablishmentById(establishment.establishmentId);
+        setSelectedEstablishment(updated);
       }
+
+      setAllLocations((prev) =>
+        prev.map((loc) =>
+          loc.establishmentId === establishment.establishmentId
+            ? {
+              ...loc,
+              rating: reviewData.rating,
+              typeValues: reviewData.selectedTypes,
+              description: reviewData.description || "",
+            }
+            : loc
+        )
+      );
+
+      
 
       toast({
         title: reviewModalState.isEditing ? "Avaliação Atualizada!" : "Avaliação Salva!",
-        description: `Obrigado por contribuir com informações sobre ${reviewModalState.locationName}.`,
+        description: `Obrigado por contribuir com informações sobre ${establishment.name}.`,
       });
-      setReviewModalState({ isOpen: false, locationId: null, locationName: null, isEditing: false });
+      setReviewModalState({ isOpen: false, establishment: null, isEditing: false });
     }
   };
 
@@ -209,10 +246,10 @@ export default function MapPage() {
       toast({ title: "Nenhum resultado encontrado", variant: "destructive" });
     }
   };
-  
+
   const checkUserReview = (establishment: Establishment | null): boolean => {
-      if (!establishment || !establishment.reviewList || !isLoggedIn || !userId) return false;
-      return establishment.reviewList.some(review => review.userId === userId);
+    if (!establishment || !establishment.reviewList || !isLoggedIn || !userId) return false;
+    return establishment.reviewList.some(review => review.userId === userId);
   };
 
   if (isLoading) return <MapPageSkeleton />;
@@ -240,17 +277,18 @@ export default function MapPage() {
             onLocationSelect={handleLocationClick}
           />
         </div>
-        
+
         {selectedEstablishment && (
           <LocationDetailCard
             establishment={selectedEstablishment}
             isUserReview={checkUserReview(selectedEstablishment)}
+            createNew={selectedEstablishment.establishmentId === null}
             onClose={() => setSelectedEstablishment(null)}
-            onAddReview={(establishment) => handleReviewClick(establishment)}
+            onAddReview={(establishment, newName) => handleReviewClick(establishment, newName)}
             onEditReview={(establishment) => handleReviewClick(establishment)}
           />
         )}
-        
+
         <FloatingMenu
           onAddClick={() => isLoggedIn ? setActiveModal("add") : setActiveModal("login")}
           onFilterAndListClick={() => setActiveModal("filter")}
@@ -263,7 +301,7 @@ export default function MapPage() {
       <Dialog open={activeModal === 'login'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogTitle className="sr-only">Login</DialogTitle>
-          <LoginPage onNavigate={(view) => setActiveModal(view)} onLogin={(email, password) => { login(email, password); setActiveModal(null); }} />
+          <LoginPage onNavigate={(view) => setActiveModal(view)} onLoginSuccess={() => {  setActiveModal(null); }} />
         </DialogContent>
       </Dialog>
       <Dialog open={activeModal === 'register'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
@@ -299,9 +337,9 @@ export default function MapPage() {
 
       <ReviewLocationModal
         isOpen={reviewModalState.isOpen}
-        onClose={() => setReviewModalState({ isOpen: false, locationId: null, locationName: null, isEditing: false })}
+        onClose={() => setReviewModalState({ isOpen: false, establishment: null, isEditing: false })}
         onSubmit={handleSaveReview}
-        locationName={reviewModalState.locationName}
+        locationName={reviewModalState.establishment?.name || ""}
         initialData={reviewModalState.initialData}
       />
 

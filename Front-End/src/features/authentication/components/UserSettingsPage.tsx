@@ -44,7 +44,6 @@ export default function UserSettingsPage({
   const [selectedNeeds, setSelectedNeeds] = useState<Necessity[]>(userNeeds ?? []);
   const [newFirstName, setFirstName] = useState(firstName || "");
   const [newLastName, setLastName] = useState(lastName || "");
-  const [newEmail, setEmail] = useState(email || ""); // E-mail simulado
 
   const toggleNeed = (needValue: string) => {
     setSelectedNeeds((prev) => {
@@ -119,11 +118,11 @@ export default function UserSettingsPage({
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="firstName">Nome</Label>
-                      <Input id="firstName" value={firstName} onChange={e => setFirstName(e.target.value)} />
+                      <Input id="firstName" value={newFirstName} onChange={e => setFirstName(e.target.value)} />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="lastName">Sobrenome</Label>
-                      <Input id="lastName" value={lastName} onChange={e => setLastName(e.target.value)} />
+                      <Input id="lastName" value={newLastName} onChange={e => setLastName(e.target.value)} />
                     </div>
                   </div>
                   <div className="space-y-2">

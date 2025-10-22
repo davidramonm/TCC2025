@@ -7,6 +7,7 @@ import { jwtDecode } from 'jwt-decode';
 import { tokenService } from '@/lib/tokenService';
 import { Necessity } from '@/types';
 import api from '@/lib/api';
+import Error from 'next/error';
 
 
 interface DecodedToken {
@@ -81,11 +82,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (response.data && response.data.userId) {
         setUserDataFromResponse(response.data);
-      } else {
-        throw new Error("Formato de resposta inválido recebido do servidor.");
       }
-    } catch (error) {
-      console.error("Falha no login:", error);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Erro desconhecido durante o login.");
       logout();
       throw error;
     }
@@ -102,7 +101,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await login(email, pass);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await api.post('/auth/logout');
     tokenService.clear();
     setIsLoggedIn(false);
     setUserId("");

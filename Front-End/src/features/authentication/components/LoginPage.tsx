@@ -1,4 +1,3 @@
-// src/features/authentication/components/LoginPage.tsx
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -36,29 +35,45 @@ export default function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
         title="Mapa Acessível"
         subtitle="Conectando pessoas a lugares acessíveis"
       />
-      <form onSubmit={handleSubmit(handleLogin)} className="space-y-4 pt-6">
+
+      <form onSubmit={handleSubmit(handleLogin)} className="space-y-4 pt-6" noValidate>
         <div className="space-y-2">
           <Label htmlFor="email">E-mail</Label>
           <div className="relative">
-            <Mail className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-            <Input id="email" type="email" placeholder="Digite seu e-mail" className="pl-10 h-12" {...register("email")} />
+            <Mail className="absolute left-3 top-3 w-4 h-4 text-gray-400" aria-hidden="true" />
+            <Input
+              id="email"
+              type="email"
+              placeholder="Digite seu e-mail"
+              className="pl-10 h-12"
+              {...register("email")}
+              aria-invalid={errors.email ? "true" : "false"}
+            />
           </div>
-          {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
+          {errors.email && <p className="text-xs text-red-500 mt-1" role="alert">{errors.email.message}</p>}
         </div>
+
         <div className="space-y-2">
           <Label htmlFor="password">Senha</Label>
-          <PasswordInput id="password" placeholder="Digite sua senha" {...register("password")} />
-          {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>}
+          <PasswordInput
+            id="password"
+            placeholder="Digite sua senha"
+            {...register("password")}
+            aria-invalid={errors.password ? "true" : "false"}
+          />
+          {errors.password && <p className="text-xs text-red-500 mt-1" role="alert">{errors.password.message}</p>}
         </div>
-        <Button type="submit" className="w-full h-12" disabled={isSubmitting}>
-          {isSubmitting ? <Loader2 className="animate-spin" /> : 'Entrar'}
+
+        <Button type="submit" className="w-full h-12" disabled={isSubmitting} aria-busy={isSubmitting}>
+          {isSubmitting ? <Loader2 className="animate-spin" aria-hidden="true" /> : 'Entrar'}
         </Button>
+
         <div className="flex justify-between items-center text-sm pt-4 border-t">
           <button type="button" onClick={() => onNavigate("register")} className="text-gray-600 hover:text-gray-800 font-medium flex items-center gap-1">
-            <UserPlus className="w-4 h-4" /> Criar conta
+            <UserPlus className="w-4 h-4" aria-hidden="true" />Criar conta
           </button>
           <button type="button" onClick={() => onNavigate("recovery")} className="text-gray-500 hover:text-gray-700 flex items-center gap-1">
-            <Key className="w-4 h-4" /> Esqueci a senha
+            <Key className="w-4 h-4" aria-hidden="true" />Esqueci a senha
           </button>
         </div>
       </form>

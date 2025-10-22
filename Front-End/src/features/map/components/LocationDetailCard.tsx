@@ -17,7 +17,7 @@ interface LocationDetailCardProps {
   isUserReview: boolean; // Flag para saber se o usuário logado já avaliou
   createNew: boolean;
   onClose: () => void;
-  onAddReview: (establishment: Establishment) => void;
+  onAddReview: (establishment: Establishment, name?: string) => void;
   onEditReview: (establishment: Establishment) => void;
 }
 
@@ -103,7 +103,7 @@ export default function LocationDetailCard({
             Editar minha avaliação
           </Button>
         ) : (
-          <Button className="w-full" onClick={() => onAddReview(establishment)}>
+          <Button className="w-full" onClick={() => onAddReview(establishment, name)}>
             Adicionar uma avaliação
           </Button>
         )}

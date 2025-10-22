@@ -66,6 +66,7 @@ export default function MapPage() {
     establishment: Establishment | null;
     isEditing: boolean;
     createNew?: boolean;
+    newName?: string;
     initialData?: {
       rating: number;
       description: string;
@@ -140,7 +141,7 @@ export default function MapPage() {
     setActiveModal(null);
   };
 
-  const handleReviewClick = (establishment: Establishment) => {
+  const handleReviewClick = (establishment: Establishment, newName?: string) => {
     if (!isLoggedIn) {
       setActiveModal("login");
     } else {
@@ -152,6 +153,7 @@ export default function MapPage() {
         establishment: establishment,
         isEditing: !!userReview,
         createNew: establishment.establishmentId === null,
+        newName: newName,
         initialData: userReview ? {
           rating: userReview.rating,
           description: userReview.comment,
@@ -171,7 +173,7 @@ export default function MapPage() {
       const newEstablishment = await saveEstablishment(
         {
           establishmentId: "",
-          name: reviewModalState.establishment?.name || "",
+          name: reviewModalState.newName || "",
           address: reviewModalState.establishment?.address || "",
           xCoords: reviewModalState.establishment?.xCoords || 0,
           yCoords: reviewModalState.establishment?.yCoords || 0
@@ -282,7 +284,7 @@ export default function MapPage() {
             isUserReview={checkUserReview(selectedEstablishment)}
             createNew={selectedEstablishment.establishmentId === null}
             onClose={() => setSelectedEstablishment(null)}
-            onAddReview={(establishment) => handleReviewClick(establishment)}
+            onAddReview={(establishment, newName) => handleReviewClick(establishment, newName)}
             onEditReview={(establishment) => handleReviewClick(establishment)}
           />
         )}

@@ -17,6 +17,7 @@ public class ReviewMapper {
                 review.getReviewId(),
                 review.getUser().getUserId(),
                 review.getUser().getFName() + " " + review.getUser().getLName(),
+                review.getUser().getProfileImage(),
                 review.getComment(),
                 review.getRating(),
                 review.getNecessities()

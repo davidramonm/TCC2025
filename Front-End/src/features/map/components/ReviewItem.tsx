@@ -43,7 +43,14 @@ export default function ReviewItem({ review }: ReviewItemProps) {
       <CardContent className="p-4">
         <div className="flex items-start space-x-4">
           <Avatar>
-            <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${review.username}`} alt={review.username} />
+            {
+              review.profileImage ? (
+                <AvatarImage src={review.profileImage} alt={review.username} />
+              ) : (
+                <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${review.username}`} alt={review.username} />
+              )
+            }
+            
             <AvatarFallback>{fallback}</AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">

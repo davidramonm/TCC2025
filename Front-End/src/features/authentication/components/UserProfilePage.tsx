@@ -10,13 +10,14 @@ import { X, User, Settings } from "lucide-react";
 import { tiposAcessibilidade } from "@/lib/constants";
 import UserSettingsPage from "./UserSettingsPage";
 import { useAuth } from "@/contexts/AuthContext";
+import { AvatarImage } from "@radix-ui/react-avatar";
 
 interface UserProfilePageProps {
   onClose: () => void;
 }
 
 export default function UserProfilePage({ onClose }: UserProfilePageProps) {
-  const { firstName, lastName, email, userNeeds, updateUserName, updateNeeds } = useAuth();
+  const { firstName, lastName, email, userNeeds, profileImage, updateUserName, updateNeeds } = useAuth();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   return (
@@ -31,9 +32,15 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <Avatar className="w-20 h-20">
+                  {profileImage ? (
+                    console.log("Profile Image:", profileImage),
+                    <AvatarImage src={profileImage} alt={`${firstName} ${lastName}`} />
+                  ) : (
+                    console.log("Profile Image not:", profileImage),
                   <AvatarFallback className="text-3xl bg-gradient-to-br from-gray-600 to-gray-800 text-white">
-                    {firstName.charAt(0).toUpperCase()}
+                    {firstName.charAt(2).toUpperCase()}
                   </AvatarFallback>
+                  )}
                 </Avatar>
                 <div>
                   {}

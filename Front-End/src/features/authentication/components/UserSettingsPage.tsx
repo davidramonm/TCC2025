@@ -27,6 +27,7 @@ interface UserSettingsPageProps {
   firstName: string;
   lastName: string;
   email: string;
+  profileImage?: string;
   userNeeds: Necessity[];
   onUpdateNeeds: (newNeeds: Necessity[]) => void;
   onUpdateUser: (firstName: string, lastName: string) => void;
@@ -37,6 +38,7 @@ export default function UserSettingsPage({
   firstName,
   lastName,
   email,
+  profileImage,
   userNeeds,
   onUpdateNeeds,
   onUpdateUser,
@@ -104,7 +106,14 @@ export default function UserSettingsPage({
                 <div className="space-y-4">
                   <div className="flex items-center gap-4">
                     <div className="relative">
-                      <img src="/placeholder-user.jpg" alt="Foto do usuário" className="w-24 h-24 rounded-full border" />
+                      {
+                        profileImage ? (
+                          <img src={profileImage} alt="Foto do usuário" className="w-24 h-24 rounded-full border" />
+                        ) : (
+                          <img src="/placeholder-user.jpg" alt="Foto do usuário" className="w-24 h-24 rounded-full border" />
+                        )
+                      }
+                    
                       <Button size="icon" className="absolute bottom-0 right-0 rounded-full w-8 h-8">
                         <Camera className="w-4 h-4" />
                       </Button>

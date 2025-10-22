@@ -20,6 +20,7 @@ interface LoginResponseData {
   fName: string;
   lName: string;
   email: string;
+  profileImage?: string;
   necessities: Necessity[];
   userId: string;
 }
@@ -30,6 +31,7 @@ interface AuthContextType {
   firstName: string;
   lastName: string;
   email: string;
+  profileImage?: string;
   userNeeds: Necessity[];
   login: (email: string, pass: string) => Promise<void>;
   logout: () => void;
@@ -46,17 +48,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [profileImage, setProfileImage] = useState<string | undefined>(undefined);
   const [userNeeds, setUserNeeds] = useState<Necessity[]>([]);
 
   // Função para popular o estado a partir da resposta completa do login
   const setUserDataFromResponse = (data: LoginResponseData) => {
-    const { userId, fName, lName, email, necessities } = data;
+    const { userId, fName, lName, email, profileImage, necessities } = data;
 
     setIsLoggedIn(true);
     setUserId(userId);
     setFirstName(fName);
     setLastName(lName);
     setEmail(email);
+    setProfileImage(profileImage)
     setUserNeeds(necessities);
   };
 
@@ -109,6 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setFirstName('');
     setLastName('');
     setEmail('');
+    setProfileImage(undefined);
     setUserNeeds([]);
   };
 
@@ -127,6 +132,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     firstName,
     lastName,
     email,
+    profileImage,
     userNeeds,
     login,
     logout,

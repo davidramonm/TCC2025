@@ -29,6 +29,7 @@ export interface Review {
   reviewId: string;
   userId: string;
   username: string;
+  profileImage?: string;
   comment: string;
   rating: number;
   necessities: Necessity[];

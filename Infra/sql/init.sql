@@ -2,8 +2,8 @@ create table establishments
 (
     establishment_id uuid             not null
         primary key,
-    name             varchar(45)      not null,
-    address          varchar(100),
+    name             varchar(255)      not null,
+    address          varchar(255),
     x_coords         double precision not null,
     y_coords         double precision not null
 );
@@ -30,6 +30,7 @@ create table users
     f_name   varchar(45)  not null,
     l_name   varchar(45)  not null,
     email    varchar(45)  not null,
+    profile_image varchar(255),
     password varchar(120) not null,
     role     varchar(15)  not null
 );

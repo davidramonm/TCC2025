@@ -24,7 +24,8 @@ export default function MapHeader({
   onNavigate,
   onOpenSettings,
 }: MapHeaderProps) {
-  const { isLoggedIn, firstName, email, profileImage, logout } = useAuth();
+  const { isLoggedIn, firstName, lastName, email, profileImage, logout } = useAuth();
+  const fullName = `${firstName} ${lastName}`;
 
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 shadow-sm z-20 relative">
@@ -67,11 +68,9 @@ export default function MapHeader({
                   <Avatar className="w-9 h-9">
                     {
                       profileImage ? (
-                        <AvatarImage src={profileImage} alt={firstName} />
+                        <AvatarImage src={profileImage} alt={fullName} className="object-cover w-full h-full" />
                       ) : (
-                        <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">
-                          {firstName.charAt(0).toUpperCase()}
-                        </AvatarFallback>
+                        <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${fullName}`} alt={fullName} />
                       )
                     }
 
@@ -83,15 +82,13 @@ export default function MapHeader({
                   <Avatar className="w-20 h-20 mb-2">
                     {
                       profileImage ? (
-                        <AvatarImage src={profileImage} alt={firstName} />
+                        <AvatarImage src={profileImage} alt={fullName} className="object-cover w-full h-full"/>
                       ) : (
-                        <AvatarFallback className="text-4xl bg-gradient-to-br from-gray-600 to-gray-800 text-white">
-                          {firstName.charAt(0).toUpperCase()}
-                        </AvatarFallback>
+                        <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${fullName}`} alt={fullName} />
                       )
                     }
                   </Avatar>
-                  <h2 className="text-lg font-semibold">{firstName}</h2>
+                  <h2 className="text-lg font-semibold">{fullName}</h2>
                   <p className="text-sm text-muted-foreground">{email}</p>
                   <Button variant="outline" className="mt-4" onClick={onOpenSettings}>
                     <Settings className="mr-2 h-4 w-4" />

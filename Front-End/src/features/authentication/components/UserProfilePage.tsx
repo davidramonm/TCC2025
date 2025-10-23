@@ -34,12 +34,10 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                 <Avatar className="w-20 h-20">
                   {profileImage ? (
                     console.log("Profile Image:", profileImage),
-                    <AvatarImage src={profileImage} alt={`${firstName} ${lastName}`} />
+                    <AvatarImage src={profileImage} alt={`${firstName} ${lastName}`} className="object-cover w-full h-full" />
                   ) : (
                     console.log("Profile Image not:", profileImage),
-                  <AvatarFallback className="text-3xl bg-gradient-to-br from-gray-600 to-gray-800 text-white">
-                    {firstName.charAt(2).toUpperCase()}
-                  </AvatarFallback>
+                    <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${firstName}`} alt={firstName} />
                   )}
                 </Avatar>
                 <div>

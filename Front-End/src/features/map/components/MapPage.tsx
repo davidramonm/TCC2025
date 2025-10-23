@@ -5,11 +5,11 @@
 import { useState, useEffect, use } from "react";
 import dynamic from "next/dynamic";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext"; // Importação já existe
 import { useLocations } from "../hooks/useLocations";
 import apiClient, { getAddressFromCoordinates, fetchLocations, getEstablishmentFromCoordinates, saveEstablishment, saveReview, getEstablishmentById } from "@/lib/api";
 import MapHeader from "@/components/layouts/MapHeader";
-import { AddLocationForm } from "./AddLocationForm";
+// import { AddLocationForm } from "./AddLocationForm"; // Removido
 import FilterAndListComponent from "./FilterAndListComponent";
 import FloatingMenu from "./FloatingMenu";
 import LoginPage from "@/features/authentication/components/LoginPage";
@@ -42,14 +42,27 @@ const MOCK_USER_REVIEW = (userId: number, userName: string) => ({
 
 export default function MapPage() {
   const { toast } = useToast();
-  const { isLoggedIn, userId, register, firstName, lastName, email, userNeeds, updateUser, updateNeeds } = useAuth();
+  
+  const { 
+    isLoggedIn, 
+    userId, 
+    register, 
+    firstName, 
+    lastName, 
+    email, 
+    userNeeds, 
+    updateUser, 
+    updateNeeds,
+    profileImage
+  } = useAuth();
 
-  const [activeModal, setActiveModal] = useState<"login" | "register" | "recovery" | "add" | "filter" | null>(null);
+  const [activeModal, setActiveModal] = useState<"login" | "register" | "recovery" | "filter" | null>(null);
 
   const [allLocations, setAllLocations] = useState<Location[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
 
+  // O 'useLocations' agora usa 'Location' com 'typeValues?' opcional
   const { filteredLocations } = useLocations(allLocations, activeFilters);
 
   const [clickedPosition, setClickedPosition] = useState<{ lat: number; lng: number } | null>(null);
@@ -103,7 +116,7 @@ export default function MapPage() {
       setActiveModal("login");
       return;
     }
-    setSelectedEstablishment(null);
+    setSelectedEstablishment(null); 
     setClickedPosition(latlng);
     const establishment = await getEstablishmentFromCoordinates(latlng.lat, latlng.lng);
 
@@ -112,25 +125,26 @@ export default function MapPage() {
       console.log(establishment.establishmentId)
       setSelectedEstablishment(establishment);
       setActiveModal(null);
+    } else {
+      try {
+        const address = await getAddressFromCoordinates(latlng.lat, latlng.lng);
+        const newEstablishmentStub: Establishment = {
+          establishmentId: null, 
+          name: "Novo Local", 
+          address: address,
+          xCoords: latlng.lat,
+          yCoords: latlng.lng,
+          rating: 0,
+          topNecessities: [],
+          reviewList: []
+        };
+        setEstablishmentFromClick(newEstablishmentStub); 
+        setSelectedEstablishment(newEstablishmentStub); 
+        setActiveModal(null);
+      } catch (error) {
+        toast({ title: "Erro ao buscar endereço", description: "Não foi possível obter o endereço para este local.", variant: "destructive" });
+      }
     }
-    // setActiveModal("add");
-
-
-
-  };
-
-  const handleSaveEstablishment = async (formData: any, clickedPosition: any, selectedTypes: any, rating: number) => {
-    const newLocation: Location = {
-      establishmentId: "", // Gera um ID temporário
-      address: formData.address.trim(),
-      name: formData.name.trim(),
-      xCoords: clickedPosition.lat,
-      yCoords: clickedPosition.lng,
-    };
-    const location = await saveEstablishment(newLocation);
-    setAllLocations((prevLocations) => [...prevLocations, location]);
-    toast({ title: "Local salvo com sucesso!" });
-    setActiveModal(null);
   };
 
   const handleLocationClick = async (location: Location) => {
@@ -215,7 +229,7 @@ export default function MapPage() {
             ? {
               ...loc,
               rating: reviewData.rating,
-              typeValues: reviewData.selectedTypes,
+              typeValues: reviewData.selectedTypes.map(t => t.necessityId), // Atualizando typeValues
               description: reviewData.description || "",
             }
             : loc
@@ -223,7 +237,6 @@ export default function MapPage() {
       );
 
       
-
       toast({
         title: reviewModalState.isEditing ? "Avaliação Atualizada!" : "Avaliação Salva!",
         description: `Obrigado por contribuir com informações sobre ${establishment.name}.`,
@@ -282,7 +295,7 @@ export default function MapPage() {
           <LocationDetailCard
             establishment={selectedEstablishment}
             isUserReview={checkUserReview(selectedEstablishment)}
-            createNew={selectedEstablishment.establishmentId === null}
+            createNew={selectedEstablishment.establishmentId === null} 
             onClose={() => setSelectedEstablishment(null)}
             onAddReview={(establishment, newName) => handleReviewClick(establishment, newName)}
             onEditReview={(establishment) => handleReviewClick(establishment)}
@@ -290,7 +303,6 @@ export default function MapPage() {
         )}
 
         <FloatingMenu
-          onAddClick={() => isLoggedIn ? setActiveModal("add") : setActiveModal("login")}
           onFilterAndListClick={() => setActiveModal("filter")}
           onMyLocationClick={() => setFindMyLocation(true)}
         />
@@ -316,9 +328,7 @@ export default function MapPage() {
           <RecoveryPage onNavigate={(view) => setActiveModal(view)} />
         </DialogContent>
       </Dialog>
-      <Dialog open={activeModal === 'add'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
-        <DialogContent className="z-50 sm:max-w-[425px] md:max-w-[600px]"><DialogHeader><DialogTitle>Adicionar Local</DialogTitle><DialogDescription>Preencha as informações do novo local.</DialogDescription></DialogHeader><div className="py-4 max-h-[70vh] overflow-y-auto px-2"><AddLocationForm onSaveLocation={handleSaveEstablishment} clickedPosition={clickedPosition} initialData={establishmentFromClick} /></div></DialogContent>
-      </Dialog>
+      
       <Dialog open={activeModal === 'filter'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
         <DialogContent className="z-50 max-w-[700px]"><DialogHeader><DialogTitle>Filtrar & Listar Locais</DialogTitle><DialogDescription>Selecione filtros para refinar a busca.</DialogDescription></DialogHeader><div className="py-4 max-h-[70vh] overflow-y-auto px-1"><FilterAndListComponent onFilterChange={setActiveFilters} activeFilters={activeFilters} locations={filteredLocations} totalLocations={allLocations.length} onLocationClick={handleLocationClick} selectedLocationId={selectedLocationId} /></div></DialogContent>
       </Dialog>
@@ -330,7 +340,7 @@ export default function MapPage() {
           lastName={lastName}
           email={email}
           userNeeds={userNeeds}
-          profileImage={useAuth().profileImage || ""}
+          profileImage={profileImage || ""}          
           onUpdateNeeds={updateNeeds}
           onUpdateUser={updateUser}
         />

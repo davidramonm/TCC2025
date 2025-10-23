@@ -35,13 +35,20 @@ export function LocationList({
       <div className="space-y-3">
         {locations.length > 0 ? (
           locations.map((location) => {
-            const tipoPrincipal = tiposAcessibilidade.find(t => t.value === location.typeValues[0]);
+            
+            const hasTypes = Array.isArray(location.typeValues) && location.typeValues.length > 0;
+            
+            const tipoPrincipal = hasTypes
+              ? tiposAcessibilidade.find(t => t.value === location.typeValues[0])
+              : undefined;
+
             const Icon = tipoPrincipal ? tipoPrincipal.icon : MapPin;
-            const isSelected = location.id === selectedLocationId;
+
+            const isSelected = location.establishmentId === selectedLocationId;
 
             return (
             <div
-              key={location.id}
+              key={location.establishmentId}
               className={`p-4 border rounded-lg shadow-sm cursor-pointer transition-all duration-200 ${
                 isSelected ? 'bg-gray-100 border-gray-400 scale-[1.02]' : 'hover:bg-gray-50 hover:shadow-md'
               }`}
@@ -65,7 +72,7 @@ export function LocationList({
                     />
                   }
                   <div className="mt-2 flex flex-wrap gap-1">
-                    {location.typeValues.map((typeValue: string) => (
+                    {hasTypes && location.typeValues.map((typeValue: string) => (
                        <Badge key={typeValue} variant="secondary" className="bg-gray-200 text-gray-700 font-normal">
                          {getLocationTypeName(typeValue)}
                        </Badge>

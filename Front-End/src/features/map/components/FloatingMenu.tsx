@@ -7,19 +7,15 @@ import { Plus, List, X, Menu, Navigation } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface FloatingMenuProps {
-  onAddClick: () => void;
+  // onAddClick: () => void; // Removido
   onFilterAndListClick: () => void;
   onMyLocationClick: () => void;
 }
 
-export default function FloatingMenu({ onAddClick, onFilterAndListClick, onMyLocationClick }: FloatingMenuProps) {
+export default function FloatingMenu({ onFilterAndListClick, onMyLocationClick }: FloatingMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { isLoggedIn } = useAuth();
 
-  const handleAddClick = () => {
-    setIsOpen(false);
-    onAddClick();
-  };
 
   return (
     <div className="absolute bottom-6 right-6 z-40">
@@ -38,12 +34,7 @@ export default function FloatingMenu({ onAddClick, onFilterAndListClick, onMyLoc
                 <List className="w-6 h-6" />
               </Button>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="bg-background text-foreground text-sm rounded-md px-3 py-2 shadow-lg">Adicionar Local</span>
-              <Button onClick={handleAddClick} size="icon" className="w-14 h-14 rounded-full shadow-lg">
-                <Plus className="w-6 h-6" />
-              </Button>
-            </div>
+
           </div>
         )}
         <Button onClick={() => setIsOpen(!isOpen)} size="icon" className="w-16 h-16 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 text-white shadow-xl hover:scale-105 transition-transform">

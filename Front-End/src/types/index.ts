@@ -11,6 +11,8 @@ export interface Location {
   address: string;
   xCoords: number;
   yCoords: number;
+  rating?: number;
+  typeValues?: string[];
 }
 
 export interface Establishment {

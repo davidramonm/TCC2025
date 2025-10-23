@@ -45,7 +45,7 @@ export default function ReviewItem({ review }: ReviewItemProps) {
           <Avatar>
             {
               review.profileImage ? (
-                <AvatarImage src={review.profileImage} alt={review.username} />
+                <AvatarImage src={review.profileImage} alt={review.username} className="object-cover w-full h-full"/>
               ) : (
                 <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${review.username}`} alt={review.username} />
               )

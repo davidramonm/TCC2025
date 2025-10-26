@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin } from "lucide-react";
 import { tiposAcessibilidade, getLocationTypeName } from "@/lib/constants";
 import { StarRating } from "@/components/ui/star-rating";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 interface LocationListProps {
   locations: any[];
@@ -21,6 +23,19 @@ export function LocationList({
   selectedLocationId, 
   hasActiveFilters 
 }: LocationListProps) {
+
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 5; // 👈 customize as you wish
+  const totalPages = Math.ceil(locations.length / itemsPerPage);
+
+  // slice visible locations for current page
+  const startIndex = (page - 1) * itemsPerPage;
+  const visibleLocations = locations.slice(startIndex, startIndex + itemsPerPage);
+
+  const handlePrev = () => setPage((p) => Math.max(p - 1, 1));
+  const handleNext = () => setPage((p) => Math.min(p + 1, totalPages));
+
+
   return (
     <div className="locations-list">
       <div className="flex items-center justify-between gap-2 mb-4 pb-2 border-b">
@@ -33,8 +48,8 @@ export function LocationList({
         </span>
       </div>
       <div className="space-y-3">
-        {locations.length > 0 ? (
-          locations.map((location) => {
+        {visibleLocations.length > 0 ? (
+          visibleLocations.map((location) => {
             
             const hasTypes = Array.isArray(location.typeValues) && location.typeValues.length > 0;
             
@@ -93,6 +108,32 @@ export function LocationList({
           </div>
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-6">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handlePrev} 
+            disabled={page === 1}
+          >
+            ← Anterior
+          </Button>
+
+          <span className="text-sm text-gray-600">
+            Página {page} de {totalPages}
+          </span>
+
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleNext} 
+            disabled={page === totalPages}
+          >
+            Próxima →
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

@@ -42,16 +42,16 @@ const MOCK_USER_REVIEW = (userId: number, userName: string) => ({
 
 export default function MapPage() {
   const { toast } = useToast();
-  
-  const { 
-    isLoggedIn, 
-    userId, 
-    register, 
-    firstName, 
-    lastName, 
-    email, 
-    userNeeds, 
-    updateUser, 
+
+  const {
+    isLoggedIn,
+    userId,
+    register,
+    firstName,
+    lastName,
+    email,
+    userNeeds,
+    updateUser,
     updateNeeds,
     profileImage
   } = useAuth();
@@ -116,7 +116,7 @@ export default function MapPage() {
       setActiveModal("login");
       return;
     }
-    setSelectedEstablishment(null); 
+    setSelectedEstablishment(null);
     setClickedPosition(latlng);
     const establishment = await getEstablishmentFromCoordinates(latlng.lat, latlng.lng);
 
@@ -129,8 +129,8 @@ export default function MapPage() {
       try {
         const address = await getAddressFromCoordinates(latlng.lat, latlng.lng);
         const newEstablishmentStub: Establishment = {
-          establishmentId: null, 
-          name: "Novo Local", 
+          establishmentId: "",
+          name: "Novo Local",
           address: address,
           xCoords: latlng.lat,
           yCoords: latlng.lng,
@@ -138,8 +138,8 @@ export default function MapPage() {
           topNecessities: [],
           reviewList: []
         };
-        setEstablishmentFromClick(newEstablishmentStub); 
-        setSelectedEstablishment(newEstablishmentStub); 
+        setEstablishmentFromClick(newEstablishmentStub);
+        setSelectedEstablishment({ ...newEstablishmentStub });
         setActiveModal(null);
       } catch (error) {
         toast({ title: "Erro ao buscar endereço", description: "Não foi possível obter o endereço para este local.", variant: "destructive" });
@@ -204,8 +204,13 @@ export default function MapPage() {
         reviewList: []
       };
 
-      setSelectedEstablishment(establishment);
-      setAllLocations((prevLocations) => [...prevLocations, newEstablishment]);
+      setSelectedEstablishment({ ...establishment });
+      setAllLocations((prevLocations) =>
+        prevLocations.map((loc) =>
+          loc.establishmentId === establishment.establishmentId
+            ? { ...loc, name: newEstablishment.name }
+            : loc
+        ));
     }
 
     const review = await saveReview({
@@ -216,32 +221,35 @@ export default function MapPage() {
       necessities: reviewData.selectedTypes,
     });
 
-    if (establishment.establishmentId) {
+    if (establishment.establishmentId && review) {
 
-      if (selectedEstablishment?.establishmentId === establishment.establishmentId) {
-        const updated = await getEstablishmentById(establishment.establishmentId);
-        setSelectedEstablishment(updated);
-      }
 
-      setAllLocations((prev) =>
-        prev.map((loc) =>
-          loc.establishmentId === establishment.establishmentId
-            ? {
-              ...loc,
-              rating: reviewData.rating,
-              typeValues: reviewData.selectedTypes.map(t => t.necessityId), // Atualizando typeValues
-              description: reviewData.description || "",
-            }
-            : loc
-        )
-      );
 
+        setAllLocations((prev) => {
+          const exists = prev.some((loc) => loc.establishmentId === establishment.establishmentId);
+
+          if (exists) {
+            // Update existing location
+            return prev.map((loc) =>
+              loc.establishmentId === establishment.establishmentId
+                ? { ...loc, ...establishment }
+                : loc
+            );
+          } else {
+            // Add new location
+            return [...prev, establishment];
+          }
+        });
+
+        handleLocationClick(establishment as Location);
+
+
+        toast({
+          title: reviewModalState.isEditing ? "Avaliação Atualizada!" : "Avaliação Salva!",
+          description: `Obrigado por contribuir com informações sobre ${establishment.name}.`,
+        });
+        setReviewModalState({ isOpen: false, establishment: null, isEditing: false });
       
-      toast({
-        title: reviewModalState.isEditing ? "Avaliação Atualizada!" : "Avaliação Salva!",
-        description: `Obrigado por contribuir com informações sobre ${establishment.name}.`,
-      });
-      setReviewModalState({ isOpen: false, establishment: null, isEditing: false });
     }
   };
 
@@ -295,7 +303,7 @@ export default function MapPage() {
           <LocationDetailCard
             establishment={selectedEstablishment}
             isUserReview={checkUserReview(selectedEstablishment)}
-            createNew={selectedEstablishment.establishmentId === null} 
+            createNew={selectedEstablishment.establishmentId === null}
             onClose={() => setSelectedEstablishment(null)}
             onAddReview={(establishment, newName) => handleReviewClick(establishment, newName)}
             onEditReview={(establishment) => handleReviewClick(establishment)}
@@ -313,7 +321,7 @@ export default function MapPage() {
       <Dialog open={activeModal === 'login'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogTitle className="sr-only">Login</DialogTitle>
-          <LoginPage onNavigate={(view) => setActiveModal(view)} onLoginSuccess={() => {  setActiveModal(null); }} />
+          <LoginPage onNavigate={(view) => setActiveModal(view)} onLoginSuccess={() => { setActiveModal(null); }} />
         </DialogContent>
       </Dialog>
       <Dialog open={activeModal === 'register'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
@@ -328,7 +336,7 @@ export default function MapPage() {
           <RecoveryPage onNavigate={(view) => setActiveModal(view)} />
         </DialogContent>
       </Dialog>
-      
+
       <Dialog open={activeModal === 'filter'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
         <DialogContent className="z-50 max-w-[700px]"><DialogHeader><DialogTitle>Filtrar & Listar Locais</DialogTitle><DialogDescription>Selecione filtros para refinar a busca.</DialogDescription></DialogHeader><div className="py-4 max-h-[70vh] overflow-y-auto px-1"><FilterAndListComponent onFilterChange={setActiveFilters} activeFilters={activeFilters} locations={filteredLocations} totalLocations={allLocations.length} onLocationClick={handleLocationClick} selectedLocationId={selectedLocationId} /></div></DialogContent>
       </Dialog>
@@ -340,7 +348,7 @@ export default function MapPage() {
           lastName={lastName}
           email={email}
           userNeeds={userNeeds}
-          profileImage={profileImage || ""}          
+          profileImage={profileImage || ""}
           onUpdateNeeds={updateNeeds}
           onUpdateUser={updateUser}
         />

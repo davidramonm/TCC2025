@@ -78,11 +78,7 @@ export function LocationList({
                   }
                   <div className="mt-2 flex flex-wrap gap-1">
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
                     {location.typeValues.map((typeValue: string) => (
-=======
-                    {hasTypes && location.topNecessities.map((typeValue: string) => ( // <-- CORREÇÃO AQUI
->>>>>>> Stashed changes
 =======
                     {hasTypes && location.topNecessities.map((typeValue: string) => ( // <-- CORREÇÃO AQUI
 >>>>>>> Stashed changes

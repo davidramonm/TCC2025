@@ -15,9 +15,6 @@ export interface Location {
 =======
   rating?: number;
   topNecessities?: string[];
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
 >>>>>>> Stashed changes
 }
 

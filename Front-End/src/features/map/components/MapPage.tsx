@@ -8,9 +8,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocations } from "../hooks/useLocations";
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import apiClient, { getAddressFromCoordinates, fetchLocations, getEstablishmentFromCoordinates, saveEstablishment, saveReview, getEstablishmentById} from "@/lib/api";
 import MapHeader from "@/components/layouts/MapHeader";
 import { AddLocationForm } from "./AddLocationForm";
+=======
+import { getAddressFromCoordinates, fetchLocations, getEstablishmentFromCoordinates, saveEstablishment, saveReview, getEstablishmentById } from "@/lib/api";
+import MapHeader from "@/components/layouts/MapHeader";
+>>>>>>> Stashed changes
 =======
 import { getAddressFromCoordinates, fetchLocations, getEstablishmentFromCoordinates, saveEstablishment, saveReview, getEstablishmentById } from "@/lib/api";
 import MapHeader from "@/components/layouts/MapHeader";
@@ -24,7 +29,11 @@ import UserSettingsPage from "@/features/authentication/components/UserSettingsP
 import MapPageSkeleton from "./MapPageSkeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import { getLocationTypeName } from "@/lib/constants";
+=======
+import { tiposAcessibilidade } from "@/lib/constants";
+>>>>>>> Stashed changes
 =======
 import { tiposAcessibilidade } from "@/lib/constants";
 >>>>>>> Stashed changes
@@ -36,6 +45,9 @@ import WelcomeModal from "@/components/layouts/WelcomeModal";
 import LocationDetailCard from "./LocationDetailCard"; // Importando o novo card
 =======
 import LocationDetailCard from "./LocationDetailCard";
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 const MapContainerComponent = dynamic(() => import("./MapContainerComponent"), {
@@ -261,7 +273,10 @@ export default function MapPage() {
       }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
       const savedNecessityIds = reviewData.selectedTypes.map(t => t.necessityId);
       const topNecessitiesFromIds = savedNecessityIds.map(id => {
         const foundType = tiposAcessibilidade.find(t => t.necessityId === id);
@@ -282,6 +297,9 @@ export default function MapPage() {
 
       
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
       toast({
         title: reviewModalState.isEditing ? "Avaliação Atualizada!" : "Avaliação Salva!",
@@ -375,9 +393,12 @@ export default function MapPage() {
         </DialogContent>
       </Dialog>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       <Dialog open={activeModal === 'add'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
         <DialogContent className="z-50 sm:max-w-[425px] md:max-w-[600px]"><DialogHeader><DialogTitle>Adicionar Local</DialogTitle><DialogDescription>Preencha as informações do novo local.</DialogDescription></DialogHeader><div className="py-4 max-h-[70vh] overflow-y-auto px-2"><AddLocationForm onSaveLocation={handleSaveEstablishment} clickedPosition={clickedPosition} initialData={establishmentFromClick} /></div></DialogContent>
       </Dialog>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
       <Dialog open={activeModal === 'filter'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
@@ -392,6 +413,10 @@ export default function MapPage() {
           email={email}
           userNeeds={userNeeds}
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+          profileImage={profileImage || ""} 
+>>>>>>> Stashed changes
 =======
           profileImage={profileImage || ""} 
 >>>>>>> Stashed changes

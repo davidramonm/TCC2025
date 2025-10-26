@@ -27,13 +27,19 @@ export function useLocations(
     
     return allLocations.filter(location => 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       activeFilters.some(filter => location.typeValues.includes(filter))
 =======
+=======
+>>>>>>> Stashed changes
       // Comparamos os nomes dos filtros diretamente com os nomes dos locais
       activeFilters.some(filterName => 
         Array.isArray(location.topNecessities) && 
         location.topNecessities.includes(filterName)
       )
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     );
   }, [allLocations, activeFilters]);

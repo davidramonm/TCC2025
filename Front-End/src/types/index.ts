@@ -11,10 +11,15 @@ export interface Location {
   address: string;
   xCoords: number;
   yCoords: number;
+<<<<<<< Updated upstream
+=======
+  rating?: number;
+  topNecessities?: string[];
+>>>>>>> Stashed changes
 }
 
 export interface Establishment {
-  establishmentId: string;
+  establishmentId: string | null; 
   name: string;
   address: string;
   reviewList : Review[];

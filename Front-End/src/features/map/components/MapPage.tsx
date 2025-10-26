@@ -2,14 +2,19 @@
 
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocations } from "../hooks/useLocations";
+<<<<<<< Updated upstream
 import apiClient, { getAddressFromCoordinates, fetchLocations, getEstablishmentFromCoordinates, saveEstablishment, saveReview, getEstablishmentById} from "@/lib/api";
 import MapHeader from "@/components/layouts/MapHeader";
 import { AddLocationForm } from "./AddLocationForm";
+=======
+import { getAddressFromCoordinates, fetchLocations, getEstablishmentFromCoordinates, saveEstablishment, saveReview, getEstablishmentById } from "@/lib/api";
+import MapHeader from "@/components/layouts/MapHeader";
+>>>>>>> Stashed changes
 import FilterAndListComponent from "./FilterAndListComponent";
 import FloatingMenu from "./FloatingMenu";
 import LoginPage from "@/features/authentication/components/LoginPage";
@@ -18,12 +23,20 @@ import RecoveryPage from "@/features/authentication/components/RecoveryPage";
 import UserSettingsPage from "@/features/authentication/components/UserSettingsPage";
 import MapPageSkeleton from "./MapPageSkeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+<<<<<<< Updated upstream
 import { getLocationTypeName } from "@/lib/constants";
+=======
+import { tiposAcessibilidade } from "@/lib/constants";
+>>>>>>> Stashed changes
 import { Establishment, Location, Necessity } from "@/types";
 import ReviewLocationModal from "./ReviewLocationModal";
 import FloatingHelpButton from "@/components/layouts/FloatingHelpButton";
 import WelcomeModal from "@/components/layouts/WelcomeModal";
+<<<<<<< Updated upstream
 import LocationDetailCard from "./LocationDetailCard"; // Importando o novo card
+=======
+import LocationDetailCard from "./LocationDetailCard";
+>>>>>>> Stashed changes
 
 const MapContainerComponent = dynamic(() => import("./MapContainerComponent"), {
   ssr: false,
@@ -41,7 +54,23 @@ const MOCK_USER_REVIEW = (userId: number, userName: string) => ({
 
 export default function MapPage() {
   const { toast } = useToast();
+<<<<<<< Updated upstream
   const { isLoggedIn, userId, login, register, firstName, lastName, email, userNeeds, updateUserName, updateNeeds } = useAuth();
+=======
+  
+  const { 
+    isLoggedIn, 
+    userId, 
+    register, 
+    firstName, 
+    lastName, 
+    email, 
+    userNeeds, 
+    updateUser, 
+    updateNeeds,
+    profileImage 
+  } = useAuth();
+>>>>>>> Stashed changes
 
   const [activeModal, setActiveModal] = useState<"login" | "register" | "recovery" | "add" | "filter" | null>(null);
 
@@ -80,7 +109,7 @@ export default function MapPage() {
       setIsLoading(true);
       try {
         const locations = await fetchLocations();
-        console.log(locations);
+        console.log("Locais carregados:", locations);
         setAllLocations(locations);
       } catch (error) {
         toast({
@@ -157,7 +186,51 @@ export default function MapPage() {
 
   const handleSaveReview = async (reviewData: { rating: number; selectedTypes: Necessity[]; description: string }) => {
 
+<<<<<<< Updated upstream
     console.log("aqui: " + reviewData.selectedTypes)
+=======
+    let establishment = reviewModalState.establishment!;
+    console.log(reviewModalState.createNew)
+    if (reviewModalState.createNew) {
+      console.log('Criando novo estabelecimento antes de salvar a avaliação...');
+      const newEstablishment = await saveEstablishment(
+        {
+          establishmentId: "",
+          name: reviewModalState.newName || "",
+          address: reviewModalState.establishment?.address || "",
+          xCoords: reviewModalState.establishment?.xCoords || 0,
+          yCoords: reviewModalState.establishment?.yCoords || 0
+        }
+      );
+      establishment = {
+        establishmentId: newEstablishment.establishmentId,
+        name: newEstablishment.name,
+        address: newEstablishment.address,
+        rating: 0,
+        xCoords: newEstablishment.xCoords,
+        yCoords: newEstablishment.yCoords,
+        topNecessities: [],
+        reviewList: []
+      };
+
+      setSelectedEstablishment(establishment);
+      const savedNecessityIds = reviewData.selectedTypes.map(t => t.necessityId);
+      const topNecessitiesFromIds = savedNecessityIds.map(id => {
+        const foundType = tiposAcessibilidade.find(t => t.necessityId === id);
+        return foundType ? foundType.value : null;
+      }).filter(v => v !== null) as string[];
+
+      const locationToAdd: Location = {
+        ...newEstablishment,
+        establishmentId: newEstablishment.establishmentId,
+        rating: reviewData.rating,
+        topNecessities: topNecessitiesFromIds
+      }
+      
+      setAllLocations((prevLocations) => [...prevLocations, locationToAdd]);
+    }
+
+>>>>>>> Stashed changes
     const review = await saveReview({
       establishmentId: reviewModalState.locationId,
       userId: userId,
@@ -187,6 +260,29 @@ export default function MapPage() {
           }
       }
 
+<<<<<<< Updated upstream
+=======
+      const savedNecessityIds = reviewData.selectedTypes.map(t => t.necessityId);
+      const topNecessitiesFromIds = savedNecessityIds.map(id => {
+        const foundType = tiposAcessibilidade.find(t => t.necessityId === id);
+        return foundType ? foundType.value : null;
+      }).filter(v => v !== null) as string[];
+
+      setAllLocations((prev) =>
+        prev.map((loc) =>
+          loc.establishmentId === establishment.establishmentId
+            ? {
+              ...loc,
+              rating: reviewData.rating,
+              topNecessities: topNecessitiesFromIds,
+            }
+            : loc
+        )
+      );
+
+      
+
+>>>>>>> Stashed changes
       toast({
         title: reviewModalState.isEditing ? "Avaliação Atualizada!" : "Avaliação Salva!",
         description: `Obrigado por contribuir com informações sobre ${reviewModalState.locationName}.`,
@@ -201,7 +297,7 @@ export default function MapPage() {
     const searchResults = allLocations.filter((location) =>
       location.name.toLowerCase().includes(normalizedQuery)  //||
       // location.address.toLowerCase().includes(normalizedQuery) ||
-      // location.typeValues.some((type: string) => getLocationTypeName(type).toLowerCase().includes(normalizedQuery))
+      // location.topNecessities.some((type: string) => getLocationTypeName(type).toLowerCase().includes(normalizedQuery))
     );
     if (searchResults.length > 0) {
       handleLocationClick(searchResults[0]);
@@ -278,9 +374,12 @@ export default function MapPage() {
           <RecoveryPage onNavigate={(view) => setActiveModal(view)} />
         </DialogContent>
       </Dialog>
+<<<<<<< Updated upstream
       <Dialog open={activeModal === 'add'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
         <DialogContent className="z-50 sm:max-w-[425px] md:max-w-[600px]"><DialogHeader><DialogTitle>Adicionar Local</DialogTitle><DialogDescription>Preencha as informações do novo local.</DialogDescription></DialogHeader><div className="py-4 max-h-[70vh] overflow-y-auto px-2"><AddLocationForm onSaveLocation={handleSaveEstablishment} clickedPosition={clickedPosition} initialData={establishmentFromClick} /></div></DialogContent>
       </Dialog>
+=======
+>>>>>>> Stashed changes
       <Dialog open={activeModal === 'filter'} onOpenChange={(isOpen) => !isOpen && setActiveModal(null)}>
         <DialogContent className="z-50 max-w-[700px]"><DialogHeader><DialogTitle>Filtrar & Listar Locais</DialogTitle><DialogDescription>Selecione filtros para refinar a busca.</DialogDescription></DialogHeader><div className="py-4 max-h-[70vh] overflow-y-auto px-1"><FilterAndListComponent onFilterChange={setActiveFilters} activeFilters={activeFilters} locations={filteredLocations} totalLocations={allLocations.length} onLocationClick={handleLocationClick} selectedLocationId={selectedLocationId} /></div></DialogContent>
       </Dialog>
@@ -292,6 +391,10 @@ export default function MapPage() {
           lastName={lastName}
           email={email}
           userNeeds={userNeeds}
+<<<<<<< Updated upstream
+=======
+          profileImage={profileImage || ""} 
+>>>>>>> Stashed changes
           onUpdateNeeds={updateNeeds}
           onUpdateUser={updateUserName}
         />

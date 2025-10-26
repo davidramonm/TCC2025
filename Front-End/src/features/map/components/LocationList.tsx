@@ -35,9 +35,21 @@ export function LocationList({
       <div className="space-y-3">
         {locations.length > 0 ? (
           locations.map((location) => {
+<<<<<<< Updated upstream
             const tipoPrincipal = tiposAcessibilidade.find(t => t.value === location.typeValues[0]);
             const Icon = tipoPrincipal ? tipoPrincipal.icon : MapPin;
             const isSelected = location.id === selectedLocationId;
+=======
+            
+            const hasTypes = Array.isArray(location.topNecessities) && location.topNecessities.length > 0;
+            
+            const tipoPrincipal = hasTypes
+              ? tiposAcessibilidade.find(t => t.value === location.topNecessities[0])
+              : undefined;
+
+            const Icon = tipoPrincipal ? tipoPrincipal.icon : MapPin;
+            const isSelected = location.establishmentId === selectedLocationId;
+>>>>>>> Stashed changes
 
             return (
             <div
@@ -65,7 +77,11 @@ export function LocationList({
                     />
                   }
                   <div className="mt-2 flex flex-wrap gap-1">
+<<<<<<< Updated upstream
                     {location.typeValues.map((typeValue: string) => (
+=======
+                    {hasTypes && location.topNecessities.map((typeValue: string) => ( // <-- CORREÇÃO AQUI
+>>>>>>> Stashed changes
                        <Badge key={typeValue} variant="secondary" className="bg-gray-200 text-gray-700 font-normal">
                          {getLocationTypeName(typeValue)}
                        </Badge>

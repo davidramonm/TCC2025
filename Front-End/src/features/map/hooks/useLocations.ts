@@ -14,7 +14,7 @@ export function useLocations(
       // --- CORREÇÃO ---
       // Adicionamos a verificação "Array.isArray(location.typeValues)"
       // para garantir que só chamamos ".includes" se typeValues existir e for um array.
-      activeFilters.some(filter => Array.isArray(location.typeValues) && location.typeValues.includes(filter))
+      activeFilters.some(filter => Array.isArray(location.topNecessities) && location.topNecessities.includes(filter))
       // --- FIM DA CORREÇÃO ---
     );
   }, [allLocations, activeFilters]);

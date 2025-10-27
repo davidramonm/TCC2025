@@ -31,6 +31,11 @@ public class EstablishmentController {
         return ResponseEntity.ok().body(service.getEstablishmentById(id));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<AllEstablishmentResponseDTO>> searchEstablishments (@RequestParam String query) {
+        return ResponseEntity.ok().body(service.searchEstablishments(query));
+    }
+
     @PostMapping
     public ResponseEntity<EstablishmentResponseDTO> createEstablishment(@RequestBody EstablishmentRequestDTO establishment){
 

@@ -81,7 +81,7 @@ function MapController({ searchLocation }: { searchLocation: Location | null }) 
   const map = useMap();
   useEffect(() => {
     if (searchLocation) {
-      map.flyTo([searchLocation.xCoords, searchLocation.yCoords], 16);
+      map.flyTo([searchLocation.xCoords, searchLocation.yCoords], 18);
     }
   }, [searchLocation, map]);
 

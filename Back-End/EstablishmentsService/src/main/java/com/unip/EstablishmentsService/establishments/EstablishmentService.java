@@ -37,6 +37,16 @@ public class EstablishmentService {
         return mapper.toEstablishmentCoordsResponseDTOList(establishments);
     }
 
+    public List<AllEstablishmentResponseDTO> searchEstablishments(String query){
+        List<Establishment> establishments = repository.findByNameContainingIgnoreCaseOrAddressContainingIgnoreCase(query, query);
+
+        if(!establishments.isEmpty()){
+            return mapper.toEstablishmentCoordsResponseDTOList(establishments);
+        } else {
+            throw new RuntimeException("Establishments not found");
+        }
+    }
+
     public EstablishmentResponseDTO getEstablishmentById(UUID id) {
 
         Establishment establishment = repository.findById(id).orElseThrow();

@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext"; // Importação já existe
@@ -190,7 +190,8 @@ export default function MapPage() {
           name: reviewModalState.newName || "",
           address: reviewModalState.establishment?.address || "",
           xCoords: reviewModalState.establishment?.xCoords || 0,
-          yCoords: reviewModalState.establishment?.yCoords || 0
+          yCoords: reviewModalState.establishment?.yCoords || 0,
+          topNecessities: [],
         }
       );
       establishment = {
@@ -253,19 +254,21 @@ export default function MapPage() {
     }
   };
 
-  const performGlobalSearch = () => {
-    const normalizedQuery = searchTerm.toLowerCase().trim();
-    if (!normalizedQuery) return;
-    const searchResults = allLocations.filter((location) =>
-      location.name.toLowerCase().includes(normalizedQuery)  //||
-      // location.address.toLowerCase().includes(normalizedQuery) ||
-      // location.typeValues.some((type: string) => getLocationTypeName(type).toLowerCase().includes(normalizedQuery))
-    );
-    if (searchResults.length > 0) {
-      handleLocationClick(searchResults[0]);
-    } else {
-      toast({ title: "Nenhum resultado encontrado", variant: "destructive" });
-    }
+  const performGlobalSearch = (location: Location) => {
+
+    console.log("Performing global search for location:", location);
+    handleLocationClick(location);
+
+    // const searchResults = allLocations.filter((location) =>
+    //   location.name.toLowerCase().includes(normalizedQuery)  //||
+    //   // location.address.toLowerCase().includes(normalizedQuery) ||
+    //   // location.typeValues.some((type: string) => getLocationTypeName(type).toLowerCase().includes(normalizedQuery))
+    // );
+    // if (searchResults.length > 0) {
+    //   handleLocationClick(searchResults[0]);
+    // } else {
+    //   toast({ title: "Nenhum resultado encontrado", variant: "destructive" });
+    // }
   };
 
   const checkUserReview = (establishment: Establishment | null): boolean => {
@@ -280,7 +283,7 @@ export default function MapPage() {
       <MapHeader
         searchTerm={searchTerm}
         onSearchTermChange={setSearchTerm}
-        onGlobalSearch={performGlobalSearch}
+        onGlobalSearch = {(location) => performGlobalSearch(location)}
         onNavigate={(view) => setActiveModal(view)}
         onOpenSettings={() => setIsSettingsOpen(true)}
       />

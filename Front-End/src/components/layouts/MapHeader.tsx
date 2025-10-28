@@ -8,11 +8,14 @@ import { MapPin, Search, LogOut, LogIn, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Separator } from "@/components/ui/separator";
 import { AvatarImage } from "@radix-ui/react-avatar";
+import SearchBar from "./SearchBar";
+import { on } from "events";
+import { Location } from "@/types";
 
 interface MapHeaderProps {
   searchTerm: string;
   onSearchTermChange: (term: string) => void;
-  onGlobalSearch: () => void;
+  onGlobalSearch: (location: Location) => void;
   onNavigate: (view: "login") => void;
   onOpenSettings: () => void;
 }
@@ -39,8 +42,8 @@ export default function MapHeader({
       </div>
 
       <div className="flex-1 max-w-2xl mx-8 relative">
-        <div className="flex items-center bg-gray-100 rounded-full p-1 shadow-sm">
-          <Search className="absolute left-4 w-4 h-4 text-gray-400 z-10" />
+
+        {/* <Search className="absolute left-4 w-4 h-4 text-gray-400 z-10" />
           <Input
             placeholder="Pesquisar por nome, endereço ou tipo de acessibilidade..."
             className="pl-12 pr-12 border-0 bg-transparent focus:ring-0 h-10"
@@ -54,8 +57,9 @@ export default function MapHeader({
             onClick={onGlobalSearch}
           >
             <Search className="w-3 h-3" />
-          </Button>
-        </div>
+          </Button> */}
+        <SearchBar onSelectResult={(location) => onGlobalSearch(location)} />
+
       </div>
 
       <div className="flex items-center gap-3">
@@ -82,7 +86,7 @@ export default function MapHeader({
                   <Avatar className="w-20 h-20 mb-2">
                     {
                       profileImage ? (
-                        <AvatarImage src={profileImage} alt={fullName} className="object-cover w-full h-full"/>
+                        <AvatarImage src={profileImage} alt={fullName} className="object-cover w-full h-full" />
                       ) : (
                         <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${fullName}`} alt={fullName} />
                       )

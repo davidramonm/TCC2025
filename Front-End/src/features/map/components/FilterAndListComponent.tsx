@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { tiposAcessibilidade } from "@/lib/constants";
 import { Filter, X } from "lucide-react";
 import { LocationList } from "./LocationList";
+import { Location } from "@/types";
 
 interface FilterAndListComponentProps {
   onFilterChange: (filters: string[]) => void;
   activeFilters: string[];
-  locations: any[];
+  locations: Location[];
   totalLocations: number;
-  onLocationClick: (location: any) => void;
+  onLocationClick: (location: Location) => void;
   selectedLocationId?: string | null;
 }
 
@@ -28,6 +29,7 @@ export default function FilterAndListComponent({
     const newFilters = activeFilters.includes(typeValue)
       ? activeFilters.filter((f) => f !== typeValue)
       : [...activeFilters, typeValue];
+      console.log("newFilters", newFilters);
     onFilterChange(newFilters);
   };
 
@@ -49,9 +51,9 @@ export default function FilterAndListComponent({
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           {tiposAcessibilidade.map((tipo) => {
-            const isSelected = activeFilters.includes(tipo.value);
+            const isSelected = activeFilters.includes(tipo.label);
             return (
-              <button key={tipo.value} onClick={() => toggleFilter(tipo.value)} className={`flex items-center gap-3 p-2 border-2 rounded-lg cursor-pointer transition-all duration-200 text-sm w-full text-left ${isSelected ? "border-gray-600 bg-gray-100 shadow-sm" : "border-gray-200 hover:border-gray-400 hover:bg-gray-50"}`}>
+              <button key={tipo.value} onClick={() => toggleFilter(tipo.label)} className={`flex items-center gap-3 p-2 border-2 rounded-lg cursor-pointer transition-all duration-200 text-sm w-full text-left ${isSelected ? "border-gray-600 bg-gray-100 shadow-sm" : "border-gray-200 hover:border-gray-400 hover:bg-gray-50"}`}>
                 <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${isSelected ? "border-gray-600 bg-gray-600" : "border-gray-300"}`}>{isSelected && <Filter className="w-3 h-3 text-white" />}</div>
                 <tipo.icon className="w-4 h-4" style={{ color: tipo.color }} />
                 <span>{tipo.label}</span>

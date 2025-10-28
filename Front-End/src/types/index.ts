@@ -12,7 +12,7 @@ export interface Location {
   xCoords: number;
   yCoords: number;
   rating?: number;
-  typeValues?: string[];
+  topNecessities: string[];
 }
 
 export interface Establishment {

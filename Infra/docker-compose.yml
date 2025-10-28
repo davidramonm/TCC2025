@@ -28,6 +28,9 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/example
       SPRING_DATASOURCE_USERNAME: example
       SPRING_DATASOURCE_PASSWORD: example
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - ../Back-end/EstablishmentsService/uploads:/app/uploads
     depends_on:
       - db
 

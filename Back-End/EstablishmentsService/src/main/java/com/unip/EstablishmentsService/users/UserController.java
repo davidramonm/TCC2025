@@ -38,7 +38,8 @@ public class UserController {
 
             String newFileName = user.getUserId() + "_profile" + extension;
 
-            Path uploadDir = Paths.get("uploads/profile-pictures");
+            String uploadBaseDir = System.getenv().getOrDefault("UPLOAD_DIR", "uploads/profile-pictures");
+            Path uploadDir = Paths.get(uploadBaseDir);
             if (!Files.exists(uploadDir)) {
                 Files.createDirectories(uploadDir);
             }

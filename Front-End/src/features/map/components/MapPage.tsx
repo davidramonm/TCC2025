@@ -117,14 +117,11 @@ export default function MapPage() {
       return;
     }
     setSelectedEstablishment(null);
-    setClickedPosition(latlng);
     const establishment = await getEstablishmentFromCoordinates(latlng.lat, latlng.lng);
 
     if (establishment) {
+      handleLocationClick(establishment as Location, establishment);
       setEstablishmentFromClick(establishment);
-      console.log(establishment.establishmentId)
-      setSelectedEstablishment(establishment);
-      setActiveModal(null);
     } else {
       try {
         const address = await getAddressFromCoordinates(latlng.lat, latlng.lng);
@@ -147,12 +144,20 @@ export default function MapPage() {
     }
   };
 
-  const handleLocationClick = async (location: Location) => {
+  const handleLocationClick = async (location: Location, hEstablishment?: Establishment) => {
     setSearchLocation({ ...location });
+    if (!location.establishmentId && hEstablishment) {
+      setSelectedEstablishment(hEstablishment);
+      return;
+    }
+
     setSelectedLocationId(location.establishmentId);
     const establishment = await getEstablishmentById(location.establishmentId);
+    
+      
     setSelectedEstablishment(establishment ?? null);
     setActiveModal(null);
+    
   };
 
   const handleReviewClick = (establishment: Establishment, newName?: string) => {
@@ -257,7 +262,8 @@ export default function MapPage() {
   const performGlobalSearch = (location: Location) => {
 
     console.log("Performing global search for location:", location);
-    handleLocationClick(location);
+    handleMapClick({ lat: location.xCoords, lng: location.yCoords });
+    //handleLocationClick(location);
 
     // const searchResults = allLocations.filter((location) =>
     //   location.name.toLowerCase().includes(normalizedQuery)  //||

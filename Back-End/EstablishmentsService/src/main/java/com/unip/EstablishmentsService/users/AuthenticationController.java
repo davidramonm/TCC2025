@@ -123,7 +123,7 @@ public class AuthenticationController {
         }
 
         String username = jwtService.extractUsername(refreshToken);
-        User user = ((User) repository.findByEmail(username));
+        User user = ((User) repository.findByEmailAndEnabledIsTrue(username));
 
         if (!jwtService.isTokenValid(refreshToken, user, Token.REFRESH_TOKEN)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -158,7 +158,7 @@ public class AuthenticationController {
         }
 
         String username = jwtService.extractUsername(refreshToken);
-        User user = ((User) repository.findByEmail(username));
+        User user = ((User) repository.findByEmailAndEnabledIsTrue(username));
 
         if (!jwtService.isTokenValid(refreshToken, user, Token.REFRESH_TOKEN)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -184,6 +184,25 @@ public class AuthenticationController {
 
         return ResponseEntity.noContent().build(); // 204 No Content
 }
+
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(
+            @CookieValue(value = "refreshToken", required = false) String refreshToken
+    ) {
+        if (refreshToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String username = jwtService.extractUsername(refreshToken);
+        User user = ((User) repository.findByEmailAndEnabledIsTrue(username));
+        if (!jwtService.isTokenValid(refreshToken, user, Token.REFRESH_TOKEN)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        user.setEnabled(false);
+        repository.save(user);
+
+        return ResponseEntity.noContent().build();
+    }
 
 
 }

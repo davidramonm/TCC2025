@@ -30,6 +30,7 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private String profileImage;
+    private Boolean enabled;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

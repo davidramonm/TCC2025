@@ -89,9 +89,8 @@ export default function UserSettingsPage({
       const form = new FormData();
       if (fileInputRef.current?.files?.[0]) {
         form.append("file", fileInputRef.current.files[0]);
-      }
 
-      const response = await apiClient.post("/users/me/profile-picture", form, {
+        const response = await apiClient.post("/users/me/profile-picture", form, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -100,6 +99,9 @@ export default function UserSettingsPage({
       if (response?.data?.profileImage) {
         setLocalProfileImage(response.data.profileImage);
       }
+      }
+
+      
 
       onUpdateNeeds(selectedNeeds);
       onUpdateUser(newFirstName, newLastName, localProfileImage);

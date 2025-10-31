@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -82,7 +83,10 @@ public class EstablishmentService {
     }
 
     public EstablishmentResponseDTO createEstablishment(EstablishmentRequestDTO establishmentDTO) {
-
+        Optional<Establishment> existingEstablishment = repository.findByNameAndAddress(establishmentDTO.name(),  establishmentDTO.address());
+        if (existingEstablishment.isPresent()) {
+            return mapper.toEstablishmentResponseDTO(existingEstablishment.get());
+        }
         Establishment establishment = mapper.toEstablishment(establishmentDTO);
         repository.save(establishment);
         return mapper.toEstablishmentResponseDTO(establishment);

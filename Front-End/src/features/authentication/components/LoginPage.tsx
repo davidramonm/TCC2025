@@ -32,7 +32,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
       await login(data.email, data.password);
       onLoginSuccess();
     } catch (error: Error | any) {
-      setLoginError(error.props);
+      setLoginError(error.message || "Erro ao fazer login. Por favor, tente novamente.");
     }
 
 
@@ -76,6 +76,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
         </div>
 
         {loginError && (
+          console.log(loginError),
           <p className="text-sm text-red-600 font-medium text-center mt-2" role="alert">
             {loginError}
           </p>

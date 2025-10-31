@@ -9,7 +9,7 @@ import { tokenService } from './tokenService';
  * Inclui baseURL, withCredentials e interceptors para gerenciamento de token.
  */
 const apiClient = axios.create({
-  baseURL: "http://localhost:8080", 
+  baseURL: "http://26.13.31.18:8080", 
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -42,7 +42,7 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const res = await axios.post(
-          `http://localhost:8080/auth/refresh`,
+          `http://26.13.31.18:8080/auth/refresh`,
           {},
           { withCredentials: true }
         );

@@ -43,6 +43,15 @@ services:
     depends_on:
       - backend
 
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ../Front-End/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - frontend
+
 networks:
   default:
     name: local-network

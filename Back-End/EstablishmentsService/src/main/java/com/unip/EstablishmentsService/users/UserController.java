@@ -38,7 +38,7 @@ public class UserController {
 
             String newFileName = user.getUserId() + "_profile" + extension;
 
-            String uploadBaseDir = System.getenv().getOrDefault("UPLOAD_DIR", "uploads/profile-pictures");
+            String uploadBaseDir = System.getenv().getOrDefault("UPLOAD_DIR/profile-pictures", "uploads/profile-pictures");
             Path uploadDir = Paths.get(uploadBaseDir);
             if (!Files.exists(uploadDir)) {
                 Files.createDirectories(uploadDir);
@@ -47,7 +47,7 @@ public class UserController {
             Path filePath = uploadDir.resolve(newFileName);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            user.setProfileImage("http://localhost:8080/uploads/profile-pictures/" + newFileName);
+            user.setProfileImage("http://26.13.31.18:8080/uploads/profile-pictures/" + newFileName);
             userRepository.save(user);
 
             return ResponseEntity.ok().body(user);

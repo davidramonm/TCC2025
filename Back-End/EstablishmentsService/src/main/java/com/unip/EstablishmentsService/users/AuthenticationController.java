@@ -54,7 +54,7 @@ public class AuthenticationController {
 
             ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                     .httpOnly(true)
-                    .secure(true)
+                    .secure(false)
                     .sameSite("Strict")
                     .path("/")
                     .maxAge(7 * 24 * 60 * 60)
@@ -102,7 +102,7 @@ public class AuthenticationController {
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
-                .secure(true)  //TODO: alterar para seguro com certificado SSL
+                .secure(false)  //TODO: alterar para seguro com certificado SSL
                 .sameSite("Strict")
                 .path("/")
                 .maxAge(7 * 24 * 60 * 60)
@@ -174,7 +174,7 @@ public class AuthenticationController {
         
         ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .sameSite("Strict")
                 .path("/")
                 .maxAge(0) // expires immediately

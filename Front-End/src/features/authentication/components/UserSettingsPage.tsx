@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { X, Shield, Save, Heart, User, Trash2, Camera } from "lucide-react";
+import { X, Shield, Save, Heart, Trash2, Camera } from "lucide-react";
 import { tiposAcessibilidade } from "@/lib/constants";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Necessity } from '@/types';
 import apiClient from "@/lib/api";
-import { set } from "zod";
 
 interface UserSettingsPageProps {
   onClose: () => void;

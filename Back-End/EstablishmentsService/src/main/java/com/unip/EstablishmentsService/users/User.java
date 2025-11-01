@@ -1,5 +1,6 @@
 package com.unip.EstablishmentsService.users;
 
+
 import com.unip.EstablishmentsService.necessities.Necessity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,9 +17,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Data@AllArgsConstructor@NoArgsConstructor
 @Builder
 public class User implements UserDetails {
 
@@ -31,11 +30,16 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private String profileImage;
-    private Boolean enabled;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "users_necessities", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "necessity_id"))
+    @JoinTable(
+            name = "users_necessities",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "necessity_id")
+    )
     List<Necessity> necessities;
+
+
 
     @Enumerated(EnumType.STRING)
     private Role role;

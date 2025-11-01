@@ -1,5 +1,6 @@
 package com.unip.EstablishmentsService.users;
 
+
 import com.unip.EstablishmentsService.users.dtos.LoginRequestDTO;
 import com.unip.EstablishmentsService.users.dtos.LoginResponseDTO;
 import com.unip.EstablishmentsService.users.dtos.RegisterRequestDTO;
@@ -37,10 +38,12 @@ public class AuthenticationController {
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
 
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(
             @RequestBody @Valid LoginRequestDTO request,
-            HttpServletResponse response) {
+            HttpServletResponse response
+    ){
 
         try {
             var usernamePassword = new UsernamePasswordAuthenticationToken(request.email(), request.password());
@@ -60,7 +63,7 @@ public class AuthenticationController {
             response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
             return ResponseEntity.ok().body(userMapper.userToLoginResponseDTO(user, accessToken));
-        } catch (Exception e) {
+        } catch (Exception e){
             throw new UserNotFoundException("Usuario não encontrado");
         }
 
@@ -69,10 +72,11 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<LoginResponseDTO> register(
             @RequestBody @Valid RegisterRequestDTO request,
-            HttpServletResponse response) {
+            HttpServletResponse response
+    ){
 
         List<Necessity> necessities = new ArrayList<>();
-        for (Necessity necessity : request.necessities()) {
+        for (Necessity necessity: request.necessities()) {
             try {
                 necessities.add(necessityService.getNecessityById(necessity.getNecessityId()));
             } catch (Exception e) {
@@ -98,7 +102,7 @@ public class AuthenticationController {
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
-                .secure(true) // TODO: alterar para seguro com certificado SSL
+                .secure(true)  //TODO: alterar para seguro com certificado SSL
                 .sameSite("Strict")
                 .path("/")
                 .maxAge(7 * 24 * 60 * 60)
@@ -112,20 +116,21 @@ public class AuthenticationController {
     @PutMapping("/update")
     public ResponseEntity<LoginResponseDTO> update(
             @RequestBody UserRequestDTO request,
-            @CookieValue(value = "refreshToken", required = false) String refreshToken) {
+            @CookieValue(value = "refreshToken", required = false) String refreshToken
+    ) {
         if (refreshToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         String username = jwtService.extractUsername(refreshToken);
-        User user = ((User) repository.findByEmailAndEnabledIsTrue(username));
+        User user = ((User) repository.findByEmail(username));
 
-        if (!jwtService.isTokenValid(refreshToken, user, Token.REFRESH_TOKEN)) {
+        if (!jwtService.isTokenValid(refreshToken, user, Token.REFRESH_TOKEN)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         List<Necessity> necessities = new ArrayList<>();
-        for (Necessity necessity : request.necessities()) {
+        for (Necessity necessity: request.necessities()) {
             try {
                 necessities.add(necessityService.getNecessityById(necessity.getNecessityId()));
             } catch (Exception e) {
@@ -146,15 +151,16 @@ public class AuthenticationController {
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(
-            @CookieValue(value = "refreshToken", required = false) String refreshToken) {
+            @CookieValue(value = "refreshToken", required = false) String refreshToken
+    ) {
         if (refreshToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         String username = jwtService.extractUsername(refreshToken);
-        User user = ((User) repository.findByEmailAndEnabledIsTrue(username));
+        User user = ((User) repository.findByEmail(username));
 
-        if (!jwtService.isTokenValid(refreshToken, user, Token.REFRESH_TOKEN)) {
+        if (!jwtService.isTokenValid(refreshToken, user, Token.REFRESH_TOKEN)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -165,7 +171,7 @@ public class AuthenticationController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
-
+        
         ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
                 .secure(true)
@@ -177,24 +183,7 @@ public class AuthenticationController {
         response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
 
         return ResponseEntity.noContent().build(); // 204 No Content
-    }
+}
 
-    @PostMapping("/delete")
-    public ResponseEntity<?> delete(
-            @CookieValue(value = "refreshToken", required = false) String refreshToken) {
-        if (refreshToken == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        String username = jwtService.extractUsername(refreshToken);
-        User user = ((User) repository.findByEmailAndEnabledIsTrue(username));
-        if (!jwtService.isTokenValid(refreshToken, user, Token.REFRESH_TOKEN)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        user.setEnabled(false);
-        repository.save(user);
-
-        return ResponseEntity.noContent().build();
-    }
 
 }

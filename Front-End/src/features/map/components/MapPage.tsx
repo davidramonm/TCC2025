@@ -5,10 +5,11 @@
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext"; // Importação já existe
 import { useLocations } from "../hooks/useLocations";
-import { getAddressFromCoordinates, fetchLocations, getEstablishmentFromCoordinates, saveEstablishment, saveReview, getEstablishmentById } from "@/lib/api";
+import apiClient, { getAddressFromCoordinates, fetchLocations, getEstablishmentFromCoordinates, saveEstablishment, saveReview, getEstablishmentById } from "@/lib/api";
 import MapHeader from "@/components/layouts/MapHeader";
+// import { AddLocationForm } from "./AddLocationForm"; // Removido
 import FilterAndListComponent from "./FilterAndListComponent";
 import FloatingMenu from "./FloatingMenu";
 import LoginPage from "@/features/authentication/components/LoginPage";
@@ -17,18 +18,27 @@ import RecoveryPage from "@/features/authentication/components/RecoveryPage";
 import UserSettingsPage from "@/features/authentication/components/UserSettingsPage";
 import MapPageSkeleton from "./MapPageSkeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Establishment, Location, Necessity } from "@/types";
+import { getLocationTypeName } from "@/lib/constants";
+import { Establishment, Location, Necessity, Review } from "@/types";
 import ReviewLocationModal from "./ReviewLocationModal";
 import FloatingHelpButton from "@/components/layouts/FloatingHelpButton";
 import WelcomeModal from "@/components/layouts/WelcomeModal";
 import LocationDetailCard from "./LocationDetailCard";
+import { set } from "zod";
 
 const MapContainerComponent = dynamic(() => import("./MapContainerComponent"), {
   ssr: false,
   loading: () => <div className="flex-1 bg-gray-200 animate-pulse" />,
 });
 
+const MOCK_REVIEWS = [
+  { id: 1, user: { id: 2, name: "Maria Silva" }, rating: 5, description: "Excelente acesso com rampas bem construídas!" },
+  { id: 2, user: { id: 3, name: "João Santos" }, rating: 4, description: "Banheiro adaptado muito bom, mas a entrada principal é um pouco estreita." },
+];
 
+const MOCK_USER_REVIEW = (userId: number, userName: string) => ({
+  id: 99, user: { id: userId, name: `${userName} (Você)` }, rating: 3, description: "Faltou piso tátil na área externa."
+});
 
 export default function MapPage() {
   const { toast } = useToast();
@@ -52,6 +62,7 @@ export default function MapPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
 
+  // O 'useLocations' agora usa 'Location' com 'typeValues?' opcional
   const { filteredLocations } = useLocations(allLocations, activeFilters);
 
   const [clickedPosition, setClickedPosition] = useState<{ lat: number; lng: number } | null>(null);
@@ -78,15 +89,6 @@ export default function MapPage() {
 
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
-  useEffect(() => {
-    const hasVisited = localStorage.getItem("hasVisitedApp");
-    
-    if (!hasVisited) {
-      setIsHelpModalOpen(true);
-      localStorage.setItem("hasVisitedApp", "true");
-    }
-  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -256,6 +258,17 @@ export default function MapPage() {
 
     console.log("Performing global search for location:", location);
     handleLocationClick(location);
+
+    // const searchResults = allLocations.filter((location) =>
+    //   location.name.toLowerCase().includes(normalizedQuery)  //||
+    //   // location.address.toLowerCase().includes(normalizedQuery) ||
+    //   // location.typeValues.some((type: string) => getLocationTypeName(type).toLowerCase().includes(normalizedQuery))
+    // );
+    // if (searchResults.length > 0) {
+    //   handleLocationClick(searchResults[0]);
+    // } else {
+    //   toast({ title: "Nenhum resultado encontrado", variant: "destructive" });
+    // }
   };
 
   const checkUserReview = (establishment: Establishment | null): boolean => {

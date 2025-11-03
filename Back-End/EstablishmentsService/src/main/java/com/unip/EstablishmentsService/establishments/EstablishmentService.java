@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -102,6 +104,10 @@ public class EstablishmentService {
                 .mapToInt(Review::getRating)
                 .average()
                 .orElse(0);
+
+        rating = BigDecimal.valueOf(rating)
+                .setScale(2, RoundingMode.HALF_EVEN)
+                .doubleValue();
 
         List<String> topNecessityNames = establishment.getReviewList().stream()
                 .filter(review -> review.getNecessities() != null)

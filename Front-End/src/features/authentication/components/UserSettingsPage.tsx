@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { X, Shield, Save, Heart, User, Trash2, Camera } from "lucide-react";
+import { X, Shield, Save, Heart, User, Trash2, Camera, Loader2 } from "lucide-react";
 import { tiposAcessibilidade } from "@/lib/constants";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -22,6 +22,8 @@ import {
 import { Necessity } from '@/types';
 import apiClient from "@/lib/api";
 import { set } from "zod";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface UserSettingsPageProps {
   onClose: () => void;
@@ -49,6 +51,10 @@ export default function UserSettingsPage({
   const [newLastName, setLastName] = useState(lastName || "");
   const [localProfileImage, setLocalProfileImage] = useState<string | "">(profileImage || "");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const [isLoading, setIsLoading] = useState(false); // <-- ADICIONADO
+  const { deleteUserAccount } = useAuth(); // <-- ADICIONADO
+  const { toast } = useToast(); // <-- ADICIONADO
 
   useEffect(() => {
     setLocalProfileImage(profileImage);
@@ -91,17 +97,17 @@ export default function UserSettingsPage({
         form.append("file", fileInputRef.current.files[0]);
 
         const response = await apiClient.post("/users/me/profile-picture", form, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
 
-      if (response?.data?.profileImage) {
-        setLocalProfileImage(response.data.profileImage);
-      }
+        if (response?.data?.profileImage) {
+          setLocalProfileImage(response.data.profileImage);
+        }
       }
 
-      
+
 
       onUpdateNeeds(selectedNeeds);
       onUpdateUser(newFirstName, newLastName, localProfileImage);
@@ -126,6 +132,26 @@ export default function UserSettingsPage({
 
     const previewUrl = URL.createObjectURL(file);
     setLocalProfileImage(previewUrl);
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsLoading(true);
+    try {
+      await deleteUserAccount();
+      toast({
+        title: "Conta excluída com sucesso",
+        description: "Sentiremos sua falta.",
+      });
+      // O logout e o fechamento do modal são tratados pelo AuthContext e seu 'logout'
+    } catch (error: any) {
+      toast({
+        title: "Erro ao excluir conta",
+        description: error.message || "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+      setIsLoading(false); // Só define como falso em caso de erro
+    }
+
   };
 
   return (
@@ -240,22 +266,27 @@ export default function UserSettingsPage({
                     <h3 className="text-lg font-semibold mb-3">Excluir Conta</h3>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="destructive">
-                          <Trash2 className="w-4 h-4 mr-2" />
+                        <Button variant="destructive" disabled={isLoading}>
+                          {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
                           Excluir minha conta
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                          <AlertDialogTitle>Você tem certeza absoluta?</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Essa ação não pode ser desfeita. Todos os seus dados serão permanentemente removidos.
+                            Esta ação não pode ser desfeita. Isso excluirá permanentemente
+                            sua conta e removerá todos os seus dados e avaliações de
+                            nossos servidores.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                          <AlertDialogAction className="bg-gray-800 hover:bg-gray-900">
-                            Continuar
+                          <AlertDialogAction
+                            onClick={handleDeleteAccount}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Confirmar Exclusão
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>

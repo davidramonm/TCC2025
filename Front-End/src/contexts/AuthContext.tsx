@@ -38,6 +38,7 @@ interface AuthContextType {
   register: (fName: string, lName: string, email: string, pass: string, needs: Necessity[]) => Promise<void>;
   updateUser: (fName: string, lName: string, profileImage: string) => void;
   updateNeeds: (needs: Necessity[]) => void;
+  deleteUserAccount: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -127,6 +128,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUserNeeds(needs);
   };
 
+  /**
+   * @description Exclui a conta do usuário logado.
+   * Chama o endpoint de exclusão da API e, em caso de sucesso, faz logout.
+   * @returns {Promise<void>}
+   * @throws {Error} Lança um erro se a exclusão falhar.
+   */
+  const deleteUserAccount = async (): Promise<void> => {
+    if (!userId) {
+      throw new Error("Usuário não está logado.");
+    }
+    try {
+
+      await api.delete(`/auth/delete`);
+      
+      // Se a exclusão no back-end for bem-sucedida,
+      // chame a função de logout para limpar o front-end.
+      await logout(); // Chame o logout para limpar a sessão
+    } catch (error: any) {
+      console.error("Erro ao excluir conta:", error);
+      // Re-lança o erro para que o componente de UI possa tratá-lo (ex: mostrar um toast)
+      throw new Error(error.response?.data?.message || "Não foi possível excluir a conta. Tente novamente.");
+    }
+  };
+
   const value = {
     isLoggedIn,
     userId,
@@ -140,6 +165,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     register,
     updateUser,
     updateNeeds,
+    deleteUserAccount
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

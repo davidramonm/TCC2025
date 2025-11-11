@@ -28,6 +28,9 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/example
       SPRING_DATASOURCE_USERNAME: example
       SPRING_DATASOURCE_PASSWORD: example
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - ../Back-end/EstablishmentsService/uploads:/app/uploads
     depends_on:
       - db
 
@@ -38,6 +41,16 @@ services:
     ports:
       - "3000:3000"
     depends_on:
+      - backend
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - frontend
       - backend
 
 networks:

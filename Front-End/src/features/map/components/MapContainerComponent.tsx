@@ -100,8 +100,8 @@ export default function MapContainerComponent({
 }: MapContainerComponentProps) {
   return (
     <MapContainer
-      center={[-23.55052, -46.633308]}
-      zoom={13}
+      center={[-23.529327428797327, -47.47122840255941]}
+      zoom={14}
       style={{ height: "100%", width: "100%" }}
     >
       <TileLayer

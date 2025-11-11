@@ -22,17 +22,20 @@ public class EstablishmentMapper {
 
     public AllEstablishmentResponseDTO toEstablishmentCoordsResponseDTO(Establishment establishment) {
 
-        List<String> topNecessityNames = establishment.getReviewList().stream()
-                .filter(review -> review.getNecessities() != null)
-                .flatMap(review -> review.getNecessities().stream())
-                .collect(Collectors.groupingBy(
-                        Necessity::getName,
-                        Collectors.counting()
-                ))
-                .entrySet().stream()
-                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-                .map(Map.Entry::getKey)
-                .toList();
+        List<String> topNecessityNames = new ArrayList<>();
+        if (establishment.getReviewList() != null) {
+            topNecessityNames = establishment.getReviewList().stream()
+                    .filter(review -> review.getNecessities() != null)
+                    .flatMap(review -> review.getNecessities().stream())
+                    .collect(Collectors.groupingBy(
+                            Necessity::getName,
+                            Collectors.counting()
+                    ))
+                    .entrySet().stream()
+                    .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                    .map(Map.Entry::getKey)
+                    .toList();
+        }
 
         return new AllEstablishmentResponseDTO(
                 establishment.getEstablishmentId(), establishment.getName(), establishment.getAddress(), establishment.getXCoords(), establishment.getYCoords(), topNecessityNames

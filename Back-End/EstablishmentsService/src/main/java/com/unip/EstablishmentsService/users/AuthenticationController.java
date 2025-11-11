@@ -10,6 +10,9 @@ import com.unip.EstablishmentsService.necessities.Necessity;
 import com.unip.EstablishmentsService.necessities.NecessityService;
 import com.unip.EstablishmentsService.users.exceptions.UserNotFoundException;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("auth")
 @SecurityRequirement(name = "bearerToken")
+@Tag(name = "Autenticação", description = "Endpoints de login, registro, atualização e logout de usuários")
 public class AuthenticationController {
 
     private final UserService service;
@@ -40,6 +44,8 @@ public class AuthenticationController {
 
 
     @PostMapping("/login")
+    @Operation(summary = "Login do usuário", description = "Autentica o usuário e retorna access token; também define cookie de refresh token.")
+    @ApiResponse(responseCode = "200", description = "Autenticação bem-sucedida")
     public ResponseEntity<LoginResponseDTO> login(
             @RequestBody @Valid LoginRequestDTO request,
             HttpServletResponse response
@@ -54,7 +60,7 @@ public class AuthenticationController {
 
             ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                     .httpOnly(true)
-                    .secure(true)
+                    .secure(false)
                     .sameSite("Strict")
                     .path("/")
                     .maxAge(7 * 24 * 60 * 60)
@@ -70,6 +76,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Registro de usuário", description = "Cria um novo usuário e retorna tokens de sessão.")
+    @ApiResponse(responseCode = "200", description = "Registro bem-sucedido")
     public ResponseEntity<LoginResponseDTO> register(
             @RequestBody @Valid RegisterRequestDTO request,
             HttpServletResponse response
@@ -93,6 +101,7 @@ public class AuthenticationController {
                 .necessities(necessities)
                 .password(new BCryptPasswordEncoder().encode(request.password()))
                 .role(Role.ROLE_USER)
+                .enabled(true)
                 .build();
 
         repository.save(user);
@@ -102,7 +111,7 @@ public class AuthenticationController {
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
-                .secure(true)  //TODO: alterar para seguro com certificado SSL
+                .secure(false)  //TODO: alterar para seguro com certificado SSL
                 .sameSite("Strict")
                 .path("/")
                 .maxAge(7 * 24 * 60 * 60)
@@ -114,6 +123,8 @@ public class AuthenticationController {
     }
 
     @PutMapping("/update")
+    @Operation(summary = "Atualiza perfil do usuário", description = "Atualiza dados do usuário autenticado usando o refresh token em cookie.")
+    @ApiResponse(responseCode = "200", description = "Atualização bem-sucedida")
     public ResponseEntity<LoginResponseDTO> update(
             @RequestBody UserRequestDTO request,
             @CookieValue(value = "refreshToken", required = false) String refreshToken
@@ -123,7 +134,7 @@ public class AuthenticationController {
         }
 
         String username = jwtService.extractUsername(refreshToken);
-        User user = ((User) repository.findByEmail(username));
+        User user = ((User) repository.findByEmailAndEnabledIsTrue(username));
 
         if (!jwtService.isTokenValid(refreshToken, user, Token.REFRESH_TOKEN)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -150,6 +161,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/refresh")
+    @Operation(summary = "Renova access token", description = "Gera um novo access token a partir do refresh token armazenado no cookie.")
+    @ApiResponse(responseCode = "200", description = "Access token renovado")
     public ResponseEntity<?> refreshToken(
             @CookieValue(value = "refreshToken", required = false) String refreshToken
     ) {
@@ -158,7 +171,7 @@ public class AuthenticationController {
         }
 
         String username = jwtService.extractUsername(refreshToken);
-        User user = ((User) repository.findByEmail(username));
+        User user = ((User) repository.findByEmailAndEnabledIsTrue(username));
 
         if (!jwtService.isTokenValid(refreshToken, user, Token.REFRESH_TOKEN)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -170,11 +183,13 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "Logout do usuário", description = "Remove o cookie de refresh token e encerra a sessão localmente.")
+    @ApiResponse(responseCode = "204", description = "Logout realizado")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         
         ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .sameSite("Strict")
                 .path("/")
                 .maxAge(0) // expires immediately
@@ -184,6 +199,32 @@ public class AuthenticationController {
 
         return ResponseEntity.noContent().build(); // 204 No Content
 }
+
+    @DeleteMapping("/delete")
+    @Operation(summary = "Desabilita conta", description = "Desabilita (soft-delete) a conta do usuário autenticado.")
+    @ApiResponse(responseCode = "204", description = "Conta desabilitada")
+    public ResponseEntity<?> delete(
+            @CookieValue(value = "refreshToken", required = false) String refreshToken
+    ) {
+        if (refreshToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String username = jwtService.extractUsername(refreshToken);
+        User user = ((User) repository.findByEmailAndEnabledIsTrue(username));
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found or already disabled");
+        }
+
+        if (!jwtService.isTokenValid(refreshToken, user, Token.REFRESH_TOKEN)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        user.setEnabled(false);
+        repository.save(user);
+
+        return ResponseEntity.noContent().build();
+    }
 
 
 }

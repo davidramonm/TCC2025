@@ -8,13 +8,16 @@ import { tokenService } from './tokenService';
  * interagir com a API backend.
  * Inclui baseURL, withCredentials e interceptors para gerenciamento de token.
  */
+
+const resolvedBaseUrl = (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_API_BASE_URL)
+  ? process.env.NEXT_PUBLIC_API_BASE_URL
+  : '/api';
+
 const apiClient = axios.create({
-  baseURL: "http://localhost:8080", 
+  baseURL: resolvedBaseUrl,
   withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
+
 
 /**
  * @description Interceptor de requisição do Axios.
@@ -41,8 +44,10 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
+        // Call the refresh endpoint via the same-origin proxy (/api/auth/refresh).
+        // Use the global axios (not apiClient) to avoid interceptors here.
         const res = await axios.post(
-          `http://localhost:8080/auth/refresh`,
+          `/api/auth/refresh`,
           {},
           { withCredentials: true }
         );
@@ -198,7 +203,7 @@ export async function getAddressFromCoordinates(lat: number, lng: number): Promi
  */
 export async function fetchAllEstablishments(): Promise<any> {
   try {
-    const response = await fetch('http://localhost:8080/establishments', {
+    const response = await fetch('/api/establishments', {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     });
@@ -220,7 +225,7 @@ export async function fetchAllEstablishments(): Promise<any> {
  */
 export async function getEstablishmentDetails(id: number): Promise<any> {
   try {
-    const response = await fetch(`http://localhost:8080/establishments/${id}`, {
+    const response = await fetch(`/api/establishments/${id}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     });

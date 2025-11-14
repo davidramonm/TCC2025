@@ -5,11 +5,10 @@
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext"; // Importação já existe
+import { useAuth } from "@/contexts/AuthContext";
 import { useLocations } from "../hooks/useLocations";
 import apiClient, { getAddressFromCoordinates, fetchLocations, getEstablishmentFromCoordinates, saveEstablishment, saveReview, getEstablishmentById } from "@/lib/api";
 import MapHeader from "@/components/layouts/MapHeader";
-// import { AddLocationForm } from "./AddLocationForm"; // Removido
 import FilterAndListComponent from "./FilterAndListComponent";
 import FloatingMenu from "./FloatingMenu";
 import LoginPage from "@/features/authentication/components/LoginPage";
@@ -62,7 +61,6 @@ export default function MapPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
 
-  // O 'useLocations' agora usa 'Location' com 'typeValues?' opcional
   const { filteredLocations } = useLocations(allLocations, activeFilters);
 
   const [clickedPosition, setClickedPosition] = useState<{ lat: number; lng: number } | null>(null);
@@ -235,14 +233,12 @@ export default function MapPage() {
           const exists = prev.some((loc) => loc.establishmentId === establishment.establishmentId);
 
           if (exists) {
-            // Update existing location
             return prev.map((loc) =>
               loc.establishmentId === establishment.establishmentId
                 ? { ...loc, ...establishment }
                 : loc
             );
           } else {
-            // Add new location
             return [...prev, establishment];
           }
         });
@@ -263,18 +259,6 @@ export default function MapPage() {
 
     console.log("Performing global search for location:", location);
     handleMapClick({ lat: location.xCoords, lng: location.yCoords });
-    //handleLocationClick(location);
-
-    // const searchResults = allLocations.filter((location) =>
-    //   location.name.toLowerCase().includes(normalizedQuery)  //||
-    //   // location.address.toLowerCase().includes(normalizedQuery) ||
-    //   // location.typeValues.some((type: string) => getLocationTypeName(type).toLowerCase().includes(normalizedQuery))
-    // );
-    // if (searchResults.length > 0) {
-    //   handleLocationClick(searchResults[0]);
-    // } else {
-    //   toast({ title: "Nenhum resultado encontrado", variant: "destructive" });
-    // }
   };
 
   const checkUserReview = (establishment: Establishment | null): boolean => {

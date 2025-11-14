@@ -2,14 +2,29 @@ create table establishments
 (
     establishment_id uuid             not null
         primary key,
-    name             varchar(255)      not null,
+    name             varchar(255)     not null,
     address          varchar(255),
     x_coords         double precision not null,
-    y_coords         double precision not null
+    y_coords         double precision not null,
+    constraint uq_address_name
+        unique (name, address)
 );
 
 alter table establishments
     owner to example;
+
+INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('552b1b7d-ba31-4627-b11b-e3365dab393a', 'Carrefour', 'Avenida Professora Izoraida Marques Peres - Parque Bosque de São Bento II, Sorocaba - São Paulo', -23.5340764, -47.4640554);
+INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('0b32db20-5841-4501-bb87-f31b0aabf4fc', 'eSuites Sorocaba by Atlantica', 'Avenida Professora Izoraida Marques Peres - Parque Campolim, Sorocaba - São Paulo', -23.5318219, -47.4648388);
+INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('61f87c03-ece7-4d41-a8f2-005013fcafcc', 'Cinepolis', 'Avenida José da Silva Moura - Jardim Maria Jose, Sorocaba - São Paulo', -23.5355122, -47.4637169);
+INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('5065ab39-9916-44c5-8afe-9b1c6e55bee1', 'Banco do Brasil', 'Rua Renato Chiozoto - Parque Morumbi, Sorocaba - São Paulo', -23.53314, -47.4633366);
+INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('b8eb936d-82b0-4651-90e9-585cc292f77e', 'Lojas Cem', 'Rua Professor Horácio Mesquita de Camargo - Parque Campolim, Sorocaba - São Paulo', -23.5315041, -47.4647912);
+INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('b868650d-4fa9-407e-a2bd-5df203a5421e', 'Banco do Brasil', 'Avenida Independência - Éden, Sorocaba - São Paulo', -23.4238932, -47.4135268);
+INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('16eb3895-21a6-436e-bd97-4127926da21a', 'Renner 2.0', 'Rua Renato Chiozoto - Parque Morumbi, Sorocaba - São Paulo', -23.5329196, -47.4618238);
+INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('6c7da31b-6ca6-4029-bd38-c556a45c53bf', 'Jorge', 'Rua Renato Chiozoto - Parque Morumbi, Votorantim - São Paulo', -23.5332869, -47.4618947);
+INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('6c1e1d3f-64ea-463f-b37a-66e3604aa102', 'Droga Raia', 'Rua Quinze de Novembro - Centro, Sorocaba - São Paulo', -23.5001395, -47.4559904);
+INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('870ad75b-ee01-49d0-afbc-75ab182a032f', 'Droga Raia', 'Rua Capitão Pedro Tavares - Vila Sene, Sorocaba - São Paulo', -23.5177292, -47.4903818);
+INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('6b072680-67e8-4702-8a15-6e4319995bbd', 'Leonardo da Vincí', 'Rua João Dias de Souza - Parque Campolim, Sorocaba - São Paulo', -23.5322449, -47.4657451);
+
 
 create table necessities
 (
@@ -23,21 +38,45 @@ create table necessities
 alter table necessities
     owner to example;
 
+INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('729c429b-41ed-46eb-8eb5-46be1e442700', 'Rampa de acesso', 'Inclui rampas adequadas para acesso de cadeirantes e pessoas com mobilidade reduzida.', null);
+INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('c295ba47-f1fb-4116-8d11-9d342c30843b', 'Acesso para Cadeira de Rodas', 'Ambiente com entrada e circulação adaptadas para cadeiras de rodas.', null);
+INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('8783ab67-d11b-46aa-a9a3-fab9d8855936', 'Banheiro adaptado', 'Banheiro com espaço, barras de apoio e altura adequada para acessibilidade.', null);
+INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('f67997ad-c0b6-4f5e-9e65-2d162751e0b0', 'Elevador acessível', 'Elevador com espaço suficiente, botões em braille e sinalização sonora.', null);
+INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('7902aa2b-7203-4f19-b4a2-19d70c383918', 'Escada rolante', 'Escadas rolantes disponíveis para facilitar o deslocamento entre andares.', null);
+INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('eaa13db2-95e1-47a0-8b59-f4608d0ed142', 'Piso tátil', 'Piso tátil direcional e de alerta para pessoas com deficiência visual.', null);
+INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('d91d9e90-e01c-4866-b8c3-21c8dfad688b', 'Vagas especiais', 'Vagas de estacionamento reservadas próximas à entrada.', null);
+INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('abc38e78-130f-4647-bcf5-af4de49ab6c2', 'Espaço para circulação', 'Ambiente com espaço suficiente para circulação segura de pessoas com deficiência.', null);
+INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('f68441e2-1817-4a6f-8e91-b60b44b6e489', 'Ajudantes no local', 'Pessoas treinadas disponíveis para auxiliar no deslocamento e uso das instalações.', null);
+INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('67dfc995-5edc-4515-8106-7500b162603e', 'Informações em Braile', 'Sinalização e materiais informativos disponíveis em braille.', null);
+INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('44ed4004-4d96-4bfe-8a87-bc4e21f3a0e4', 'Permite animais de suporte', 'Local permite a entrada de cães-guia e outros animais de suporte.', null);
+
+
 create table users
 (
-    user_id  uuid         not null
+    user_id       uuid                 not null
         primary key,
-    f_name   varchar(45)  not null,
-    l_name   varchar(45)  not null,
-    email    varchar(45)  not null,
+    f_name        varchar(45)          not null,
+    l_name        varchar(45)          not null,
+    email         varchar(45)          not null,
     profile_image varchar(255),
-    password varchar(120) not null,
-    role     varchar(15)  not null
+    password      varchar(120)         not null,
+    role          varchar(15)          not null,
+    enabled       boolean default true not null
 );
 
 alter table users
     owner to example;
 
+INSERT INTO public.users (user_id, f_name, l_name, email, profile_image, password, role, enabled) VALUES ('ec85afca-fefe-4388-ae57-139b9dd5edfa', 'Ricardo', 'Sonnenberg', 'rsonnenberg@gmail.com', '/uploads/profile-pictures/ec85afca-fefe-4388-ae57-139b9dd5edfa_profile.JPG', '$2a$10$7sRd48xEK3teAGix/QKxVOX1x6533W8UlG98sBbk04ZXyVc7r4FMe', 'ROLE_USER', true);
+INSERT INTO public.users (user_id, f_name, l_name, email, profile_image, password, role, enabled) VALUES ('f99b3c57-2a42-4f42-a412-a598de32d40d', 'Marcos', 'Adriano', 'madriano@gmail.com', null, '$2a$10$qev/6Q1s4jrFwQGmIYOkMeah8P7fta7.WXSKNpn6fntt6t3Kl7myq', 'ROLE_USER', true);
+INSERT INTO public.users (user_id, f_name, l_name, email, profile_image, password, role, enabled) VALUES ('45eedf58-aacb-4df5-87ef-6d6f23ffe27e', 'henrique', 'sonnenberg', 'henrique@gmail.com', null, '$2a$10$d3eJsSIueO4RH4cBtKqFLeHcNuywGFqMIxDdcJ4eS2VvDJOU/k4he', 'ROLE_USER', true);
+INSERT INTO public.users (user_id, f_name, l_name, email, profile_image, password, role, enabled) VALUES ('405ca9f4-507a-4d52-9b70-92b7b0e249f0', 'Test', 'User', 'testuser+dev@example.com', null, '$2a$10$P7KTn/k6xscw21X0blCFEeETIX1F55CbXhiAdjQ/APvGEVhEiqbOa', 'ROLE_USER', true);
+INSERT INTO public.users (user_id, f_name, l_name, email, profile_image, password, role, enabled) VALUES ('8e24b1c8-4420-4b71-8695-da480896e64a', 'CI', 'Test', 'ci_test_pw@example.com', null, '$2a$10$cpVFk8MxdbD3aAjou.T/w.kPha3CNE9dY/1sSH3mCKYnf5Da6Ftc2', 'ROLE_USER', true);
+INSERT INTO public.users (user_id, f_name, l_name, email, profile_image, password, role, enabled) VALUES ('589a7803-dfd1-4b18-9af6-52c472758c46', 'CI2', 'Test2', 'ci_test_pw2@example.com', '/uploads/profile-pictures/589a7803-dfd1-4b18-9af6-52c472758c46_profile.jpg', '$2a$10$ePrjgp96NuQwK2a/UDH9y.cqhMhO1Fzo4qn8gt/PGdVD/GwA9upFG', 'ROLE_USER', true);
+INSERT INTO public.users (user_id, f_name, l_name, email, profile_image, password, role, enabled) VALUES ('1866a61e-0db5-4c83-8ad6-e4b56d802d96', 'Juliana', 'sonnenberg', 'ze@ze.com', '/uploads/profile-pictures/1866a61e-0db5-4c83-8ad6-e4b56d802d96_profile.jpg', '$2a$10$eATI3eUfNdS1lN6KYjMgdu.1a27zLYpe.JtRNc8CTERtiAHMiaiOK', 'ROLE_USER', true);
+INSERT INTO public.users (user_id, f_name, l_name, email, profile_image, password, role, enabled) VALUES ('b426ca3b-51d3-4696-8816-26bfbc441420', 'David', 'Machado', 'davidmachado250897@gmail.com', '/uploads/profile-pictures/b426ca3b-51d3-4696-8816-26bfbc441420_profile.jpg', '$2a$10$ET6UbbaCWT4zam2ZiIfr/ePI3oexC10iHWMJ7btlLPjrqU2zTMgai', 'ROLE_USER', true);
+INSERT INTO public.users (user_id, f_name, l_name, email, profile_image, password, role, enabled) VALUES ('9a1cb8f5-7339-4bf9-9e4c-59b65f9ee639', 'André', 'Crepaldi', 'agsmcrepaldi@gmail.com', '/uploads/profile-pictures/9a1cb8f5-7339-4bf9-9e4c-59b65f9ee639_profile.jpg', '$2a$10$ekQOcfjmZ1U3KPu3.7b8u.cy6gyHUjyVBVoJi6JcnOJqwU/iVl44C', 'ROLE_USER', true);
+INSERT INTO public.users (user_id, f_name, l_name, email, profile_image, password, role, enabled) VALUES ('9b71cdb4-503c-480e-b6f0-1e16a4063c1e', 'André', 'Crepaldi', 'contatwitterze@gmail.com', '/uploads/profile-pictures/9b71cdb4-503c-480e-b6f0-1e16a4063c1e_profile.jpg', '$2a$10$fGriHFAMes9D2kqGuUXlsetXJc9zwmMR7POQMgjVFAu7mWItNiPem', 'ROLE_USER', false);
 
 create table reviews
 (
@@ -58,6 +97,26 @@ create table reviews
 alter table reviews
     owner to example;
 
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('a504b129-da88-4182-856e-c5f8729801e6', '552b1b7d-ba31-4627-b11b-e3365dab393a', 'ec85afca-fefe-4388-ae57-139b9dd5edfa', 'legal e bonito', 4);
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('57513d9b-0056-47c0-8f01-ec802077ce0c', '0b32db20-5841-4501-bb87-f31b0aabf4fc', '9a1cb8f5-7339-4bf9-9e4c-59b65f9ee639', '', 1);
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('bf7154f5-c45f-4ae1-b47f-a51d65709575', '0b32db20-5841-4501-bb87-f31b0aabf4fc', 'ec85afca-fefe-4388-ae57-139b9dd5edfa', 'bom', 4);
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('cacaec8b-8b2e-43a4-a965-df84cf94fb25', '61f87c03-ece7-4d41-a8f2-005013fcafcc', '45eedf58-aacb-4df5-87ef-6d6f23ffe27e', 'Pouca iluminação e sem corrimão', 1);
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('79eeafd4-4664-41e0-942d-a785ae607954', '5065ab39-9916-44c5-8afe-9b1c6e55bee1', '45eedf58-aacb-4df5-87ef-6d6f23ffe27e', 'Ótimo atendimento', 5);
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('4b8664d0-ebfd-4959-b684-45519dbab41e', 'b8eb936d-82b0-4651-90e9-585cc292f77e', '45eedf58-aacb-4df5-87ef-6d6f23ffe27e', 'Péssima experiencia, nunca irei voltar', 1);
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('2d1142cd-2890-4db2-9546-fc9ef46a756d', '5065ab39-9916-44c5-8afe-9b1c6e55bee1', 'b426ca3b-51d3-4696-8816-26bfbc441420', 'achei mid', 4);
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('4612fa88-5822-4662-97c7-945fd77e873a', 'b868650d-4fa9-407e-a2bd-5df203a5421e', 'ec85afca-fefe-4388-ae57-139b9dd5edfa', 'mto bom', 4);
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('95761e88-3e4d-47dd-a324-337ade299966', '5065ab39-9916-44c5-8afe-9b1c6e55bee1', 'ec85afca-fefe-4388-ae57-139b9dd5edfa', 'Achei uma bosta', 1);
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('99c2a658-f179-4139-a028-9e8f35345ddb', '16eb3895-21a6-436e-bd97-4127926da21a', 'ec85afca-fefe-4388-ae57-139b9dd5edfa', 'aaaa', 5);
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('4d8377a9-ae86-4199-9d2e-f50647002e0e', '6c7da31b-6ca6-4029-bd38-c556a45c53bf', 'ec85afca-fefe-4388-ae57-139b9dd5edfa', 'a', 1);
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('90a2de60-c586-418c-8f13-23cc58a7a427', '6c1e1d3f-64ea-463f-b37a-66e3604aa102', 'ec85afca-fefe-4388-ae57-139b9dd5edfa', 'a', 4);
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('658f2002-619f-4f5a-be4d-dabcf1b2b038', '61f87c03-ece7-4d41-a8f2-005013fcafcc', '9a1cb8f5-7339-4bf9-9e4c-59b65f9ee639', 'qwq', 3);
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('1622c3df-3433-4c1a-be0d-1066fd1d1f89', 'b8eb936d-82b0-4651-90e9-585cc292f77e', '9b71cdb4-503c-480e-b6f0-1e16a4063c1e', 'Achei que o local foi bom, mas poderia melhorar', 3);
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('a36aa415-2982-4eb1-bad4-c7a981dcffaf', '870ad75b-ee01-49d0-afbc-75ab182a032f', '9b71cdb4-503c-480e-b6f0-1e16a4063c1e', '', 4);
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('52792ea7-9d6c-4dff-9338-437e21f6399a', 'b8eb936d-82b0-4651-90e9-585cc292f77e', 'f99b3c57-2a42-4f42-a412-a598de32d40d', 'Teste 2', 5);
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('2ef1ea93-b52e-46bc-9099-bae05ae4028c', 'b8eb936d-82b0-4651-90e9-585cc292f77e', 'ec85afca-fefe-4388-ae57-139b9dd5edfa', 'Funcionando', 5);
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('6694cd30-34e4-4bd4-86cb-0d013e2d3847', '6b072680-67e8-4702-8a15-6e4319995bbd', '9a1cb8f5-7339-4bf9-9e4c-59b65f9ee639', '', 2);
+INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('8e4ef57c-11fe-4928-856e-8bd06dedeba6', '6b072680-67e8-4702-8a15-6e4319995bbd', 'ec85afca-fefe-4388-ae57-139b9dd5edfa', 'Estou aqui', 4);
+
 create table users_necessities
 (
     necessity_id uuid not null
@@ -71,6 +130,24 @@ create table users_necessities
 
 alter table users_necessities
     owner to example;
+
+INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('67dfc995-5edc-4515-8106-7500b162603e', 'b426ca3b-51d3-4696-8816-26bfbc441420');
+INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('44ed4004-4d96-4bfe-8a87-bc4e21f3a0e4', 'b426ca3b-51d3-4696-8816-26bfbc441420');
+INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('c295ba47-f1fb-4116-8d11-9d342c30843b', '1866a61e-0db5-4c83-8ad6-e4b56d802d96');
+INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('f67997ad-c0b6-4f5e-9e65-2d162751e0b0', '1866a61e-0db5-4c83-8ad6-e4b56d802d96');
+INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('eaa13db2-95e1-47a0-8b59-f4608d0ed142', '1866a61e-0db5-4c83-8ad6-e4b56d802d96');
+INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('d91d9e90-e01c-4866-b8c3-21c8dfad688b', '1866a61e-0db5-4c83-8ad6-e4b56d802d96');
+INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('8783ab67-d11b-46aa-a9a3-fab9d8855936', 'f99b3c57-2a42-4f42-a412-a598de32d40d');
+INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('abc38e78-130f-4647-bcf5-af4de49ab6c2', 'f99b3c57-2a42-4f42-a412-a598de32d40d');
+INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('67dfc995-5edc-4515-8106-7500b162603e', 'f99b3c57-2a42-4f42-a412-a598de32d40d');
+INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('44ed4004-4d96-4bfe-8a87-bc4e21f3a0e4', '9b71cdb4-503c-480e-b6f0-1e16a4063c1e');
+INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('7902aa2b-7203-4f19-b4a2-19d70c383918', '9b71cdb4-503c-480e-b6f0-1e16a4063c1e');
+INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('abc38e78-130f-4647-bcf5-af4de49ab6c2', '9b71cdb4-503c-480e-b6f0-1e16a4063c1e');
+INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('eaa13db2-95e1-47a0-8b59-f4608d0ed142', 'ec85afca-fefe-4388-ae57-139b9dd5edfa');
+INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('abc38e78-130f-4647-bcf5-af4de49ab6c2', 'ec85afca-fefe-4388-ae57-139b9dd5edfa');
+INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('67dfc995-5edc-4515-8106-7500b162603e', 'ec85afca-fefe-4388-ae57-139b9dd5edfa');
+INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('44ed4004-4d96-4bfe-8a87-bc4e21f3a0e4', 'ec85afca-fefe-4388-ae57-139b9dd5edfa');
+
 
 create table necessities_reviews
 (
@@ -86,148 +163,41 @@ create table necessities_reviews
 alter table necessities_reviews
     owner to example;
 
-INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('729c429b-41ed-46eb-8eb5-46be1e442700', 'Rampa de acesso', 'Inclui rampas adequadas para acesso de cadeirantes e pessoas com mobilidade reduzida.', null);
-INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('c295ba47-f1fb-4116-8d11-9d342c30843b', 'Acesso para Cadeira de Rodas', 'Ambiente com entrada e circulação adaptadas para cadeiras de rodas.', null);
-INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('8783ab67-d11b-46aa-a9a3-fab9d8855936', 'Banheiro adaptado', 'Banheiro com espaço, barras de apoio e altura adequada para acessibilidade.', null);
-INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('f67997ad-c0b6-4f5e-9e65-2d162751e0b0', 'Elevador acessível', 'Elevador com espaço suficiente, botões em braille e sinalização sonora.', null);
-INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('7902aa2b-7203-4f19-b4a2-19d70c383918', 'Escada rolante', 'Escadas rolantes disponíveis para facilitar o deslocamento entre andares.', null);
-INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('eaa13db2-95e1-47a0-8b59-f4608d0ed142', 'Piso tátil', 'Piso tátil direcional e de alerta para pessoas com deficiência visual.', null);
-INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('d91d9e90-e01c-4866-b8c3-21c8dfad688b', 'Vagas especiais', 'Vagas de estacionamento reservadas próximas à entrada.', null);
-INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('abc38e78-130f-4647-bcf5-af4de49ab6c2', 'Espaço para circulação', 'Ambiente com espaço suficiente para circulação segura de pessoas com deficiência.', null);
-INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('f68441e2-1817-4a6f-8e91-b60b44b6e489', 'Ajudantes no local', 'Pessoas treinadas disponíveis para auxiliar no deslocamento e uso das instalações.', null);
-INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('67dfc995-5edc-4515-8106-7500b162603e', 'Informações em Braile', 'Sinalização e materiais informativos disponíveis em braille.', null);
-INSERT INTO public.necessities (necessity_id, name, description, n_group) VALUES ('44ed4004-4d96-4bfe-8a87-bc4e21f3a0e4', 'Permite animais de suporte', 'Local permite a entrada de cães-guia e outros animais de suporte.', null);
-
-
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('f36c5bb2-94d5-4b5c-b567-0c19ef421f50', 'Padaria Pão Quente', 'Rua das Flores, 123 - São Paulo, SP', -23.5505, -46.6333);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('9f98e3a1-31c0-49bc-94a5-833ebef9ac97', 'Café do Centro', 'Avenida Brasil, 456 - Rio de Janeiro, RJ', -22.9068, -43.1729);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('4c6cbf41-f105-4722-8514-bb7c2c68f7f4', 'Restaurante Sabor & Arte', 'Rua Amazonas, 789 - Belo Horizonte, MG', -19.9167, -43.9345);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('3722296f-b5ad-4d77-b14d-8fcfbd45aa0e', 'Lanchonete Bom Gosto', 'Rua da Paz, 321 - Curitiba, PR', -25.4284, -49.2733);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('d109b4cd-5e8f-4e9b-a6b5-4bb4f1a0a5e2', 'Cantinho Mineiro', 'Rua Tiradentes, 654 - Uberlândia, MG', -18.9146, -48.2755);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('60f41d4c-5f6c-47b5-b5c2-64deaf1b2a52', 'Sabor da Serra', 'Av. das Montanhas, 987 - Petrópolis, RJ', -22.5194, -43.1779);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('3d35ea17-b1c8-4724-8a71-8e96e3bcac6c', 'Doceria Delícia', 'Rua das Rosas, 231 - Campinas, SP', -22.9099, -47.0626);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('92d637c2-c142-48ab-a0a1-203d188b7985', 'Churrascaria Gaúcha', 'Av. Bento Gonçalves, 1100 - Porto Alegre, RS', -30.0346, -51.2177);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('23f0fd59-0d26-4aa1-bddb-d6e99fd3df83', 'Empório Natural', 'Rua Verdejante, 443 - Florianópolis, SC', -27.5954, -48.548);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('ae9a3f87-8de2-43d4-bc57-bdf32a88ddeb', 'Casa do Norte', 'Av. Sertão, 432 - Salvador, BA', -12.9714, -38.5014);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('7a7e8df1-82c4-4b69-a4cf-4fd6dbbbfd4d', 'Bistrô do Chef', 'Rua Gourmet, 212 - Recife, PE', -8.0476, -34.877);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('4e1dcd23-65cf-4397-a625-034aa9ea118b', 'Panificadora São João', 'Rua Rio Branco, 112 - Fortaleza, CE', -3.7172, -38.5433);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('59a8f1bd-3e1a-4bd6-8c7f-3ea2dfb08691', 'Esquina do Café', 'Rua das Palmeiras, 556 - Natal, RN', -5.7945, -35.211);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('da3c0c0c-93bb-4862-acc2-f03c6bc32777', 'Açaí Tropical', 'Av. Beira Mar, 789 - Maceió, AL', -9.6659, -35.735);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('cd8a24d1-99dc-4603-8bde-dc10c20581e6', 'Café & Prosa', 'Rua Principal, 98 - João Pessoa, PB', -7.1153, -34.861);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('f2dc6c67-65cb-44e3-b15d-d7275df4703e', 'Pastelaria da Praça', 'Praça Central, 33 - Aracaju, SE', -10.9472, -37.0731);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('3d9d5d5e-297a-4879-a9ef-2ccceec3b77c', 'Bolos da Vovó', 'Rua Alegre, 14 - Teresina, PI', -5.0892, -42.8016);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('e2e7085d-2387-470c-9774-66c39099b029', 'Padoca do Bairro', 'Rua São José, 222 - São Luís, MA', -2.5387, -44.2825);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('b7f1715e-7e52-4a17-8f35-56918495e878', 'Tapiocaria da Esquina', 'Av. Tropical, 787 - Manaus, AM', -3.119, -60.0217);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('b168fc60-4a9d-4697-936c-f4e0fcdd2c95', 'Recanto do Pão', 'Rua do Sol, 303 - Belém, PA', -1.4558, -48.4902);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('0c3175e4-80ec-4f2a-9c04-2e1528e4780d', 'Padaria Imperial', 'Rua das Acácias, 101 - Goiânia, GO', -16.6864, -49.2643);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('d9830661-e05d-4b91-b179-b02d8207b7a1', 'Boteco do Zé', 'Rua do Samba, 404 - Brasília, DF', -15.7939, -47.8828);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('4a57e03e-149b-4b50-95a4-d21442128c88', 'Chá da Tarde', 'Rua das Hortênsias, 80 - Blumenau, SC', -26.9152, -49.0718);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('a9ebc789-149f-4395-b5e0-1c3fd0b2b383', 'Mercado Central', 'Av. dos Comerciantes, 290 - Campo Grande, MS', -20.4697, -54.6201);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('742360f7-5f74-4c99-9c48-c32b3e509b02', 'Bar do Léo', 'Rua dos Pescadores, 77 - Vitória, ES', -20.3155, -40.3128);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('3c2e893d-1a93-4d77-a2ee-2df6a3b1edff', 'Café Colonial', 'Rua das Chácaras, 29 - Joinville, SC', -26.3045, -48.8487);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('ea053839-88a3-44ae-9e59-9f6be6ea5e14', 'Doce Vida Confeitaria', 'Av. Central, 909 - Maringá, PR', -23.42, -51.9331);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('c8b2934f-1983-4ce3-8019-c6e735e32d3e', 'Delícias do Norte', 'Rua das Mangueiras, 302 - Boa Vista, RR', 2.8235, -60.6753);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('8d6cf9f3-88f0-4c89-8db5-99983e5a3be3', 'Cantinho do Sabor', 'Rua Cruzeiro do Sul, 607 - Macapá, AP', 0.0349, -51.0694);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('02741a64-9e2e-4d6c-8b6a-f3b1a538ec15', 'Empório Brasil', 'Rua das Laranjeiras, 44 - Palmas, TO', -10.2046, -48.3603);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('aec2fdfa-9616-4d95-b799-19f0a7f13f00', 'Café da Praça', 'Rua do Comércio, 808 - Ribeirão Preto, SP', -21.1775, -47.8103);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('2db30b78-9462-4ef7-97de-4e5fdf862bd5', 'Pão & Companhia', 'Rua Dom Pedro II, 455 - Londrina, PR', -23.3045, -51.1696);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('2e0a9e7c-ffcb-44fd-9be1-1c98f6e0e00f', 'Bistrô Encantado', 'Rua das Gaivotas, 58 - Balneário Camboriú, SC', -26.9926, -48.6352);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('3c70a1a9-35de-437f-a3a3-9728605c4e36', 'Armazém do Café', 'Av. dos Pioneiros, 120 - Cascavel, PR', -24.9578, -53.459);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('c5c89623-552f-46aa-98cb-5d77b888dc74', 'Sabores do Sul', 'Rua da Colina, 39 - Caxias do Sul, RS', -29.1678, -51.1794);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('c7592cc3-2ac6-4b4d-83c3-bf54ad63b60d', 'Pastel & Cia', 'Rua dos Jasmins, 87 - Piracicaba, SP', -22.7303, -47.6484);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('7a1c187b-1f18-4e15-b6f6-4bff58a2d876', 'Padaria do Povo', 'Rua Independência, 19 - São Carlos, SP', -22.0174, -47.8909);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('02bafc47-6ed8-4c70-b73f-3bb6eecb5be2', 'Sabores da Roça', 'Rua do Campo, 402 - Franca, SP', -20.5382, -47.4009);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('91efb6c3-86b4-4f0f-a7f2-df23cbf6f62a', 'Empório das Delícias', 'Av. do Café, 77 - Presidente Prudente, SP', -22.1208, -51.3925);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('fe5fc81f-15e5-403b-8770-2c0e3b93473d', 'Cantinho do Pão', 'Rua da Aurora, 12 - Bauru, SP', -22.3145, -49.0606);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('8c1d6844-4a47-43bc-8434-f89f6b861b4b', 'Café Bela Vista', 'Rua Bela Vista, 66 - Taubaté, SP', -23.0301, -45.555);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('5aebef9c-c7d0-4a98-bf39-6dbf02d8e999', 'Doce Encontro', 'Av. Primavera, 34 - Jundiaí, SP', -23.1857, -46.8978);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('e13ff681-5ac9-47e5-b272-b10870c0c147', 'Aromas da Serra', 'Rua da Serra, 11 - Serra Negra, SP', -22.6111, -46.7013);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('92f18391-9d3b-4e1c-a002-88554c6f56d0', 'Tenda do Açaí', 'Rua Tropical, 70 - Itabuna, BA', -14.7876, -39.2781);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('07b62e34-b7d4-4ed5-a4b7-858f093f46f6', 'Café de Minas', 'Rua Ouro Preto, 42 - Divinópolis, MG', -20.1446, -44.8912);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('f08d88d8-dfb3-4e2d-8b4a-d9e33c41a926', 'Barra do Café', 'Av. Oceânica, 300 - Salvador, BA', -13.0046, -38.5176);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('b1f3d8b1-45c0-4ae7-b43f-f3cf1e1f1d1e', 'Recanto do Aconchego', 'Rua das Oliveiras, 210 - Vitória da Conquista, BA', -14.8615, -40.8444);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('c176302e-bf2f-46de-ae0e-c2cb540d92e4', 'Pão Nosso', 'Rua Monte Alegre, 404 - Barbacena, MG', -21.2217, -43.7706);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('eeec4ae3-babe-44e2-b102-d670a6b1aee3', 'Café Brasilis', 'Av. Independência, 808 - São José do Rio Preto, SP', -20.811, -49.3758);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('45c52760-6ab1-4d71-80b7-5c73e655ba60', 'Bistrô do Cerrado', 'Rua das Veredas, 505 - Uberaba, MG', -19.7472, -47.9318);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('2793e5bb-0e6e-4b15-aef5-6312e8e09874', 'Padaria Flor de Lis', 'Rua da Paz, 88 - Itajubá, MG', -22.4229, -45.4601);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('0ca6e322-da17-4d15-b6b8-6b3b40b11ff4', 'Doce Encontro', null, 0, 0);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('d5ad5554-5bb9-4bae-b977-5c959afa7349', 'Doce Encontro', null, 0, 0);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('82af10ed-8292-471f-a98b-7d776667403f', 'IBM', 'Rua Tutóia - Moema,  - São Paulo', -23.58001590172288, -46.64925277233124);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('b88d87ae-6cb4-4d44-8bf8-10befb6d7047', 'IBM', 'Rua Tutóia - Moema,  - São Paulo', -23.57989790563335, -46.64925277233124);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('f3e3e995-d8de-4afc-9b44-3ee3761b4a3f', 'IBM', 'Rua Tutóia - Moema,  - São Paulo', -23.579809408496594, -46.64923131465912);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('03b193f4-8048-4cb7-96ce-347001fec96d', 'Teste', 'Avenida Vinte e Três de Maio - Paraíso, Vila Mariana - São Paulo', -23.57913092846609, -46.64814233779908);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('c9b7785c-e284-4f2e-879c-41849608c17f', 'Centro de Convenções', 'Alameda de Conexão - Carandiru, Santana - São Paulo', -23.51594810379064, -46.64022445678712);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('5aced408-fb0c-4d08-9700-2796c2e9f364', 'Centro de Convenções', 'Alameda de Conexão - Carandiru, Santana - São Paulo', -23.5159087526007, -46.640267372131355);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('9778a1f9-1541-4b3d-b6e7-bc898e53eb11', 'Drogasil', 'Alameda dos Arapanés - Indianópolis,  - São Paulo', -23.607346317784724, -46.667465453829216);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('9287db17-9df5-4c96-a30e-2c862032ff73', 'Hospital Oswaldo Cruz', 'Rua Vergueiro - Liberdade, Liberdade - São Paulo', -23.56233497190423, -46.63795530796052);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('4c1fd288-519e-430e-974f-2216316abf0b', 'Hospital Pérola Byington', 'Avenida Brigadeiro Luís Antônio - Bixiga,  - São Paulo', -23.556198208550157, -46.63932859897614);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('49e9cdc4-eaff-42df-9ef2-ed8628c76539', 'Centro de Exposições Distrito Anhembi', 'Rua Professor Milton Rodrigues - Carandiru, Santana - São Paulo', -23.5164990192149, -46.63589000701905);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('40aa6dc3-9db3-4cd9-b402-cef804e4df35', 'Banco Santander', 'Rua Quinze de Novembro - Centro, Sorocaba - São Paulo', -23.50081178486366, -47.45488107204438);
-INSERT INTO public.establishments (establishment_id, name, address, x_coords, y_coords) VALUES ('5cac29ad-56b1-4b53-a04a-f232311d9f0d', 'Lojas Americanas', 'Rua Coronel Benedito Pires - Centro, Sorocaba - São Paulo', -23.499980392944796, -47.45880782604218);
-
-INSERT INTO public.users (user_id, f_name, l_name, email, password, role) VALUES ('ec85afca-fefe-4388-ae57-139b9dd5edfa', 'Ricardo', 'Sonnenberg', 'rsonnenberg@gmail.com', '$2a$10$7sRd48xEK3teAGix/QKxVOX1x6533W8UlG98sBbk04ZXyVc7r4FMe', 'ROLE_USER');
-INSERT INTO public.users (user_id, f_name, l_name, email, password, role) VALUES ('1866a61e-0db5-4c83-8ad6-e4b56d802d96', 'Juliana', 'sonnenberg', 'ze@ze.com', '$2a$10$eATI3eUfNdS1lN6KYjMgdu.1a27zLYpe.JtRNc8CTERtiAHMiaiOK', 'ROLE_USER');
-INSERT INTO public.users (user_id, f_name, l_name, email, password, role) VALUES ('983e7a5b-30d4-48ca-b5a2-026ddc4a1d4b', 'David', 'Ramon', 'davidramon@gmail.com', '$2a$10$cdgo3qO8.Va10NO9Vg9tVuysVtR7ejCuoMyOre7AGskNRGD6Slklq', 'ROLE_USER');
-
-INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('e4f4eba1-d85c-4384-985e-eaf0c83d8353', 'f36c5bb2-94d5-4b5c-b567-0c19ef421f50', '1866a61e-0db5-4c83-8ad6-e4b56d802d96', 'seila 3', 3);
-INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('1e04b454-6b57-4109-8a89-78341275a9f6', '5aebef9c-c7d0-4a98-bf39-6dbf02d8e999', '1866a61e-0db5-4c83-8ad6-e4b56d802d96', 'perfeito', 5);
-INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('b2ad8fb7-5253-4532-a29c-f1269a557d59', 'f36c5bb2-94d5-4b5c-b567-0c19ef421f50', 'ec85afca-fefe-4388-ae57-139b9dd5edfa', 'esse lugar e mto bom', 4);
-INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('d500c9d3-f514-413d-a3c2-4723da2e5eee', 'f36c5bb2-94d5-4b5c-b567-0c19ef421f50', '983e7a5b-30d4-48ca-b5a2-026ddc4a1d4b', 'a', 5);
-INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('0eef66c0-1209-4b14-b60b-f09ce9e06d57', '5aebef9c-c7d0-4a98-bf39-6dbf02d8e999', '983e7a5b-30d4-48ca-b5a2-026ddc4a1d4b', 'Gostei da experiencia', 5);
-INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('c1dd0c23-c867-4e83-8daa-bc35a53e8307', '4c1fd288-519e-430e-974f-2216316abf0b', '983e7a5b-30d4-48ca-b5a2-026ddc4a1d4b', 'aa', 4);
-INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('9c8652a4-9c66-4177-995d-5ae210ffcbe5', '9287db17-9df5-4c96-a30e-2c862032ff73', '983e7a5b-30d4-48ca-b5a2-026ddc4a1d4b', 'aaaa', 4);
-INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('092bad64-7508-4f3f-b0e5-1d6e8eec460e', '9778a1f9-1541-4b3d-b6e7-bc898e53eb11', 'ec85afca-fefe-4388-ae57-139b9dd5edfa', 'Gostei', 4);
-INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('c6bc665a-5a22-4ecc-9613-a5cc230cffd5', '5aced408-fb0c-4d08-9700-2796c2e9f364', 'ec85afca-fefe-4388-ae57-139b9dd5edfa', 'Melhorou um pouco', 3);
-INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('914bd15d-c9a5-4e54-999d-3c1e197aed74', '5aced408-fb0c-4d08-9700-2796c2e9f364', '1866a61e-0db5-4c83-8ad6-e4b56d802d96', 'Gostei de mais so', 4);
-INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('132ed945-d417-4075-99c2-ad820256c91b', '5cac29ad-56b1-4b53-a04a-f232311d9f0d', '983e7a5b-30d4-48ca-b5a2-026ddc4a1d4b', 'Muito boa a experiência, gostei!!!!', 4);
-INSERT INTO public.reviews (review_id, establishment_id, user_id, comment, rating) VALUES ('94c56746-cb94-4fdd-9680-2242027f3e0c', '5cac29ad-56b1-4b53-a04a-f232311d9f0d', 'ec85afca-fefe-4388-ae57-139b9dd5edfa', 'Nao gostei muito', 5);
-
-INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('7902aa2b-7203-4f19-b4a2-19d70c383918', 'ec85afca-fefe-4388-ae57-139b9dd5edfa');
-INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('729c429b-41ed-46eb-8eb5-46be1e442700', 'ec85afca-fefe-4388-ae57-139b9dd5edfa');
-INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('eaa13db2-95e1-47a0-8b59-f4608d0ed142', 'ec85afca-fefe-4388-ae57-139b9dd5edfa');
-INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('abc38e78-130f-4647-bcf5-af4de49ab6c2', 'ec85afca-fefe-4388-ae57-139b9dd5edfa');
-INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('c295ba47-f1fb-4116-8d11-9d342c30843b', '1866a61e-0db5-4c83-8ad6-e4b56d802d96');
-INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('d91d9e90-e01c-4866-b8c3-21c8dfad688b', '1866a61e-0db5-4c83-8ad6-e4b56d802d96');
-INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('f67997ad-c0b6-4f5e-9e65-2d162751e0b0', '1866a61e-0db5-4c83-8ad6-e4b56d802d96');
-INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('eaa13db2-95e1-47a0-8b59-f4608d0ed142', '1866a61e-0db5-4c83-8ad6-e4b56d802d96');
-INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('7902aa2b-7203-4f19-b4a2-19d70c383918', '983e7a5b-30d4-48ca-b5a2-026ddc4a1d4b');
-INSERT INTO public.users_necessities (necessity_id, user_id) VALUES ('f68441e2-1817-4a6f-8e91-b60b44b6e489', '983e7a5b-30d4-48ca-b5a2-026ddc4a1d4b');
-
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('e4f4eba1-d85c-4384-985e-eaf0c83d8353', 'f67997ad-c0b6-4f5e-9e65-2d162751e0b0');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('e4f4eba1-d85c-4384-985e-eaf0c83d8353', '7902aa2b-7203-4f19-b4a2-19d70c383918');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('1e04b454-6b57-4109-8a89-78341275a9f6', '44ed4004-4d96-4bfe-8a87-bc4e21f3a0e4');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('1e04b454-6b57-4109-8a89-78341275a9f6', '67dfc995-5edc-4515-8106-7500b162603e');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('1e04b454-6b57-4109-8a89-78341275a9f6', '7902aa2b-7203-4f19-b4a2-19d70c383918');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('1e04b454-6b57-4109-8a89-78341275a9f6', '729c429b-41ed-46eb-8eb5-46be1e442700');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('1e04b454-6b57-4109-8a89-78341275a9f6', '8783ab67-d11b-46aa-a9a3-fab9d8855936');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('1e04b454-6b57-4109-8a89-78341275a9f6', 'abc38e78-130f-4647-bcf5-af4de49ab6c2');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('1e04b454-6b57-4109-8a89-78341275a9f6', 'd91d9e90-e01c-4866-b8c3-21c8dfad688b');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('b2ad8fb7-5253-4532-a29c-f1269a557d59', 'd91d9e90-e01c-4866-b8c3-21c8dfad688b');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('b2ad8fb7-5253-4532-a29c-f1269a557d59', 'f67997ad-c0b6-4f5e-9e65-2d162751e0b0');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('d500c9d3-f514-413d-a3c2-4723da2e5eee', 'f67997ad-c0b6-4f5e-9e65-2d162751e0b0');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('0eef66c0-1209-4b14-b60b-f09ce9e06d57', 'd91d9e90-e01c-4866-b8c3-21c8dfad688b');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('0eef66c0-1209-4b14-b60b-f09ce9e06d57', '67dfc995-5edc-4515-8106-7500b162603e');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('0eef66c0-1209-4b14-b60b-f09ce9e06d57', '8783ab67-d11b-46aa-a9a3-fab9d8855936');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('0eef66c0-1209-4b14-b60b-f09ce9e06d57', '729c429b-41ed-46eb-8eb5-46be1e442700');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('c1dd0c23-c867-4e83-8daa-bc35a53e8307', 'c295ba47-f1fb-4116-8d11-9d342c30843b');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('c1dd0c23-c867-4e83-8daa-bc35a53e8307', 'd91d9e90-e01c-4866-b8c3-21c8dfad688b');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('9c8652a4-9c66-4177-995d-5ae210ffcbe5', 'abc38e78-130f-4647-bcf5-af4de49ab6c2');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('9c8652a4-9c66-4177-995d-5ae210ffcbe5', 'c295ba47-f1fb-4116-8d11-9d342c30843b');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('092bad64-7508-4f3f-b0e5-1d6e8eec460e', 'd91d9e90-e01c-4866-b8c3-21c8dfad688b');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('092bad64-7508-4f3f-b0e5-1d6e8eec460e', 'abc38e78-130f-4647-bcf5-af4de49ab6c2');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('c6bc665a-5a22-4ecc-9613-a5cc230cffd5', 'f68441e2-1817-4a6f-8e91-b60b44b6e489');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('c6bc665a-5a22-4ecc-9613-a5cc230cffd5', 'f67997ad-c0b6-4f5e-9e65-2d162751e0b0');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('c6bc665a-5a22-4ecc-9613-a5cc230cffd5', 'eaa13db2-95e1-47a0-8b59-f4608d0ed142');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('c6bc665a-5a22-4ecc-9613-a5cc230cffd5', '8783ab67-d11b-46aa-a9a3-fab9d8855936');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('914bd15d-c9a5-4e54-999d-3c1e197aed74', 'eaa13db2-95e1-47a0-8b59-f4608d0ed142');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('132ed945-d417-4075-99c2-ad820256c91b', '44ed4004-4d96-4bfe-8a87-bc4e21f3a0e4');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('132ed945-d417-4075-99c2-ad820256c91b', 'd91d9e90-e01c-4866-b8c3-21c8dfad688b');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('132ed945-d417-4075-99c2-ad820256c91b', 'f67997ad-c0b6-4f5e-9e65-2d162751e0b0');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('94c56746-cb94-4fdd-9680-2242027f3e0c', 'f68441e2-1817-4a6f-8e91-b60b44b6e489');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('94c56746-cb94-4fdd-9680-2242027f3e0c', 'f67997ad-c0b6-4f5e-9e65-2d162751e0b0');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('94c56746-cb94-4fdd-9680-2242027f3e0c', '67dfc995-5edc-4515-8106-7500b162603e');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('94c56746-cb94-4fdd-9680-2242027f3e0c', '7902aa2b-7203-4f19-b4a2-19d70c383918');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('94c56746-cb94-4fdd-9680-2242027f3e0c', 'abc38e78-130f-4647-bcf5-af4de49ab6c2');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('94c56746-cb94-4fdd-9680-2242027f3e0c', '44ed4004-4d96-4bfe-8a87-bc4e21f3a0e4');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('94c56746-cb94-4fdd-9680-2242027f3e0c', '729c429b-41ed-46eb-8eb5-46be1e442700');
-INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('94c56746-cb94-4fdd-9680-2242027f3e0c', '8783ab67-d11b-46aa-a9a3-fab9d8855936');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('a504b129-da88-4182-856e-c5f8729801e6', 'd91d9e90-e01c-4866-b8c3-21c8dfad688b');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('a504b129-da88-4182-856e-c5f8729801e6', '44ed4004-4d96-4bfe-8a87-bc4e21f3a0e4');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('57513d9b-0056-47c0-8f01-ec802077ce0c', '8783ab67-d11b-46aa-a9a3-fab9d8855936');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('bf7154f5-c45f-4ae1-b47f-a51d65709575', 'eaa13db2-95e1-47a0-8b59-f4608d0ed142');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('bf7154f5-c45f-4ae1-b47f-a51d65709575', 'abc38e78-130f-4647-bcf5-af4de49ab6c2');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('79eeafd4-4664-41e0-942d-a785ae607954', '44ed4004-4d96-4bfe-8a87-bc4e21f3a0e4');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('79eeafd4-4664-41e0-942d-a785ae607954', '729c429b-41ed-46eb-8eb5-46be1e442700');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('79eeafd4-4664-41e0-942d-a785ae607954', '8783ab67-d11b-46aa-a9a3-fab9d8855936');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('79eeafd4-4664-41e0-942d-a785ae607954', 'c295ba47-f1fb-4116-8d11-9d342c30843b');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('79eeafd4-4664-41e0-942d-a785ae607954', 'eaa13db2-95e1-47a0-8b59-f4608d0ed142');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('79eeafd4-4664-41e0-942d-a785ae607954', 'f68441e2-1817-4a6f-8e91-b60b44b6e489');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('79eeafd4-4664-41e0-942d-a785ae607954', 'f67997ad-c0b6-4f5e-9e65-2d162751e0b0');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('79eeafd4-4664-41e0-942d-a785ae607954', 'd91d9e90-e01c-4866-b8c3-21c8dfad688b');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('79eeafd4-4664-41e0-942d-a785ae607954', 'abc38e78-130f-4647-bcf5-af4de49ab6c2');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('79eeafd4-4664-41e0-942d-a785ae607954', '67dfc995-5edc-4515-8106-7500b162603e');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('2d1142cd-2890-4db2-9546-fc9ef46a756d', 'd91d9e90-e01c-4866-b8c3-21c8dfad688b');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('4612fa88-5822-4662-97c7-945fd77e873a', 'abc38e78-130f-4647-bcf5-af4de49ab6c2');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('4612fa88-5822-4662-97c7-945fd77e873a', 'd91d9e90-e01c-4866-b8c3-21c8dfad688b');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('95761e88-3e4d-47dd-a324-337ade299966', '67dfc995-5edc-4515-8106-7500b162603e');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('99c2a658-f179-4139-a028-9e8f35345ddb', 'd91d9e90-e01c-4866-b8c3-21c8dfad688b');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('4d8377a9-ae86-4199-9d2e-f50647002e0e', 'f67997ad-c0b6-4f5e-9e65-2d162751e0b0');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('90a2de60-c586-418c-8f13-23cc58a7a427', 'd91d9e90-e01c-4866-b8c3-21c8dfad688b');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('658f2002-619f-4f5a-be4d-dabcf1b2b038', 'f67997ad-c0b6-4f5e-9e65-2d162751e0b0');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('658f2002-619f-4f5a-be4d-dabcf1b2b038', 'd91d9e90-e01c-4866-b8c3-21c8dfad688b');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('1622c3df-3433-4c1a-be0d-1066fd1d1f89', 'd91d9e90-e01c-4866-b8c3-21c8dfad688b');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('1622c3df-3433-4c1a-be0d-1066fd1d1f89', 'abc38e78-130f-4647-bcf5-af4de49ab6c2');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('1622c3df-3433-4c1a-be0d-1066fd1d1f89', 'eaa13db2-95e1-47a0-8b59-f4608d0ed142');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('a36aa415-2982-4eb1-bad4-c7a981dcffaf', '8783ab67-d11b-46aa-a9a3-fab9d8855936');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('a36aa415-2982-4eb1-bad4-c7a981dcffaf', '7902aa2b-7203-4f19-b4a2-19d70c383918');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('a36aa415-2982-4eb1-bad4-c7a981dcffaf', 'f67997ad-c0b6-4f5e-9e65-2d162751e0b0');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('52792ea7-9d6c-4dff-9338-437e21f6399a', 'f67997ad-c0b6-4f5e-9e65-2d162751e0b0');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('52792ea7-9d6c-4dff-9338-437e21f6399a', 'eaa13db2-95e1-47a0-8b59-f4608d0ed142');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('52792ea7-9d6c-4dff-9338-437e21f6399a', 'f68441e2-1817-4a6f-8e91-b60b44b6e489');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('2ef1ea93-b52e-46bc-9099-bae05ae4028c', '7902aa2b-7203-4f19-b4a2-19d70c383918');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('2ef1ea93-b52e-46bc-9099-bae05ae4028c', 'abc38e78-130f-4647-bcf5-af4de49ab6c2');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('6694cd30-34e4-4bd4-86cb-0d013e2d3847', 'd91d9e90-e01c-4866-b8c3-21c8dfad688b');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('8e4ef57c-11fe-4928-856e-8bd06dedeba6', 'f67997ad-c0b6-4f5e-9e65-2d162751e0b0');
+INSERT INTO public.necessities_reviews (review_id, necessity_id) VALUES ('8e4ef57c-11fe-4928-856e-8bd06dedeba6', '44ed4004-4d96-4bfe-8a87-bc4e21f3a0e4');

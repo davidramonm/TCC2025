@@ -41,11 +41,11 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        // Call the refresh endpoint via the same-origin proxy (/api/auth/refresh).
-        // Use the global axios (not apiClient) to avoid interceptors here.
         const res = await axios.post(
           `/api/auth/refresh`,
           {},
@@ -56,6 +56,7 @@ apiClient.interceptors.response.use(
 
         apiClient.defaults.headers.Authorization = `Bearer ${newToken}`;
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        
         return apiClient(originalRequest);
       } catch (err) {
         tokenService.clear();
@@ -170,7 +171,7 @@ export async function updateReview(reviewId: string, reviewData: any): Promise<R
 
 /**
  * @description Busca um endereço legível a partir de coordenadas geográficas.
- * Utiliza a API pública do Nominatim (OpenStreetMap).
+ * Utiliza a API pública do Nominatim (OpenStreetMap) para geocodificação reversa.
  * @param {number} lat - A latitude.
  * @param {number} lng - A longitude.
  * @returns {Promise<string>} O endereço formatado ou uma mensagem de erro.
@@ -185,7 +186,6 @@ export async function getAddressFromCoordinates(lat: number, lng: number): Promi
       const addressParts = [
         road || '', house_number || '', suburb || '', city || town || village || ''
       ].filter(Boolean);
-
       const uniqueAddressParts = [...new Set(addressParts)];
       return uniqueAddressParts.join(', ');
     }

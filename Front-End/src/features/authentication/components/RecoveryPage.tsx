@@ -5,39 +5,36 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  ArrowLeft, 
-  Key, 
-  Mail, 
-  Loader2 
-} from "lucide-react";
+import { ArrowLeft, Key, Mail, Loader2 } from "lucide-react";
 import AuthHeader from "@/components/layouts/AuthHeader";
 
-// Interface que define as props do componente
 interface RecoveryPageProps {
   onNavigate: (view: "login") => void;
 }
 
 /**
- * Componente RecoveryPage
- * Responsável pela página de recuperação de senha
- * Permite ao usuário solicitar reset de senha via email
+ * @component RecoveryPage
+ * @description Página responsável pelo fluxo de recuperação de senha.
+ * Permite que o usuário insira seu e-mail para receber um link de redefinição.
+ * Atualmente simula o envio de e-mail com um delay.
+ * * @param {RecoveryPageProps} props - Propriedades do componente.
+ * @returns {JSX.Element} Formulário de recuperação de senha.
  */
 export default function RecoveryPage({ onNavigate }: RecoveryPageProps) {
-  // Hooks para gerenciar estado e notificações
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
   /**
-   * Função que processa o envio do formulário
-   * Simula uma requisição com delay de 1.5s
-   * Exibe toast de sucesso e redireciona para login
+   * @function handleRecovery
+   * @description Processa o envio do formulário de recuperação.
+   * Simula uma chamada de API e exibe um feedback visual (Toast) ao usuário.
+   * * @param {React.FormEvent} e - Evento de submissão do formulário.
    */
   const handleRecovery = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simula chamada à API
+    // Simula chamada à API com delay
     await new Promise((resolve) => setTimeout(resolve, 1500));
     
     // Exibe notificação de sucesso
@@ -52,20 +49,17 @@ export default function RecoveryPage({ onNavigate }: RecoveryPageProps) {
 
   return (
     <>
-      {/* Cabeçalho da página com ícone e textos */}
       <AuthHeader
         icon={<Key className="w-8 h-8 text-white" />}
         title="Recuperar Senha"
         subtitle="Digite seu e-mail para receber o link de recuperação"
       />
 
-      {/* Formulário de recuperação */}
       <form 
         onSubmit={handleRecovery} 
         className="space-y-6 mt-8"
         noValidate
       >
-        {/* Campo de email */}
         <div className="space-y-2">
           <Label htmlFor="recovery-email">E-mail</Label>
           <div className="relative">
@@ -84,7 +78,6 @@ export default function RecoveryPage({ onNavigate }: RecoveryPageProps) {
           </div>
         </div>
 
-        {/* Botão de envio com estado de loading */}
         <Button 
           type="submit" 
           className="w-full h-12" 
@@ -101,7 +94,6 @@ export default function RecoveryPage({ onNavigate }: RecoveryPageProps) {
           )}
         </Button>
 
-        {/* Link para retornar ao login */}
         <div className="text-center pt-4 border-t">
           <button
             type="button"

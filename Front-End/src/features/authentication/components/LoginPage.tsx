@@ -6,17 +6,27 @@ import { loginSchema, LoginFormData } from "../schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { UserPlus, Key, Mail, Loader2, Armchair as Wheelchair, Accessibility } from "lucide-react";
+import { UserPlus, Key, Mail, Loader2, Accessibility } from "lucide-react";
 import { PasswordInput } from "@/components/ui/password-input";
 import AuthHeader from "@/components/layouts/AuthHeader";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 
 interface LoginPageProps {
+  /** Função de navegação para alternar entre as telas de registro e recuperação */
   onNavigate: (view: "register" | "recovery") => void;
+  /** Callback acionado quando a autenticação é realizada com sucesso */
   onLoginSuccess: () => void;
 }
 
+/**
+ * @component LoginPage
+ * @description Componente responsável pela autenticação de usuários.
+ * Gerencia o estado do formulário de login, validação de dados (via Zod) 
+ * e comunicação com o contexto de autenticação (AuthContext).
+ * * @param {LoginPageProps} props - Propriedades do componente.
+ * @returns {JSX.Element} A interface de login renderizada.
+ */
 export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps) {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -24,8 +34,15 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
   const [loginError, setLoginError] = useState<string | null>(null);
   const { login, isLoggedIn } = useAuth();
 
+  /**
+   * @function handleLogin
+   * @description Processa a submissão do formulário. Tenta autenticar o usuário
+   * e gerencia o estado de erro caso a credencial seja inválida.
+   * * @param {LoginFormData} data - Os dados do formulário (e-mail e senha) já validados.
+   */
   const handleLogin = async (data: LoginFormData) => {
     setLoginError(null);
+    // Delay artificial para feedback visual de carregamento
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     try {
@@ -34,9 +51,6 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
     } catch (error: Error | any) {
       setLoginError(error.message || "Erro ao fazer login. Por favor, tente novamente.");
     }
-
-
-
   };
 
   return (
@@ -76,7 +90,6 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
         </div>
 
         {loginError && (
-          console.log(loginError),
           <p className="text-sm text-red-600 font-medium text-center mt-2" role="alert">
             {loginError}
           </p>

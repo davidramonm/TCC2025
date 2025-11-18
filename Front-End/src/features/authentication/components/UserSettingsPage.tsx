@@ -5,42 +5,37 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { X, Shield, Save, Heart, Trash2, Camera, Loader2 } from "lucide-react";
+import { X, Shield, Save, Heart, User, Trash2, Camera, Loader2 } from "lucide-react";
 import { tiposAcessibilidade } from "@/lib/constants";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,} from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Necessity } from '@/types';
 import apiClient from "@/lib/api";
+import { set } from "zod";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 interface UserSettingsPageProps {
-  /** Função para fechar o modal de configurações */
   onClose: () => void;
-  /** Nome atual do usuário */
   firstName: string;
-  /** Sobrenome atual do usuário */
   lastName: string;
-  /** E-mail do usuário (imutável nesta view) */
   email: string;
-  /** URL da imagem de perfil atual */
   profileImage: string;
-  /** Lista de necessidades cadastradas do usuário */
   userNeeds: Necessity[];
-  /** Callback para atualizar o estado de necessidades no componente pai */
   onUpdateNeeds: (newNeeds: Necessity[]) => void;
-  /** Callback para atualizar o estado do usuário (nome, foto) no componente pai */
   onUpdateUser: (firstName: string, lastName: string, profileImage: string) => void;
 }
 
-/**
- * @component UserSettingsPage
- * @description Modal de configurações de conta do usuário.
- * Permite edição de perfil, gerenciamento de acessibilidade e configurações de segurança (como excluir conta).
- * Utiliza o componente Tabs para organizar as seções.
- * * @param {UserSettingsPageProps} props - Propriedades do componente.
- * @returns {JSX.Element} O modal de configurações.
- */
 export default function UserSettingsPage({
   onClose,
   firstName,
@@ -57,20 +52,14 @@ export default function UserSettingsPage({
   const [localProfileImage, setLocalProfileImage] = useState<string | "">(profileImage || "");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [isLoading, setIsLoading] = useState(false); 
-  const { deleteUserAccount } = useAuth(); 
-  const { toast } = useToast(); 
+  const [isLoading, setIsLoading] = useState(false); // <-- ADICIONADO
+  const { deleteUserAccount } = useAuth(); // <-- ADICIONADO
+  const { toast } = useToast(); // <-- ADICIONADO
 
   useEffect(() => {
     setLocalProfileImage(profileImage);
   }, [profileImage]);
 
-  /**
-   * @function toggleNeed
-   * @description Alterna a seleção de uma necessidade de acessibilidade.
-   * Se a necessidade já estiver na lista, ela é removida. Caso contrário, é adicionada.
-   * * @param {string} needValue - O ID da necessidade a ser alterada.
-   */
   const toggleNeed = (needValue: string) => {
     setSelectedNeeds((prev) => {
       const exists = prev.some(n => n.necessityId === needValue);
@@ -91,13 +80,6 @@ export default function UserSettingsPage({
 
   };
 
-  /**
-   * @function handleSaveChanges
-   * @description Persiste as alterações feitas no perfil.
-   * 1. Atualiza dados textuais (nome, sobrenome, necessidades) via API.
-   * 2. Se houver uma nova imagem selecionada, realiza o upload via FormData.
-   * 3. Atualiza o estado local da aplicação e fecha o modal.
-   */
   const handleSaveChanges = async () => {
     apiClient.put("auth/update", {
       fName: newFirstName,
@@ -125,6 +107,8 @@ export default function UserSettingsPage({
         }
       }
 
+
+
       onUpdateNeeds(selectedNeeds);
       onUpdateUser(newFirstName, newLastName, localProfileImage);
       onClose();
@@ -134,21 +118,15 @@ export default function UserSettingsPage({
     }
   };
 
-  /**
-   * @function updateProfileImage
-   * @description Dispara o clique no input de arquivo oculto para iniciar a seleção de imagem.
-   */
   const updateProfileImage = () => {
+
     fileInputRef.current?.click();
+
   };
 
-  /**
-   * @function handleProfileImageChange
-   * @description Handler executado quando o usuário seleciona um arquivo de imagem.
-   * Cria uma URL de preview local para exibição imediata antes do envio ao servidor.
-   * * @param {React.ChangeEvent<HTMLInputElement>} e - Evento de alteração do input.
-   */
   const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+
+
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -156,12 +134,6 @@ export default function UserSettingsPage({
     setLocalProfileImage(previewUrl);
   };
 
-  /**
-   * @function handleDeleteAccount
-   * @description Executa a exclusão permanente da conta do usuário.
-   * Utiliza o método `deleteUserAccount` do contexto de autenticação.
-   * Exibe feedback via Toast em caso de sucesso ou erro.
-   */
   const handleDeleteAccount = async () => {
     setIsLoading(true);
     try {
@@ -170,14 +142,16 @@ export default function UserSettingsPage({
         title: "Conta excluída com sucesso",
         description: "Sentiremos sua falta.",
       });
+      // O logout e o fechamento do modal são tratados pelo AuthContext e seu 'logout'
     } catch (error: any) {
       toast({
         title: "Erro ao excluir conta",
         description: error.message || "Tente novamente mais tarde.",
         variant: "destructive",
       });
-      setIsLoading(false); 
+      setIsLoading(false); // Só define como falso em caso de erro
     }
+
   };
 
   return (
@@ -200,7 +174,6 @@ export default function UserSettingsPage({
             </TabsList>
 
             <div className="pt-6 min-h-[350px]">
-              {/* Aba de Perfil */}
               <TabsContent value="profile">
                 <div className="space-y-4">
                   <div className="flex items-center gap-4">
@@ -247,7 +220,6 @@ export default function UserSettingsPage({
                 </div>
               </TabsContent>
 
-              {/* Aba de Acessibilidade */}
               <TabsContent value="accessibility">
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                   <Heart className="w-5 h-5 text-gray-600" />
@@ -279,7 +251,6 @@ export default function UserSettingsPage({
                 </div>
               </TabsContent>
 
-              {/* Aba de Segurança */}
               <TabsContent value="security">
                 <div className="space-y-6">
                   <div>
@@ -340,3 +311,4 @@ export default function UserSettingsPage({
     </div>
   );
 }
+

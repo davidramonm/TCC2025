@@ -4,19 +4,19 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, RegisterFormData } from "../schemas";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, UserPlus, Check, Loader2 } from "lucide-react";
+import { ArrowLeft, UserPlus, Mail, User, Heart, Check, Loader2 } from "lucide-react";
 import { tiposAcessibilidade } from "@/lib/constants";
 import { PasswordInput } from "@/components/ui/password-input";
 import { PasswordStrength } from "@/components/ui/password-strength";
 import AuthHeader from "@/components/layouts/AuthHeader";
-import { Card } from "@/components/ui/card"; 
+import { Card } from "@/components/ui/card"; // Import Card para o resumo
 import { Necessity } from "@/types";
 
 interface RegisterPageProps {
@@ -24,15 +24,6 @@ interface RegisterPageProps {
   onRegister: (fName: string, lName: string, email: string, password: string, needs: Necessity[]) => void;
 }
 
-/**
- * @component RegisterPage
- * @description Componente de cadastro de usuários implementado como um formulário de múltiplas etapas (Wizard).
- * - Etapa 1: Coleta de dados pessoais (Nome, Email, Senha).
- * - Etapa 2: Seleção de preferências de acessibilidade.
- * - Etapa 3: Revisão de dados e aceite dos termos.
- * * @param {RegisterPageProps} props - Propriedades do componente.
- * @returns {JSX.Element} O formulário de cadastro.
- */
 export default function RegisterPage({ onNavigate, onRegister }: RegisterPageProps) {
   const { toast } = useToast();
   const [registerStep, setRegisterStep] = useState(1);
@@ -41,16 +32,11 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
 
   const { register, handleSubmit, watch, trigger, formState: { errors, isSubmitting } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
-    mode: "onTouched",
+    mode: "onTouched", // Valida ao sair do campo
   });
 
   const passwordValue = watch("password");
 
-  /**
-   * @function handleNextStep
-   * @description Valida os campos da etapa atual antes de permitir o avanço para a próxima.
-   * Garante que o usuário não prossiga sem preencher corretamente os dados obrigatórios.
-   */
   const handleNextStep = async () => {
     const fieldsToValidate: (keyof RegisterFormData)[] = ["firstName", "lastName", "email", "password", "confirmPassword"];
     const isValid = await trigger(fieldsToValidate);
@@ -59,12 +45,6 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
     }
   };
 
-  /**
-   * @function handleRegister
-   * @description Finaliza o processo de registro.
-   * Verifica se os termos foram aceitos e invoca a função `onRegister` com os dados coletados.
-   * * @param {RegisterFormData} data - Dados validados do formulário.
-   */
   const handleRegister = async (data: RegisterFormData) => {
     if (!acceptTerms) {
       toast({ title: "Termos obrigatórios", description: "Você deve aceitar os termos.", variant: "destructive" });
@@ -75,12 +55,6 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
     onRegister(data.firstName, data.lastName, data.email, data.password, selectedNeeds);
   };
 
-  /**
-   * @function toggleNeed
-   * @description Gerencia a seleção de necessidades de acessibilidade.
-   * Adiciona ou remove uma necessidade da lista de itens selecionados.
-   * * @param {string} necessityId - O ID da necessidade a ser alternada.
-   */
   const toggleNeed = (necessityId: string) => {
     setSelectedNeeds((prev) => {
           const exists = prev.some(n => n.necessityId === necessityId);
@@ -106,7 +80,6 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
         title="Criar Conta"
         subtitle="Junte-se à nossa comunidade inclusiva"
       >
-        {/* Indicador de progresso (Stepper) */}
         <div className="flex items-center justify-center space-x-2 mt-6">
           <div className="flex items-center">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${registerStep >= 1 ? "bg-gray-600 text-white" : "bg-gray-200"}`}>{registerStep > 1 ? <Check /> : "1"}</div>
@@ -126,7 +99,6 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
       </AuthHeader>
 
       <form onSubmit={handleSubmit(handleRegister)} className="space-y-4 pt-6">
-        {/* Passo 1: Dados Pessoais */}
         {registerStep === 1 && (
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -140,7 +112,6 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
           </div>
         )}
 
-        {/* Passo 2: Preferências de Acessibilidade */}
         {registerStep === 2 && (
           <div className="space-y-4">
             <Label className="text-base">Selecione suas preferências (opcional)</Label>
@@ -156,7 +127,6 @@ export default function RegisterPage({ onNavigate, onRegister }: RegisterPagePro
           </div>
         )}
 
-        {/* Passo 3: Resumo e Termos */}
         {registerStep === 3 && (
           <div className="space-y-6">
             <Card className="p-4 bg-gray-50"><h3 className="font-semibold mb-2">Resumo dos Dados</h3><div className="space-y-1 text-sm"><p><strong>Nome:</strong> {watch("firstName")} {watch("lastName")}</p><p><strong>E-mail:</strong> {watch("email")}</p></div></Card>

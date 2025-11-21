@@ -12,24 +12,38 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Necessity } from "@/types";
 
 interface ReviewLocationModalProps {
+  /** Controla a visibilidade do modal */
   isOpen: boolean;
+  /** Callback ao fechar o modal */
   onClose: () => void;
+  /** Callback ao submeter o formulário */
   onSubmit: (reviewData: { rating: number; selectedTypes: Necessity[]; description: string }) => void;
+  /** Nome do local sendo avaliado */
   locationName: string | null;
-  initialData?: { // Prop para receber dados existentes
+  /** Dados iniciais (usado para edição) */
+  initialData?: {
     rating: number;
     description: string;
     types: Necessity[];
   };
 }
 
+/**
+ * @component ReviewLocationModal
+ * @description Modal contendo o formulário de avaliação.
+ * Permite ao usuário:
+ * 1. Atribuir uma nota (estrelas).
+ * 2. Selecionar checkboxes de acessibilidade (ex: Rampa, Braille).
+ * 3. Escrever um comentário descritivo.
+ * * @param {ReviewLocationModalProps} props - Propriedades do componente.
+ */
 export default function ReviewLocationModal({ isOpen, onClose, onSubmit, locationName, initialData }: ReviewLocationModalProps) {
   const [rating, setRating] = useState(0);
   const [description, setDescription] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<Necessity[]>([]);
 
+  // Efeito para resetar ou preencher o formulário ao abrir
   useEffect(() => {
-    // Preenche o formulário com os dados iniciais quando o modal é aberto
     if (isOpen) {
       setRating(initialData?.rating || 0);
       setDescription(initialData?.description || "");
@@ -60,7 +74,6 @@ export default function ReviewLocationModal({ isOpen, onClose, onSubmit, locatio
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      // Limpa o estado ao fechar para a próxima utilização
       setRating(0);
       setDescription("");
       setSelectedTypes([]);

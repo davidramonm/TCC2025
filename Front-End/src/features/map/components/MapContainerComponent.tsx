@@ -12,7 +12,6 @@ import { Establishment, Location } from "@/types";
 import { MapPin } from "lucide-react";
 import { renderToStaticMarkup } from "react-dom/server";
 
-// Props do componente
 interface MapContainerComponentProps {
   locations: Location[];
   clickedPosition: { lat: number; lng: number } | null;
@@ -21,39 +20,26 @@ interface MapContainerComponentProps {
   findMyLocation: boolean;
   onMyLocationFound: () => void;
   onRateClick: (establishment: Establishment) => void;
-  onEditReviewClick: (establishment: Establishment) => void; // Nova prop para edição
+  onEditReviewClick: (establishment: Establishment) => void;
   onLocationSelect: (location: Location) => void;
 }
 
-// Ícone customizado
 const IconComponent = MapPin;
-
 const iconString = renderToStaticMarkup(<IconComponent color="white" size={20} />);
-
 const iconHtml = `<div style="background: linear-gradient( to bottom right, #4b5563,#1f2937); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">${iconString}</div>`;
 
-
 const customIcon = L.divIcon({
-
   className: "location-marker",
   html: iconHtml,
   iconSize: [40, 40],
   iconAnchor: [20, 40],
-
 });
 
-// Ícone customizado
-// const customIcon = new L.Icon({
-//   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-//   iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-//   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-//   iconSize: [25, 41],
-//   iconAnchor: [12, 41],
-//   popupAnchor: [1, -34],
-//   shadowSize: [41, 41],
-// });
-
-// Componente para lidar com eventos do mapa
+/**
+ * @component MapEvents
+ * @description Componente auxiliar para capturar eventos do mapa (cliques).
+ * Utiliza o hook useMapEvents do react-leaflet.
+ */
 function MapEvents({ onMapClick }: { onMapClick: (latlng: { lat: number; lng: number }) => void }) {
   useMapEvents({
     click(e) {
@@ -63,7 +49,11 @@ function MapEvents({ onMapClick }: { onMapClick: (latlng: { lat: number; lng: nu
   return null;
 }
 
-// Componente para centralizar o mapa na localização do usuário
+/**
+ * @component LocateUser
+ * @description Componente auxiliar para geolocalização do usuário.
+ * Acessa a API de geolocalização do navegador via Leaflet map.locate().
+ */
 function LocateUser({ findMyLocation, onMyLocationFound }: { findMyLocation: boolean, onMyLocationFound: () => void }) {
   const map = useMap();
   useEffect(() => {
@@ -77,6 +67,11 @@ function LocateUser({ findMyLocation, onMyLocationFound }: { findMyLocation: boo
   return null;
 }
 
+/**
+ * @component MapController
+ * @description Componente auxiliar para controlar programaticamente a visão do mapa.
+ * Responsável por mover (flyTo) o mapa quando uma busca é realizada.
+ */
 function MapController({ searchLocation }: { searchLocation: Location | null }) {
   const map = useMap();
   useEffect(() => {
@@ -88,7 +83,14 @@ function MapController({ searchLocation }: { searchLocation: Location | null }) 
   return null;
 }
 
-// Componente principal do mapa
+/**
+ * @component MapContainerComponent
+ * @description Container principal do mapa Leaflet.
+ * Gerencia camadas (Tiles), marcadores e interações.
+ * Renderiza os componentes auxiliares de controle como filhos.
+ * * @param {MapContainerComponentProps} props - Propriedades do mapa.
+ * @returns {JSX.Element} O mapa interativo.
+ */
 export default function MapContainerComponent({
   locations,
   clickedPosition,
@@ -100,7 +102,7 @@ export default function MapContainerComponent({
 }: MapContainerComponentProps) {
   return (
     <MapContainer
-      center={[-23.529327428797327, -47.47122840255941]}
+      center={[-23.529327428797327, -47.47122840255941]} // Centro inicial (Sorocaba/Votorantim região)
       zoom={14}
       style={{ height: "100%", width: "100%" }}
     >
@@ -114,12 +116,12 @@ export default function MapContainerComponent({
       <LocateUser findMyLocation={findMyLocation} onMyLocationFound={onMyLocationFound} />
       <MapController searchLocation={searchLocation} />
 
-      {/* Marcador para a posição clicada */}
+      {/* Marcador temporário para a posição clicada (novo local em potencial) */}
       {clickedPosition && (
         <Marker position={clickedPosition} icon={customIcon} />
       )}
 
-      {/* Marcadores para as localizações */}
+      {/* Marcadores para as localizações existentes */}
       {locations.map((location) => (
         <Marker
           key={location.establishmentId}
@@ -135,5 +137,3 @@ export default function MapContainerComponent({
     </MapContainer>
   );
 }
-
-

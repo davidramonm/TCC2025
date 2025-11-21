@@ -4,18 +4,31 @@
 import { Badge } from "@/components/ui/badge";
 import { MapPin } from "lucide-react";
 import { tiposAcessibilidade, getLocationTypeName } from "@/lib/constants";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Location } from "@/types";
 
 interface LocationListProps {
+  /** Array completo de locais filtrados */
   locations: Location[];
+  /** Número total de locais (para info) */
   totalLocations: number;
+  /** Função de clique para selecionar um local */
   onLocationClick: (location: any) => void;
+  /** ID do local selecionado para aplicar estilo de destaque */
   selectedLocationId?: string | null;
+  /** Indica se há filtros ativos (muda a mensagem de estado vazio) */
   hasActiveFilters: boolean;
 }
 
+/**
+ * @component LocationList
+ * @description Lista paginada de locais.
+ * Exibe cards resumidos com ícone, nome, endereço e principais tags de acessibilidade.
+ * Implementa paginação no client-side para melhor performance de renderização.
+ * * @param {LocationListProps} props - Propriedades do componente.
+ * @returns {JSX.Element} A lista de locais.
+ */
 export function LocationList({
   locations,
   totalLocations,
@@ -28,14 +41,12 @@ export function LocationList({
   const itemsPerPage = 5; 
   const totalPages = Math.max(1,Math.ceil(locations.length / itemsPerPage));
 
-
-  // slice visible locations for current page
+  // Lógica de paginação: fatia o array para exibir apenas os itens da página atual
   const startIndex = (page - 1) * itemsPerPage;
   const visibleLocations = locations.slice(startIndex, startIndex + itemsPerPage);
 
   const handlePrev = () => setPage((p) => Math.max(p - 1, 1));
   const handleNext = () => setPage((p) => Math.min(p + 1, totalPages));
-
 
   return (
     <div className="locations-list">
@@ -53,17 +64,14 @@ export function LocationList({
           visibleLocations.map((location) => {
 
             const hasTypes = Array.isArray(location.topNecessities) && location.topNecessities.length > 0;
-
             console.log(location.topNecessities[0]);
 
+            // Determina o ícone e cor baseada na necessidade principal do local
             const tipoPrincipal = hasTypes
               ? tiposAcessibilidade.find(t => t.value === location.topNecessities[0])
               : undefined;
 
             const Icon = tipoPrincipal ? tipoPrincipal.icon : MapPin;
-
-
-
             const isSelected = String(location.establishmentId) === String(selectedLocationId);
 
             return (

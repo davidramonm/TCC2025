@@ -7,7 +7,7 @@ import dynamic from "next/dynamic";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocations } from "../hooks/useLocations";
-import apiClient, { getAddressFromCoordinates, fetchLocations, getEstablishmentFromCoordinates, saveEstablishment, saveReview, getEstablishmentById } from "@/lib/api";
+import { getAddressFromCoordinates, fetchLocations, getEstablishmentFromCoordinates, saveEstablishment, saveReview, getEstablishmentById } from "@/lib/api";
 import MapHeader from "@/components/layouts/MapHeader";
 import FilterAndListComponent from "./FilterAndListComponent";
 import FloatingMenu from "./FloatingMenu";
@@ -17,31 +17,32 @@ import RecoveryPage from "@/features/authentication/components/RecoveryPage";
 import UserSettingsPage from "@/features/authentication/components/UserSettingsPage";
 import MapPageSkeleton from "./MapPageSkeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { getLocationTypeName } from "@/lib/constants";
-import { Establishment, Location, Necessity, Review } from "@/types";
+import { Establishment, Location, Necessity } from "@/types";
 import ReviewLocationModal from "./ReviewLocationModal";
 import FloatingHelpButton from "@/components/layouts/FloatingHelpButton";
 import WelcomeModal from "@/components/layouts/WelcomeModal";
 import LocationDetailCard from "./LocationDetailCard";
-import { set } from "zod";
 
+// Importação dinâmica do mapa para evitar erros de SSR (Server Side Rendering) com o Leaflet
 const MapContainerComponent = dynamic(() => import("./MapContainerComponent"), {
   ssr: false,
   loading: () => <div className="flex-1 bg-gray-200 animate-pulse" />,
 });
 
-const MOCK_REVIEWS = [
-  { id: 1, user: { id: 2, name: "Maria Silva" }, rating: 5, description: "Excelente acesso com rampas bem construídas!" },
-  { id: 2, user: { id: 3, name: "João Santos" }, rating: 4, description: "Banheiro adaptado muito bom, mas a entrada principal é um pouco estreita." },
-];
-
-const MOCK_USER_REVIEW = (userId: number, userName: string) => ({
-  id: 99, user: { id: userId, name: `${userName} (Você)` }, rating: 3, description: "Faltou piso tátil na área externa."
-});
-
+/**
+ * @component MapPage
+ * @description Página principal da aplicação. Atua como o "Controller" ou "Orquestrador".
+ * Responsabilidades:
+ * 1. Gerenciar estado global da tela (modais, usuário logado, loading).
+ * 2. Buscar dados iniciais (locais).
+ * 3. Integrar o mapa interativo com a lista lateral e os detalhes.
+ * 4. Gerenciar o fluxo de criação/edição de avaliações.
+ * @returns {JSX.Element} A página completa do mapa.
+ */
 export default function MapPage() {
   const { toast } = useToast();
 
+  // Integração com Contexto de Autenticação
   const {
     isLoggedIn,
     userId,
@@ -55,23 +56,25 @@ export default function MapPage() {
     profileImage
   } = useAuth();
 
+  // Estados de UI e Controle
   const [activeModal, setActiveModal] = useState<"login" | "register" | "recovery" | "filter" | null>(null);
-
   const [allLocations, setAllLocations] = useState<Location[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
 
+  // Hook customizado para filtrar locais
   const { filteredLocations } = useLocations(allLocations, activeFilters);
 
+  // Estados do Mapa
   const [clickedPosition, setClickedPosition] = useState<{ lat: number; lng: number } | null>(null);
   const [establishmentFromClick, setEstablishmentFromClick] = useState<Establishment | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchLocation, setSearchLocation] = useState<Location | null>(null);
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [findMyLocation, setFindMyLocation] = useState(false);
-
   const [selectedEstablishment, setSelectedEstablishment] = useState<Establishment | null>(null);
 
+  // Estado para o Modal de Avaliação
   const [reviewModalState, setReviewModalState] = useState<{
     isOpen: boolean;
     establishment: Establishment | null;
@@ -88,6 +91,7 @@ export default function MapPage() {
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
+  // Effect: Carregamento inicial dos dados
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
@@ -108,6 +112,13 @@ export default function MapPage() {
     loadData();
   }, [toast, userId, firstName]);
 
+  /**
+   * @function handleMapClick
+   * @description Lida com cliques no mapa.
+   * - Se o usuário não estiver logado, solicita login.
+   * - Verifica se clicou em um estabelecimento existente.
+   * - Se clicou em um espaço vazio, faz geocodificação reversa para sugerir um endereço para um novo local.
+   */
   const handleMapClick = async (latlng: { lat: number; lng: number }) => {
     if (!isLoggedIn) {
       toast({ title: "Ação restrita", description: "Faça login para adicionar novos locais.", variant: "destructive" });
@@ -142,6 +153,10 @@ export default function MapPage() {
     }
   };
 
+  /**
+   * @function handleLocationClick
+   * @description Seleciona um local, centraliza o mapa nele e abre o card de detalhes.
+   */
   const handleLocationClick = async (location: Location, hEstablishment?: Establishment) => {
     setSearchLocation({ ...location });
     if (!location.establishmentId && hEstablishment) {
@@ -152,18 +167,19 @@ export default function MapPage() {
     setSelectedLocationId(location.establishmentId);
     const establishment = await getEstablishmentById(location.establishmentId);
     
-      
     setSelectedEstablishment(establishment ?? null);
     setActiveModal(null);
-    
   };
 
+  /**
+   * @function handleReviewClick
+   * @description Prepara e abre o modal de avaliação.
+   * Verifica se é uma nova avaliação ou edição de uma existente.
+   */
   const handleReviewClick = (establishment: Establishment, newName?: string) => {
     if (!isLoggedIn) {
       setActiveModal("login");
     } else {
-
-
       const userReview = establishment.reviewList?.find(review => review.userId === userId) ?? undefined;
       setReviewModalState({
         isOpen: true,
@@ -177,14 +193,19 @@ export default function MapPage() {
           types: userReview.necessities,
         } : undefined,
       });
-
     }
   };
 
+  /**
+   * @function handleSaveReview
+   * @description Salva a avaliação (e o estabelecimento, se for novo).
+   * Atualiza o estado local para refletir a mudança sem precisar recarregar a página.
+   */
   const handleSaveReview = async (reviewData: { rating: number; selectedTypes: Necessity[]; description: string }) => {
-
     let establishment = reviewModalState.establishment!;
     console.log(reviewModalState.createNew)
+    
+    // Se for um local novo, cria o estabelecimento primeiro
     if (reviewModalState.createNew) {
       console.log('Criando novo estabelecimento antes de salvar a avaliação...');
       const newEstablishment = await saveEstablishment(
@@ -197,6 +218,7 @@ export default function MapPage() {
           topNecessities: [],
         }
       );
+      // Atualiza o objeto local com o ID retornado
       establishment = {
         establishmentId: newEstablishment.establishmentId,
         name: newEstablishment.name,
@@ -226,9 +248,7 @@ export default function MapPage() {
     });
 
     if (establishment.establishmentId && review) {
-
-
-
+        // Atualização otimista da UI
         setAllLocations((prev) => {
           const exists = prev.some((loc) => loc.establishmentId === establishment.establishmentId);
 
@@ -245,18 +265,15 @@ export default function MapPage() {
 
         handleLocationClick(establishment as Location);
 
-
         toast({
           title: reviewModalState.isEditing ? "Avaliação Atualizada!" : "Avaliação Salva!",
           description: `Obrigado por contribuir com informações sobre ${establishment.name}.`,
         });
         setReviewModalState({ isOpen: false, establishment: null, isEditing: false });
-      
     }
   };
 
   const performGlobalSearch = (location: Location) => {
-
     console.log("Performing global search for location:", location);
     handleMapClick({ lat: location.xCoords, lng: location.yCoords });
   };
@@ -278,6 +295,7 @@ export default function MapPage() {
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
       <div className="flex-1 flex overflow-hidden relative">
+        {/* Mapa ocupa toda a área, com margem condicional quando o card de detalhes abre */}
         <div className={`flex-1 relative z-10 transition-all duration-300 ease-in-out ${selectedEstablishment ? 'mr-0 md:mr-[28rem]' : 'mr-0'}`}>
           <MapContainerComponent
             locations={filteredLocations}

@@ -8,14 +8,28 @@ import { LocationList } from "./LocationList";
 import { Location } from "@/types";
 
 interface FilterAndListComponentProps {
+  /** Função callback acionada quando os filtros selecionados mudam */
   onFilterChange: (filters: string[]) => void;
+  /** Array de strings contendo os filtros (labels) atualmente ativos */
   activeFilters: string[];
+  /** Lista de locais a serem exibidos */
   locations: Location[];
+  /** Contagem total de locais para exibição */
   totalLocations: number;
+  /** Callback ao clicar em um local da lista */
   onLocationClick: (location: Location) => void;
+  /** ID do local atualmente selecionado no mapa (para destaque visual) */
   selectedLocationId?: string | null;
 }
 
+/**
+ * @component FilterAndListComponent
+ * @description Painel lateral que combina a seleção de filtros por tipo de acessibilidade
+ * e a listagem dos locais encontrados.
+ * Permite ao usuário refinar a busca selecionando tags como "Rampa", "Banheiro Adaptado", etc.
+ * * @param {FilterAndListComponentProps} props - Propriedades do componente.
+ * @returns {JSX.Element} O painel de filtros e lista.
+ */
 export default function FilterAndListComponent({
   onFilterChange,
   activeFilters,
@@ -25,6 +39,11 @@ export default function FilterAndListComponent({
   selectedLocationId,
 }: FilterAndListComponentProps) {
   
+  /**
+   * @function toggleFilter
+   * @description Adiciona ou remove um filtro da lista de filtros ativos.
+   * @param {string} typeValue - O valor do filtro a ser alternado.
+   */
   const toggleFilter = (typeValue: string) => {
     const newFilters = activeFilters.includes(typeValue)
       ? activeFilters.filter((f) => f !== typeValue)
@@ -33,6 +52,10 @@ export default function FilterAndListComponent({
     onFilterChange(newFilters);
   };
 
+  /**
+   * @function clearFilters
+   * @description Remove todos os filtros ativos, retornando a lista ao estado original.
+   */
   const clearFilters = () => {
     onFilterChange([]);
   };

@@ -8,9 +8,13 @@ import { Review } from "@/types";
 import { Badge } from "@/components/ui/badge";
 
 interface ReviewItemProps {
+  /** Objeto contendo dados da avaliação (usuário, comentário, nota) */
   review: Review;
 }
 
+/**
+ * @description Componente auxiliar para exibir estrelas de avaliação.
+ */
 const StarRating = ({ rating }: { rating: number }) => (
   <div className="flex items-center">
     {[...Array(5)].map((_, i) => (
@@ -22,6 +26,13 @@ const StarRating = ({ rating }: { rating: number }) => (
   </div>
 );
 
+/**
+ * @component ReviewItem
+ * @description Exibe um card individual de avaliação.
+ * Possui funcionalidade de "expandir" para ler comentários longos.
+ * Exibe também as tags de acessibilidade que o usuário marcou naquela avaliação.
+ * * @param {ReviewItemProps} props - Propriedades do componente.
+ */
 export default function ReviewItem({ review }: ReviewItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 

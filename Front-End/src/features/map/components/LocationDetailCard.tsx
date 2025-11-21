@@ -1,28 +1,38 @@
 // src/features/map/components/LocationDetailCard.tsx
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Establishment, Location } from "@/types";
+import { Establishment } from "@/types";
 import { Star, X } from "lucide-react";
 import { getLocationTypeName } from "@/lib/constants";
 import ReviewList from "./ReviewList";
-import { create } from "domain";
 import { useState } from "react";
-import { set } from "zod";
 
 interface LocationDetailCardProps {
+  /** Dados do estabelecimento selecionado */
   establishment: Establishment;
-  isUserReview: boolean; // Flag para saber se o usuário logado já avaliou
+  /** Flag indicando se o usuário logado já avaliou este local */
+  isUserReview: boolean;
+  /** Flag indicando se é um novo local sendo criado (ainda não salvo no banco) */
   createNew: boolean;
+  /** Callback para fechar o card */
   onClose: () => void;
+  /** Callback para abrir o modal de adicionar avaliação */
   onAddReview: (establishment: Establishment, name?: string) => void;
+  /** Callback para abrir o modal de editar avaliação existente */
   onEditReview: (establishment: Establishment) => void;
 }
 
-
-
+/**
+ * @component LocationDetailCard
+ * @description Card lateral flutuante que exibe informações detalhadas de um local.
+ * Mostra: Nome, endereço, nota média, necessidades atendidas e lista de avaliações.
+ * Permite edição do nome se o local for novo.
+ * * @param {LocationDetailCardProps} props - Propriedades do componente.
+ * @returns {JSX.Element} O painel de detalhes do local.
+ */
 export default function LocationDetailCard({
   establishment,
   isUserReview,
@@ -66,7 +76,6 @@ export default function LocationDetailCard({
         </div>
         <div className="flex items-center pt-2">
           <Star className="mr-1 h-5 w-5 text-yellow-400 fill-yellow-400" />
-          {/* <span className="font-bold">{establishment.rating.toFixed(1)}</span> */}
           <span className="font-bold">{establishment.rating}</span>
           <span className="ml-2 text-sm text-gray-500">({establishment.reviewList?.length ?? 0} avaliações)</span>
         </div>

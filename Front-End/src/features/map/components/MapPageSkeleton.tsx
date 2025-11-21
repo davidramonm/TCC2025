@@ -3,7 +3,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { MapPin, Search } from "lucide-react";
 
 /**
- * @description Exibe uma versão "esqueleto" da interface principal enquanto os dados do mapa são carregados.
+ * @component MapPageSkeleton
+ * @description Componente de estado de carregamento (Loading State).
+ * Exibe uma versão "esqueleto" da interface principal enquanto os dados do mapa são carregados pela API.
+ * Melhora a percepção de performance (Perceived Performance).
+ * @returns {JSX.Element} O esqueleto da página.
  */
 export default function MapPageSkeleton() {
   return (

@@ -3,19 +3,27 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, List, X, Menu, Navigation } from 'lucide-react';
+import { List, X, Menu, Navigation } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface FloatingMenuProps {
-  // onAddClick: () => void; // Removido
+  /** Ação para abrir o modal de filtros e lista */
   onFilterAndListClick: () => void;
+  /** Ação para centralizar o mapa na localização do usuário */
   onMyLocationClick: () => void;
 }
 
+/**
+ * @component FloatingMenu
+ * @description Menu flutuante (FAB - Floating Action Button) posicionado no canto inferior direito.
+ * Expande para oferecer opções rápidas como "Minha Localização" e "Listar Locais".
+ * Essencial para a usabilidade em dispositivos móveis.
+ * * @param {FloatingMenuProps} props - Propriedades do componente.
+ * @returns {JSX.Element} O botão flutuante e suas opções.
+ */
 export default function FloatingMenu({ onFilterAndListClick, onMyLocationClick }: FloatingMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { isLoggedIn } = useAuth();
-
 
   return (
     <div className="absolute bottom-6 right-6 z-40">

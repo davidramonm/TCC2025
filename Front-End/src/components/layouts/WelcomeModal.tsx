@@ -1,3 +1,4 @@
+// Front-End/src/components/layouts/WelcomeModal.tsx
 "use client";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -8,6 +9,11 @@ interface WelcomeModalProps {
   onClose: () => void;
 }
 
+/**
+ * @component FeatureItem
+ * @description Subcomponente para renderizar cada item da lista de funcionalidades.
+ * Mantém o código do modal limpo e organizado.
+ */
 const FeatureItem = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
     <div className="flex items-start gap-4">
         <div className="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
@@ -20,7 +26,14 @@ const FeatureItem = ({ icon, title, description }: { icon: React.ReactNode, titl
     </div>
 );
 
-
+/**
+ * @component WelcomeModal
+ * @description Modal de Boas-Vindas (Onboarding).
+ * Apresentado ao usuário para explicar as principais funcionalidades da plataforma:
+ * Exploração, Pesquisa, Cadastro, Filtros e Geolocalização.
+ * Essencial para reduzir a curva de aprendizado do usuário.
+ * @param {WelcomeModalProps} props - Propriedades do componente.
+ */
 export default function WelcomeModal({ isOpen, onClose }: WelcomeModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

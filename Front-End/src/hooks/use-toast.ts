@@ -1,13 +1,15 @@
+// src/hooks/use-toast.ts
 "use client"
 
-// Inspired by react-hot-toast library
+// Baseado na biblioteca react-hot-toast e adaptado para o Design System do projeto.
 import * as React from "react"
 
 import type {
   ToastActionElement,
   ToastProps,
-} from "@/src/components/ui/toast"
+} from "@/components/ui/toast"
 
+// Configurações de limite e tempo de vida das notificações
 const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 1000000
 
@@ -18,6 +20,7 @@ type ToasterToast = ToastProps & {
   action?: ToastActionElement
 }
 
+// Definição das ações possíveis no reducer
 const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
   UPDATE_TOAST: "UPDATE_TOAST",
@@ -74,11 +77,17 @@ const addToRemoveQueue = (toastId: string) => {
   toastTimeouts.set(toastId, timeout)
 }
 
+/**
+ * @function reducer
+ * @description Gerencia o estado da lista de Toasts (notificações).
+ * Lida com adição, atualização e remoção, garantindo que o limite de toasts na tela seja respeitado.
+ */
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "ADD_TOAST":
       return {
         ...state,
+        // Adiciona o novo toast e limita a lista ao TOAST_LIMIT
         toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT),
       }
 
@@ -93,8 +102,6 @@ export const reducer = (state: State, action: Action): State => {
     case "DISMISS_TOAST": {
       const { toastId } = action
 
-      // ! Side effects ! - This could be extracted into a dismissToast() action,
-      // but I'll keep it here for simplicity
       if (toastId) {
         addToRemoveQueue(toastId)
       } else {
@@ -142,6 +149,11 @@ function dispatch(action: Action) {
 
 type Toast = Omit<ToasterToast, "id">
 
+/**
+ * @function toast
+ * @description Função auxiliar para disparar notificações de qualquer lugar do código.
+ * Exemplo de uso: `toast({ title: "Sucesso", description: "Login realizado" })`
+ */
 function toast({ ...props }: Toast) {
   const id = genId()
 
@@ -171,6 +183,12 @@ function toast({ ...props }: Toast) {
   }
 }
 
+/**
+ * @hook useToast
+ * @description Hook customizado para acessar o sistema de notificações.
+ * Permite que componentes se inscrevam no estado de toasts e disparem novas mensagens.
+ * @returns {Object} Objeto contendo o estado atual (`toasts`) e a função de disparo (`toast`).
+ */
 function useToast() {
   const [state, setState] = React.useState<State>(memoryState)
 

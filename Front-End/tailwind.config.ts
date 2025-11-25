@@ -1,18 +1,24 @@
 // Front-End/tailwind.config.ts
 import type { Config } from "tailwindcss";
 
+/**
+ * @constant config
+ * @description Configuração do Tailwind CSS.
+ * Define onde o Tailwind deve procurar classes CSS (content) e estende o tema padrão
+ * com as variáveis de cores e animações utilizadas pelo Shadcn/UI e pelo design system do projeto.
+ */
 const config: Config = {
     darkMode: ["class"],
     content: [
-    // Caminhos atualizados para incluir a pasta 'src'
+    // Define os caminhos onde o Tailwind irá "escanear" por classes utilitárias
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/features/**/*.{js,ts,jsx,tsx,mdx}', // Adicionamos a pasta 'features'
+    './src/features/**/*.{js,ts,jsx,tsx,mdx}', // Importante: Inclui a pasta de features modulares
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
   	extend: {
-  		// ... (O resto do seu tema permanece o mesmo)
+  		// Definição de variáveis CSS para suporte a temas (Light/Dark mode)
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
@@ -53,6 +59,7 @@ const config: Config = {
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
+        // Animações customizadas para componentes interativos (Accordions, Dropdowns)
   		keyframes: {
   			'accordion-down': {
   				from: { height: '0' },

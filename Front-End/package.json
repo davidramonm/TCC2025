@@ -20,6 +20,7 @@
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "latest",
     "@radix-ui/react-tabs": "latest",
+    "@radix-ui/react-toast": "^1.2.15",
     "@tanstack/react-query": "^5.90.2",
     "autoprefixer": "^10.4.20",
     "axios": "^1.4.0",

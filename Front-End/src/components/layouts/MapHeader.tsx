@@ -1,25 +1,39 @@
+// Front-End/src/components/layouts/MapHeader.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { MapPin, Search, LogOut, LogIn, Settings } from "lucide-react";
+import { MapPin, LogOut, LogIn, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Separator } from "@/components/ui/separator";
-import { AvatarImage } from "@radix-ui/react-avatar";
+import { AvatarImage } from "@/components/ui/avatar"; 
 import SearchBar from "./SearchBar";
-import { on } from "events";
 import { Location } from "@/types";
 
 interface MapHeaderProps {
+  /** Termo de busca atual (controlled state) */
   searchTerm: string;
+  /** Função para atualizar o termo de busca */
   onSearchTermChange: (term: string) => void;
+  /** Função executada ao selecionar um local na busca */
   onGlobalSearch: (location: Location) => void;
+  /** Função de navegação para telas de login/cadastro */
   onNavigate: (view: "login") => void;
+  /** Função para abrir as configurações do usuário */
   onOpenSettings: () => void;
 }
 
+/**
+ * @component MapHeader
+ * @description Barra de navegação superior (Navbar).
+ * Responsabilidades:
+ * 1. Branding (Logo e Nome).
+ * 2. Hospedar a barra de busca (`SearchBar`).
+ * 3. Gerenciar o estado de autenticação visual (Botão Entrar vs Avatar do Usuário).
+ * 4. Menu de contexto do usuário (Popover) com opções de Perfil e Logout.
+ * @param {MapHeaderProps} props - Propriedades do componente.
+ */
 export default function MapHeader({
   searchTerm,
   onSearchTermChange,
@@ -32,6 +46,7 @@ export default function MapHeader({
 
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 shadow-sm z-20 relative">
+      {/* Identidade Visual */}
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-gradient-to-br from-gray-600 to-gray-800 rounded-full flex items-center justify-center">
           <MapPin className="w-5 h-5 text-white" />
@@ -41,27 +56,12 @@ export default function MapHeader({
         </h1>
       </div>
 
+      {/* Barra de Busca Centralizada */}
       <div className="flex-1 max-w-2xl mx-8 relative">
-
-        {/* <Search className="absolute left-4 w-4 h-4 text-gray-400 z-10" />
-          <Input
-            placeholder="Pesquisar por nome, endereço ou tipo de acessibilidade..."
-            className="pl-12 pr-12 border-0 bg-transparent focus:ring-0 h-10"
-            value={searchTerm}
-            onChange={(e) => onSearchTermChange(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && onGlobalSearch()}
-          />
-          <Button
-            size="sm"
-            className="rounded-full bg-gray-600 hover:bg-gray-700 h-8 px-3 absolute right-1"
-            onClick={onGlobalSearch}
-          >
-            <Search className="w-3 h-3" />
-          </Button> */}
         <SearchBar onSelectResult={(location) => onGlobalSearch(location)} />
-
       </div>
 
+      {/* Controles de Usuário */}
       <div className="flex items-center gap-3">
         {isLoggedIn ? (
           <>
@@ -70,27 +70,22 @@ export default function MapHeader({
               <PopoverTrigger asChild>
                 <Button variant="ghost" className="rounded-full w-9 h-9 p-0">
                   <Avatar className="w-9 h-9">
-                    {
-                      profileImage ? (
-                        <AvatarImage src={profileImage} alt={fullName} className="object-cover w-full h-full" />
-                      ) : (
-                        <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${fullName}`} alt={fullName} />
-                      )
-                    }
-
+                    {profileImage ? (
+                      <AvatarImage src={profileImage} alt={fullName} className="object-cover w-full h-full" />
+                    ) : (
+                      <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${fullName}`} alt={fullName} />
+                    )}
                   </Avatar>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80 mr-4" align="end">
                 <div className="flex flex-col items-center p-4">
                   <Avatar className="w-20 h-20 mb-2">
-                    {
-                      profileImage ? (
-                        <AvatarImage src={profileImage} alt={fullName} className="object-cover w-full h-full" />
-                      ) : (
-                        <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${fullName}`} alt={fullName} />
-                      )
-                    }
+                    {profileImage ? (
+                      <AvatarImage src={profileImage} alt={fullName} className="object-cover w-full h-full" />
+                    ) : (
+                      <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${fullName}`} alt={fullName} />
+                    )}
                   </Avatar>
                   <h2 className="text-lg font-semibold">{fullName}</h2>
                   <p className="text-sm text-muted-foreground">{email}</p>
